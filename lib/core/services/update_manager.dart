@@ -7,7 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class UpdateManager {
   static const String _versionUrl =
-      'https://dgharmohamed.github.io/IslamHome-App-distribution/version.json';
+      'https://raw.githubusercontent.com/DgharMohamed/IslamHome/main/version.json';
 
   static Future<void> check(BuildContext context) async {
     try {
