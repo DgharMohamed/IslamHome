@@ -56,63 +56,13 @@
 * **Localization:** Flexible system for multi-language support (i18n).
 
 ## 👨‍💻 Development | إعداد وتطوير
-* **Student Name / اسم الطالب:** (Your Name Here)
-* **University / الجامعة:** (Your University Here)
+* **Student Name / اسم الطالب:** Mohamed Dghar
+
 
 ---
 > [!NOTE]
 > This project represents the first version (Beta), and work is ongoing to make it the most comprehensive Islamic app.
 > يمثل هذا المشروع النسخة الأولية، والعمل مستمر لتحديثه ليكون التطبيق الإسلامي الأكثر شمولاً.
 
-
----
-
-## 🧪 Testing | الاختبارات
-
-### Automated Notification Testing | اختبار الإشعارات التلقائي
-
-تم إضافة نظام اختبار شامل لجميع أنظمة الإشعارات في التطبيق.
-
-#### Quick Start | البدء السريع
-
-```bash
-# تشغيل الاختبارات
-dart scripts/test_notifications.dart
-
-# مع تقارير HTML و JSON
-dart scripts/test_notifications.dart --html --json
-```
-
-#### What's Tested | ما يتم اختباره
-
-✅ **17 اختبار شامل:**
-- 📿 إشعارات أوقات الصلاة (4 اختبارات)
-- 🎵 إشعارات تشغيل القرآن (4 اختبارات)
-- 📥 إشعارات التحميل (3 اختبارات)
-- ⚡ اختبارات الأداء (2 اختبار)
-- 🔗 اختبارات التكامل (2 اختبار)
-- 🛡️ معالجة الأخطاء (2 اختبار)
-
-#### Documentation | التوثيق
-
-- 📖 [Quick Start Guide](QUICK_START_TESTING.md) - دليل البدء السريع
-- 📖 [Full Documentation](SCRIPTS_DOCUMENTATION.md) - التوثيق الكامل
-- 📖 [Script README](scripts/README_TEST_NOTIFICATIONS.md) - توثيق السكريبت
-
-#### VS Code Integration | التكامل مع VS Code
-
-يمكنك تشغيل الاختبارات مباشرة من VS Code:
-1. اضغط `Ctrl+Shift+P` (أو `Cmd+Shift+P` على Mac)
-2. اختر `Tasks: Run Task`
-3. اختر `🧪 Test Notifications`
-
-أو استخدم Debug panel (F5) واختر أحد التكوينات المتاحة.
-
-#### CI/CD Integration | التكامل مع CI/CD
-
-تم إضافة GitHub Actions workflow تلقائي:
-- يعمل عند Push أو Pull Request
-- يرفع التقارير كـ artifacts
-- يضيف تعليق بالنتائج على PR
 
 ---
