@@ -1,0 +1,394 @@
+[
+  {
+    "id": 1,
+    "title_ar": "المولد والنشأة",
+    "title_en": "Birth and Early Life",
+    "description_ar": "ولادة النبي ﷺ في عام الفيل وفترة يتمه ونشأته في بني سعد.",
+    "description_en": "The birth of the Prophet (PBUH) in the Year of the Elephant and his upbringing in Bani Sa'd.",
+    "icon": "baby_changing_station",
+    "year_label": "53 ق.هـ",
+    "content_ar": "ولد النبي محمد ﷺ في مكة المكرمة في الثاني عشر من ربيع الأول من عام الفيل (نحو 570م). مات أبوه عبد الله وهو جنين في بطن أمه آمنة بنت وهب. أُرسل إلى البادية لينشأ في بني سعد عند مرضعة تدعى حليمة السعدية، حيث وقعت حادثة شق الصدر. توفيت أمه وهو في السادسة، فكفله جده عبد المطلب ثم عمه أبو طالب.",
+    "content_en": "Prophet Muhammad (PBUH) was born in Makkah on the 12th of Rabi' al-Awwal in the Year of the Elephant (~570 CE). His father Abdullah died before he was born. He was sent to Halima al-Sa'diyya in Bani Sa'd, where the incident of the chest-opening occurred. His mother died when he was six; he was then raised by his grandfather Abdul-Muttalib, then by his uncle Abu Talib.",
+    "events_ar": [
+      "ولادته ﷺ عام الفيل في مكة المكرمة",
+      "إرضاعه عند حليمة السعدية في بادية بني سعد",
+      "حادثة شق الصدر وهو طفل صغير",
+      "وفاة أمه آمنة وهو في السادسة",
+      "كفالة جده عبد المطلب ثم عمه أبو طالب"
+    ],
+    "events_en": [
+      "Born in the Year of the Elephant in Makkah",
+      "Nursed by Halima al-Sa'diyya in the Bani Sa'd desert",
+      "The incident of chest-opening as a young child",
+      "Mother Amina passed away when he was six",
+      "Raised by his grandfather then uncle Abu Talib"
+    ],
+    "lesson_ar": "يتعلمنا موت والديه مبكراً أن الله يختار لأنبيائه ما يصهر شخصيتهم ويقوي توكلهم عليه سبحانه.",
+    "lesson_en": "The early loss of his parents teaches us that Allah shapes His prophets through trials, building reliance and strength of character."
+  },
+  {
+    "id": 2,
+    "title_ar": "شبابه ﷺ وزواجه",
+    "title_en": "Youth and Marriage",
+    "description_ar": "عمله في الرعي والتجارة، ولقبه بالصادق الأمين، وزواجه من خديجة.",
+    "description_en": "His work in trade, being known as 'The Trustworthy', and his marriage to Khadijah.",
+    "icon": "work_history",
+    "year_label": "28 ق.هـ",
+    "content_ar": "شبّ النبي ﷺ على مكارم الأخلاق، وعمل في رعي الغنم ثم في التجارة. اشتُهر بين قومه بـ 'الصادق الأمين'. في سن الخامسة والعشرين، خرج في تجارة للسيدة خديجة بنت خويلد إلى الشام. ولما رأت من أمانته وكرم أخلاقه رغبت في الزواج منه، فكانت أولى زوجاته وأم أولاده، وأول من آمن به من النساء.",
+    "content_en": "The Prophet (PBUH) grew up with the finest character, working as a shepherd and then in trade. He became known as 'Al-Amin' (The Trustworthy). At 25, he managed Khadijah's trade caravan to Syria. Impressed by his integrity, she proposed marriage. She became his first wife, mother of his children, and the first woman to embrace Islam.",
+    "events_ar": [
+      "عمله في رعي الغنم في طفولته",
+      "رحلة التجارة الأولى إلى الشام مع عمه أبو طالب وهو في الثانية عشرة",
+      "حضوره حلف الفضول لنصرة المظلومين",
+      "إدارته لتجارة خديجة إلى الشام في سن الخامسة والعشرين",
+      "زواجه من خديجة بنت خويلد رضي الله عنها"
+    ],
+    "events_en": [
+      "Shepherding as a child",
+      "First trade journey to Syria with uncle Abu Talib at age 12",
+      "Participated in Hilf al-Fudul to protect the oppressed",
+      "Managed Khadijah's trade caravan to Syria at age 25",
+      "Married Khadijah bint Khuwaylid (may Allah be pleased with her)"
+    ],
+    "lesson_ar": "في سيرته ﷺ قبل النبوة دليل على أن الكسب الحلال والأمانة في التجارة من أعظم القِيَم الإسلامية.",
+    "lesson_en": "His life before prophethood shows that honest livelihood and trustworthiness in trade are among the greatest Islamic values."
+  },
+  {
+    "id": 3,
+    "title_ar": "نزول الوحي",
+    "title_en": "The Revelation",
+    "description_ar": "بداية البعثة ونزول جبريل عليه السلام في غار حراء.",
+    "description_en": "The beginning of Prophethood and the descent of Angel Jibril in Cave Hira.",
+    "icon": "auto_awesome",
+    "year_label": "1 بعثة",
+    "content_ar": "عندما بلغ الأربعين، حبّب الله إليه التعبد في غار حراء. وفي ليلة السابع عشر من رمضان (حسب بعض الروايات)، نزل عليه الملك جبريل عليه السلام وضمّه ثلاث مرات ثم قال: 'اقرأ باسم ربك الذي خلق'. عاد النبي ﷺ وهو يرتجف إلى خديجة التي طمأنته وذهبت به إلى ورقة بن نوفل، الذي أخبره أنه نبي هذه الأمة وأنه سيُخرَج من مكة.",
+    "content_en": "At age 40, the Prophet retreated to Cave Hira for worship. On the 17th of Ramadan (per some narrations), Angel Jibril embraced him three times and revealed: 'Read in the name of your Lord who created.' He returned trembling to Khadijah, who reassured him and brought him to Waraqa ibn Nawfal, who confirmed he was the Prophet of this nation, and warned he would be driven from Makkah.",
+    "events_ar": [
+      "تحنثه في غار حراء قبل النبوة",
+      "نزول جبريل وأول آيات بسورة العلق",
+      "طمأنة خديجة له: 'كلا والله لا يخزيك الله أبداً'",
+      "لقاء ورقة بن نوفل وبشارته بالنبوة",
+      "فترة الفتور ثم استئناف الوحي بسورة المدثر"
+    ],
+    "events_en": [
+      "Seclusion in Cave Hira before prophethood",
+      "Jibril descends and reveals the first verses of Surah Al-Alaq",
+      "Khadijah comforts him: 'By Allah, He will never disgrace you'",
+      "Meeting Waraqa ibn Nawfal who confirms the prophethood",
+      "The pause of revelation, then its resumption with Surah Al-Muddaththir"
+    ],
+    "lesson_ar": "توضح هذه المرحلة أن الله يختار لرسالاته قلوباً تعبده في الخفاء، وأن الدعم العائلي ركن أساسي في مسيرة الدعوة.",
+    "lesson_en": "This stage shows Allah chooses for His message those who worship in private, and that family support is a cornerstone of any dawah journey."
+  },
+  {
+    "id": 4,
+    "title_ar": "الدعوة الجهرية والأذى",
+    "title_en": "Public Da'wah and Persecution",
+    "description_ar": "بدء دعوة قريش للإسلام وما واجهه من صد وابتلاء.",
+    "description_en": "Starting to call Quraysh to Islam and the subsequent opposition and persecution.",
+    "icon": "campaign",
+    "year_label": "4-13 بعثة",
+    "content_ar": "بعد ثلاث سنوات من الدعوة السرية، أُمر النبي ﷺ بالجهر. صعد الصفا ونادى في قريش، فواجهوه بالتكذيب والأذى. تعرّض المسلمون الأوائل كبلال وعمّار وصهيب لأشد العذاب. وحين اشتدّ الأذى، أذن النبي ﷺ للمستضعفين بالهجرة إلى الحبشة حيث أكرمهم النجاشي. بلغ الأذى ذروته حين حوصر النبي ﷺ وبنو هاشم في شعب أبي طالب ثلاث سنوات.",
+    "content_en": "After three years of secret calling, the Prophet (PBUH) was commanded to go public. He stood on Safa and addressed Quraysh, who responded with denial and harm. Early Muslims like Bilal, Ammar, and Suhaib faced severe torture. The Prophet permitted the persecuted to emigrate to Ethiopia, where the Negus King treated them honorably. The persecution peaked with the three-year siege of Banu Hashim in Shi'b Abi Talib.",
+    "events_ar": [
+      "الدعوة على الصفا وإعلان التوحيد لقريش",
+      "تعذيب المستضعفين: بلال وعمار وسمية وصهيب",
+      "الهجرة الأولى والثانية إلى الحبشة",
+      "حصار شعب أبي طالب لمدة ثلاث سنوات",
+      "عام الحزن: وفاة خديجة وأبو طالب"
+    ],
+    "events_en": [
+      "Calling from Safa mountain, declaring monotheism to Quraysh",
+      "Torture of the weak: Bilal, Ammar, Sumayyah, Suhaib",
+      "First and second emigrations to Ethiopia (Abyssinia)",
+      "Three-year siege in Shi'b Abi Talib",
+      "The Year of Sorrow: deaths of Khadijah and Abu Talib"
+    ],
+    "lesson_ar": "الصمود أمام الأذى والتخطيط الحكيم (كالهجرة إلى الحبشة) من أبرز دروس هذه المرحلة لكل داعٍ إلى الله.",
+    "lesson_en": "Perseverance under persecution and wise planning (like the Ethiopia emigration) are key lessons from this stage for every caller to Allah."
+  },
+  {
+    "id": 5,
+    "title_ar": "الإسراء والمعراج",
+    "title_en": "Isra and Mi'raj",
+    "description_ar": "الرحلة المعجزة من المسجد الحرام إلى المسجد الأقصى ثم إلى السماوات العلا.",
+    "description_en": "The miraculous night journey from Makkah to Jerusalem and then ascension to the Heavens.",
+    "icon": "nights_stay",
+    "year_label": "11 بعثة",
+    "content_ar": "بعد عام الحزن (وفاة خديجة وأبو طالب)، أكرم الله نبيه برحلة الإسراء والمعراج. أُسري به ليلاً من المسجد الحرام إلى المسجد الأقصى على البُراق، ثم عُرج به إلى السماوات السبع. التقى بالأنبياء: إبراهيم وموسى وعيسى وغيرهم. وصل إلى سدرة المنتهى، وفُرضت عليه الصلوات الخمس. عاد في نفس الليلة كتثبيت من الله.",
+    "content_en": "Following the Year of Sorrow, Allah honored the Prophet with the Night Journey. He was transported on Buraq from the Sacred Mosque to Al-Aqsa, then ascended through the seven heavens. He met the prophets: Ibrahim, Musa, Isa and others. He reached Sidrat al-Muntaha, and the five daily prayers were ordained. He returned the same night as a divine gift of comfort.",
+    "events_ar": [
+      "الإسراء من المسجد الحرام إلى المسجد الأقصى على البُراق",
+      "الصلاة بالأنبياء إماماً في المسجد الأقصى",
+      "العروج إلى السماوات السبع والتعرف على الأنبياء",
+      "فرض الصلوات الخمسين ثم تخفيفها إلى خمس بشفاعة سيدنا موسى",
+      "رجوعه ﷺ في نفس الليلة وتكذيب قريش له"
+    ],
+    "events_en": [
+      "Night journey from Makkah to Al-Aqsa Mosque on Buraq",
+      "Led all prophets in prayer at Al-Aqsa",
+      "Ascension through the seven heavens, meeting the prophets",
+      "Fifty prayers ordained then reduced to five through Moses' intercession",
+      "Returned the same night; Quraysh disbelieved the account"
+    ],
+    "lesson_ar": "الإسراء والمعراج تثبيت ربّاني للنبي ﷺ في أحلك لحظاته ودليل على أن بعد كل شدة فرجاً.",
+    "lesson_en": "Isra and Mi'raj was a divine comfort for the Prophet in his darkest times, and a sign that after every hardship comes ease."
+  },
+  {
+    "id": 6,
+    "title_ar": "الهجرة إلى المدينة",
+    "title_en": "The Hijrah to Madinah",
+    "description_ar": "خروج النبي ﷺ وأبو بكر إلى يثرب وتأسيس الدولة الإسلامية.",
+    "description_en": "The emigration with Abu Bakr to Yathrib and the founding of the Islamic State.",
+    "icon": "flight_takeoff",
+    "year_label": "1 هـ",
+    "content_ar": "بعد اشتداد الأذى وتآمر قريش على قتله ﷺ، أذن الله له بالهجرة سراً مع أبي بكر الصديق. استطاع الخروج من بيته ليلاً والمشركون ينامون عند بابه. اختبأ في غار ثور ثلاثة أيام ثم اتجه نحو المدينة. استُقبِل بالمدينة بالترحاب والأناشيد. فور وصوله بنى المسجد النبوي وآخى بين المهاجرين والأنصار، وأصدر وثيقة المدينة التي نظمت الحياة المدنية.",
+    "content_en": "After Quraysh plotted to kill him, Allah permitted the Hijrah. He escaped from his home at night while the polytheists slept at his door. He hid with Abu Bakr in Cave Thawr for three days, then headed to Madinah. He was received with immense joy. He immediately built the Prophet's Mosque, established brotherhood between Muhajirun and Ansar, and drafted the Constitution of Madinah.",
+    "events_ar": [
+      "مؤامرة قريش على قتله ﷺ ليلة الهجرة",
+      "خروجه ﷺ بمعجزة وهو يتلو سورة يس",
+      "الاختباء في غار ثور ثلاثة أيام",
+      "الرحلة الشاقة إلى المدينة برفقة دليل مشرك",
+      "الوصول إلى قباء وبناء أول مسجد في الإسلام",
+      "تأسيس المسجد النبوي والمؤاخاة بين المهاجرين والأنصار"
+    ],
+    "events_en": [
+      "Quraysh's plot to assassinate him on the night of Hijrah",
+      "His miraculous exit while reciting Surah Yaseen",
+      "Three-day hideout in Cave Thawr",
+      "The arduous journey to Madinah with a non-Muslim guide",
+      "Arrival at Quba and building the first mosque in Islam",
+      "Founding the Prophet's Mosque and the Brotherhood of Muhajirun-Ansar"
+    ],
+    "lesson_ar": "الهجرة تعلمنا أن الثقة بالله والتخطيط الدقيق يجتمعان ولا يتعارضان في سيرة النبي ﷺ.",
+    "lesson_en": "The Hijrah teaches us that trusting Allah and meticulous planning go hand in hand in the Prophet's biography."
+  },
+  {
+    "id": 7,
+    "title_ar": "غزوة بدر الكبرى",
+    "title_en": "The Battle of Badr",
+    "description_ar": "أول معركة فاصلة بين الحق والباطل ونصر المسلمين العظيم.",
+    "description_en": "The first major decisive battle and the great victory of the Muslims.",
+    "icon": "shield",
+    "year_label": "2 هـ",
+    "content_ar": "في السابع عشر من رمضان من العام الثاني للهجرة، بدأت المعركة بالقرب من بئر بدر. كان المسلمون 313 رجلاً واجهوا جيشاً قوامه نحو 1000 مقاتل من قريش بقيادة أبي جهل. أيّد الله المؤمنين بالملائكة، فسقط 70 من قادة قريش قتلى و70 أسيراً، ولم يُستشهد من المسلمين إلا 14. كانت بدر يوم الفرقان الذي أعزّ الله به الإسلام.",
+    "content_en": "On the 17th of Ramadan, 2 AH, the battle began near the wells of Badr. The Muslims were 313 men against ~1,000 Quraysh fighters led by Abu Jahl. Allah supported the believers with angels. Seventy of Quraysh's leaders were killed and 70 captured; only 14 Muslims were martyred. Badr became the Day of Furqan, the day Allah honored Islam.",
+    "events_ar": [
+      "الخروج الأصلي لاعتراض قافلة تجارية لقريش",
+      "نزول المطر ليلة المعركة ليثبت الأقدام ويزيل الوسواس",
+      "دعاء النبي ﷺ المشهور: 'اللهم إن تهلك هذه العصابة لا تُعبد'",
+      "نزول الملائكة عوناً للمسلمين",
+      "مقتل أبي جهل وكبار قريش",
+      "التعامل الكريم مع الأسرى وإطلاق سراحهم بالفدية"
+    ],
+    "events_en": [
+      "Original mission to intercept a Quraysh trade caravan",
+      "Rain fell the night before the battle, firming the ground",
+      "The Prophet's famous supplication: 'O Allah, if this group perishes, You will not be worshipped'",
+      "Angels descended to assist the Muslims",
+      "Killing of Abu Jahl and Quraysh's leaders",
+      "Honorable treatment of prisoners and their release by ransom"
+    ],
+    "lesson_ar": "بدر علّمتنا أن النصر من الله وحده، وأن الاستعداد الجيد مع التوكل والدعاء هو منهج المؤمن في مواجهة التحديات.",
+    "lesson_en": "Badr teaches us that victory comes from Allah alone, and that solid preparation combined with supplication is the believer's approach to every challenge."
+  },
+  {
+    "id": 8,
+    "title_ar": "غزوة أحد",
+    "title_en": "The Battle of Uhud",
+    "description_ar": "الابتلاء الذي حل بالمسلمين في أحد وأهمية طاعة القائد.",
+    "description_en": "The trial at Uhud and the critical lesson of obeying the commander.",
+    "icon": "terrain",
+    "year_label": "3 هـ",
+    "content_ar": "في شوال من العام الثالث للهجرة، خرجت قريش تطلب الثأر من بدر بثلاثة آلاف مقاتل. وقف النبي ﷺ على جبل أحد وأمر خمسين رامياً بحماية ظهر الجيش وعدم مغادرة مواضعهم مهما حدث. بدأت المعركة بنصر للمسلمين، لكن الرماة خالفوا الأمر ونزلوا للغنائم، فالتف خالد بن الوليد وهاجم الجيش من الخلف. استُشهد سيد الشهداء حمزة بن عبد المطلب، وجُرح النبي ﷺ في وجهه وكُسرت رباعيّته.",
+    "content_en": "In Shawwal, 3 AH, Quraysh marched with 3,000 fighters seeking revenge for Badr. The Prophet stationed 50 archers on a hill, strictly ordering them not to leave regardless of outcome. The Muslims initially prevailed, but the archers disobeyed and descended for booty. Khalid ibn al-Walid outflanked the army. Hamza, the Master of Martyrs, was killed, and the Prophet was wounded and had a tooth broken.",
+    "events_ar": [
+      "خروج قريش بثلاثة آلاف مقاتل للانتقام من بدر",
+      "أمر النبي ﷺ للرماة بعدم مغادرة مواضعهم",
+      "الانتصار الأولي للمسلمين وفرار قريش",
+      "نزول الرماة من مواضعهم طمعاً في الغنائم",
+      "هجوم خالد بن الوليد من الخلف وانقلاب المعركة",
+      "استشهاد حمزة بن عبد المطلب وسبعين من الصحابة"
+    ],
+    "events_en": [
+      "Quraysh marching with 3,000 to avenge Badr",
+      "Prophet's strict orders to the archers to hold position",
+      "Initial Muslim victory and Quraysh's flight",
+      "Archers descend from their posts for spoils",
+      "Khalid's flanking attack and the reversal of fortune",
+      "Martyrdom of Hamza and 70 companions"
+    ],
+    "lesson_ar": "أحد درس خالد في التاريخ: إن الانضباط وطاعة القيادة أساس النصر وخروج عنها يکلّف الأمة ثمناً باهظاً.",
+    "lesson_en": "Uhud is history's eternal lesson: discipline and obedience to leadership are the foundation of victory, and departing from them costs the nation dearly."
+  },
+  {
+    "id": 9,
+    "title_ar": "غزوة الخندق",
+    "title_en": "The Battle of the Trench",
+    "description_ar": "تحالف الأحزاب لاجتثاث الإسلام وحفر الخندق بعبقرية سلمان الفارسي.",
+    "description_en": "The allied confederates' siege and the ingenious trench strategy by Salman al-Farisi.",
+    "icon": "landscape",
+    "year_label": "5 هـ",
+    "content_ar": "في شوال من العام الخامس، تحالفت قبائل عربية ويهودية في جيش ضخم قوامه عشرة آلاف مقاتل لاجتثاث الإسلام من جذوره. اقترح سلمان الفارسي حفر خندق حول المدينة وهو أسلوب لم تعرفه العرب. استمر الحصار نحو شهر والمسلمون في ضيق شديد، حتى أرسل الله عليهم ريحاً وجنوداً لا تُرى فانهزم الأحزاب وولّوا.",
+    "content_en": "In Shawwal, 5 AH, Arab and Jewish tribes formed a massive coalition of 10,000 fighters to uproot Islam. Salman al-Farisi suggested digging a trench around Madinah, a strategy unknown to Arabs. The siege lasted about a month in great hardship until Allah sent a fierce wind and invisible troops, dispersing the Confederates.",
+    "events_ar": [
+      "تحالف الأحزاب من قريش وغطفان وبني النضير ضد المسلمين",
+      "اقتراح سلمان الفارسي حفر الخندق",
+      "مشاركة النبي ﷺ في الحفر بنفسه",
+      "المعجزة: تكثير الطعام القليل لإطعام الصحابة",
+      "إرسال الله الريح والملائكة لتفريق الأحزاب",
+      "غزوة بني قريظة بعدها إثر خيانتهم للعهد"
+    ],
+    "events_en": [
+      "Coalition of Quraysh, Ghatafan, and Banu Nadir against Muslims",
+      "Salman al-Farisi proposes digging the trench",
+      "The Prophet himself participates in digging",
+      "Miracle: little food multiplied to feed the companions",
+      "Allah sends the wind and angels to disperse the Confederates",
+      "Battle of Banu Qurayza after their betrayal of the covenant"
+    ],
+    "lesson_ar": "الخندق تعلمنا أن الإبداع والابتكار من فقه الجهاد، وأن النصر يأتي بالصمود حتى يأتي نصر الله.",
+    "lesson_en": "The Trench teaches us that creativity and innovation are part of strategic wisdom in Islam, and that victory comes through perseverance until Allah's help arrives."
+  },
+  {
+    "id": 10,
+    "title_ar": "صلح الحديبية",
+    "title_en": "The Treaty of Hudaybiyyah",
+    "description_ar": "الهدنة التي بدت هزيمة وكانت فتحاً مبيناً وتحولاً استراتيجياً.",
+    "description_en": "The apparent defeat that turned out to be a clear victory and a strategic turning point.",
+    "icon": "handshake",
+    "year_label": "6 هـ",
+    "content_ar": "في ذي القعدة من العام السادس، خرج النبي ﷺ مع نحو 1400 صحابي لأداء العمرة، فصدّتهم قريش عند الحديبية. أرسل النبي ﷺ عثمان بن عفان سفيراً، وحين تأخّر أشيع أنه قُتل فبايع الصحابة النبي تحت الشجرة (بيعة الرضوان). ثم جاء الصلح بشروط بدت ثقيلة: رد المسلم القادم من مكة وعدم رد المشرك. لكن الله أنزل عن الإيمان أنه فتح مبين.",
+    "content_en": "In Dhul Qi'dah, 6 AH, the Prophet and ~1,400 companions headed to perform Umrah but were stopped at Hudaybiyyah by Quraysh. He sent Uthman ibn Affan as an envoy; when his return was delayed, a rumor spread he was killed, leading to the companions pledging allegiance under a tree (Bay'at al-Ridwan). A treaty followed with seemingly harsh terms: return Muslim arrivals but not Quraysh defectors. Yet Allah declared it a clear victory.",
+    "events_ar": [
+      "خروج النبي ﷺ والصحابة بنية العمرة دون سلاح",
+      "صدّ قريش لهم عند الحديبية",
+      "سفارة عثمان بن عفان وتأخره",
+      "بيعة الرضوان تحت الشجرة",
+      "بنود الصلح وموقف عمر بن الخطاب",
+      "نزول سورة الفتح تبشيراً بالنصر القريب"
+    ],
+    "events_en": [
+      "Departure with the intention of Umrah, unarmed",
+      "Blocked by Quraysh at Hudaybiyyah",
+      "Uthman ibn Affan sent as envoy and his delay",
+      "Bay'at al-Ridwan (pledge of satisfaction) under the tree",
+      "Treaty terms and Umar ibn al-Khattab's concerns",
+      "Revelation of Surah Al-Fath heralding imminent victory"
+    ],
+    "lesson_ar": "الحديبية أعظم مثال على أن الحكمة والمرونة في السياسة الشرعية قد تبلغ من النصر ما لا تبلغه السيوف.",
+    "lesson_en": "Hudaybiyyah is the greatest example that wisdom and flexibility in Islamic policy can achieve victories that even swords cannot."
+  },
+  {
+    "id": 11,
+    "title_ar": "فتح مكة",
+    "title_en": "The Conquest of Makkah",
+    "description_ar": "العودة المظفرة إلى مكة وتطهير الكعبة من الأصنام.",
+    "description_en": "The triumphant return to Makkah and cleansing the Kaaba of idols.",
+    "icon": "castle",
+    "year_label": "8 هـ",
+    "content_ar": "في رمضان من العام الثامن، بعد نقض قريش لصلح الحديبية، دخل النبي ﷺ مكة بجيش قوامه عشرة آلاف مقاتل. دخلها متواضعاً رأسه ساجد لله شكراً. وقف عند الكعبة وأعلن العفو العام بقوله: 'يا معشر قريش ما تظنون أني فاعل بكم؟ اذهبوا فأنتم الطلقاء'. حطّم 360 صنماً حول الكعبة، ودخل الناس في دين الله أفواجاً.",
+    "content_en": "In Ramadan, 8 AH, after Quraysh broke the Hudaybiyyah treaty, the Prophet entered Makkah with 10,000 fighters. He entered humbly, head bowed in gratitude. At the Kaaba he declared a general amnesty: 'O Quraysh, what do you think I will do with you? Go, for you are free.' He destroyed 360 idols and people entered the religion of Allah in multitudes.",
+    "events_ar": [
+      "نقض قريش لصلح الحديبية بمهاجمة حلفاء النبي ﷺ",
+      "دخول مكة من أربعة محاور دون قتال يُذكر",
+      "دخوله ﷺ الكعبة وإزالة الأصنام والصور",
+      "العفو العام عن أهل مكة بمن فيهم ألدّ الأعداء",
+      "خطبته ﷺ في المسجد الحرام معلناً المبادئ الإسلامية"
+    ],
+    "events_en": [
+      "Quraysh violates the treaty by attacking the Prophet's allies",
+      "Entry into Makkah from four directions with minimal resistance",
+      "Entering the Kaaba and removing all idols and images",
+      "General amnesty for all Makkans including staunchest enemies",
+      "His sermon at the Sacred Mosque proclaiming Islamic principles"
+    ],
+    "lesson_ar": "فتح مكة يجسّد قمة الرحمة والعفو في السيرة النبوية: إن أعظم النصر ليس بالبطش بل بالعفو.",
+    "lesson_en": "The Conquest of Makkah embodies the pinnacle of mercy in the Prophet's biography: the greatest victory is not in vengeance, but in forgiveness."
+  },
+  {
+    "id": 12,
+    "title_ar": "غزوة حنين والطائف",
+    "title_en": "Battle of Hunayn and Taif",
+    "description_ar": "غرور النصر وعودة التوكل على الله في أحلك لحظات الهزيمة.",
+    "description_en": "The pride after victory and the return to reliance on Allah in the darkest moment.",
+    "icon": "forest",
+    "year_label": "8 هـ",
+    "content_ar": "بعد فتح مكة مباشرة، تحالفت قبيلتا هوازن وثقيف لمواجهة الجيش الإسلامي. كان المسلمون يبلغون اثني عشر ألفاً فأخذتهم العُجب. فجأة انقضّ العدو من مضايق حنين بكثافة فانهزم كثيرون، وثبت النبي ﷺ على بغلته يقاتل وهو ينادي: 'أنا النبي لا كذب، أنا ابن عبد المطلب'. جمع الله المسلمين وانتصروا. لاحقاً حاصر الطائف دون أن يفتحها وانصرف حكمةً.",
+    "content_en": "Right after Makkah's conquest, the Hawazin and Thaqif tribes allied against the Muslims. With 12,000 fighters, some were overcome by pride. Suddenly enemies ambushed from Hunayn's valleys and many fled. The Prophet stood firm on his mule, calling out: 'I am the Prophet, no lie, I am the son of Abdul-Muttalib.' Allah rallied the Muslims and they won. He later besieged Taif but withdrew wisely without conquering it.",
+    "events_ar": [
+      "اتحاد هوازن وثقيف لمواجهة الجيش الإسلامي",
+      "الاندفاع الأولي للمسلمين وثقة بعضهم الزائدة",
+      "الكمين المفاجئ وانهزام أكثر المسلمين",
+      "ثبات النبي ﷺ ومناداته الصحابة بالرجوع",
+      "تجمّع المسلمين ونصر الله لهم",
+      "حصار الطائف والانصراف عنها حكمةً"
+    ],
+    "events_en": [
+      "Coalition of Hawazin and Thaqif against the Islamic army",
+      "Initial Muslim charge and the overconfidence of some",
+      "Sudden ambush and the retreat of most Muslims",
+      "The Prophet's steadfastness, calling companions back",
+      "Muslim rally and Allah's victory",
+      "Siege of Taif and the wise decision to withdraw"
+    ],
+    "lesson_ar": "حنين تعلمنا أن كثرة العدد لا تُغني عن التوكل على الله، وأن الغرور أخطر عدو يواجهه المؤمن.",
+    "lesson_en": "Hunayn teaches us that large numbers are no substitute for reliance on Allah, and that pride is the most dangerous enemy a believer faces."
+  },
+  {
+    "id": 13,
+    "title_ar": "حجة الوداع",
+    "title_en": "The Farewell Pilgrimage",
+    "description_ar": "آخر حجة للنبي ﷺ وخطبته الجامعة التي وضع فيها ميثاق الإنسانية.",
+    "description_en": "The Prophet's last Hajj and his comprehensive sermon that set a charter for humanity.",
+    "icon": "mosque",
+    "year_label": "10 هـ",
+    "content_ar": "في ذي الحجة من العام العاشر للهجرة، حج النبي ﷺ في أول حجة له ومعه أكثر من مائة ألف من المسلمين. خطب في الناس خطبة الوداع التاريخية في عرفات أوصى فيها بالنساء خيراً، ونهى عن الربا والظلم والدماء، وأكد على الأخوة الإسلامية. وفيها نزلت: 'الْيَوْمَ أَكْمَلْتُ لَكُمْ دِينَكُمْ'. سأل الجموع: 'هل بلّغتُ؟' فأجابوا: 'اللهم نعم'.",
+    "content_en": "In Dhul Hijjah, 10 AH, the Prophet performed his only Hajj, accompanied by over 100,000 Muslims. He delivered the historic Farewell Sermon at Arafat, emphasizing women's rights, prohibiting usury and injustice, affirming Islamic brotherhood. The verse 'Today I have perfected your religion' was revealed. He asked the crowd: 'Have I conveyed the message?' They replied: 'O Allah, yes!'",
+    "events_ar": [
+      "أول وآخر حجة للنبي ﷺ مع أكثر من مائة ألف صحابي",
+      "خطبة عرفات التاريخية وبنودها العظيمة",
+      "نزول آية إكمال الدين في يوم عرفة",
+      "حديث الثقلين: 'تركت فيكم كتاب الله وسنتي'",
+      "إشارته ﷺ إلى قرب لقاء ربه"
+    ],
+    "events_en": [
+      "First and only Hajj of the Prophet with 100,000+ companions",
+      "Historic Arafat sermon and its magnificent principles",
+      "Revelation of the verse perfecting the religion on the Day of Arafat",
+      "Hadith of the Two Weighty Things: 'I leave you the Book of Allah and my Sunnah'",
+      "His indication of his imminent return to his Lord"
+    ],
+    "lesson_ar": "خطبة الوداع هي دستور الحضارة الإسلامية: حقوق الإنسان والمرأة والعدالة الاجتماعية قبل أن تعرفها الإنسانية.",
+    "lesson_en": "The Farewell Sermon is the constitution of Islamic civilization: human rights, women's rights, and social justice, centuries before humanity recognized them."
+  },
+  {
+    "id": 14,
+    "title_ar": "وفاة النبي ﷺ",
+    "title_en": "The Passing of the Prophet",
+    "description_ar": "لحظات الوداع وانتقال النبي ﷺ إلى الرفيق الأعلى في المدينة.",
+    "description_en": "The final moments and the passing of the Prophet (PBUH) in Madinah.",
+    "icon": "favorite",
+    "year_label": "11 هـ",
+    "content_ar": "في ربيع الأول من العام الحادي عشر للهجرة، اشتدّ المرض بالنبي ﷺ بعد أن لدّه أهله دواءً في مرضه فغضب ﷺ وأمر بأن يُلدّ كل من في البيت. صلّى بالناس حتى ثقُل عليه المشي، فأمر أبا بكر بالإمامة. في الثاني عشر من ربيع الأول، رفع يده وقال: 'الرفيق الأعلى'. زلزل موته المسلمين حتى أعلن عمر أنه لم يمت، فخطب أبو بكر قائلاً: 'من كان يعبد محمداً فإن محمداً قد مات، ومن كان يعبد الله فإن الله حي لا يموت'.",
+    "content_en": "In Rabi al-Awwal, 11 AH, the Prophet's illness intensified. He continued leading prayer until he could no longer walk, then instructed Abu Bakr to lead. On the 12th of Rabi' al-Awwal, he raised his hand and said: 'To the Highest Companion.' His death shook the Muslims; Umar declared he had not died, so Abu Bakr proclaimed: 'Whoever worshipped Muhammad, know he has died. Whoever worshipped Allah, know that Allah is Ever-Living and never dies.'",
+    "events_ar": [
+      "بدء مرضه ﷺ بعد غزوة ذات السلاسل وفي أيام قبل وفاته",
+      "إمامة أبي بكر بالناس بأمر النبي ﷺ",
+      "رفع الستار ونظرته الأخيرة الابتسامة إلى الصحابة في الصلاة",
+      "وفاته ﷺ في الثاني عشر من ربيع الأول عن 63 عاماً",
+      "خطبة أبي بكر الخالدة بعد وفاته",
+      "دفنه ﷺ في موضع وفاته في بيت عائشة"
+    ],
+    "events_en": [
+      "Onset of his final illness before his passing",
+      "Abu Bakr leading prayers by the Prophet's command",
+      "Lifting the curtain to smile at the companions praying",
+      "His passing on the 12th of Rabi' al-Awwal at age 63",
+      "Abu Bakr's immortal speech after his death",
+      "Burial in the same place he passed away, in Aisha's room"
+    ],
+    "lesson_ar": "وفاته ﷺ تعلمنا أن كل نفس ذائقة الموت، وأن الرسالة لا تموت بموت صاحبها بل تستمر في كل من يحمل روح سنته.",
+    "lesson_en": "His passing teaches us that every soul shall taste death, and that the message never dies with its bearer but lives in all who carry the spirit of his Sunnah."
+  }
+]

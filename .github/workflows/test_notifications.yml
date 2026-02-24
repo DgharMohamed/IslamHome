@@ -1,0 +1,63 @@
+name: Test Notifications
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'lib/services/notification_service.dart'
+      - 'lib/services/quran_audio_handler.dart'
+      - 'lib/services/download_service.dart'
+      - 'scripts/test_notifications.dart'
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: اختبار أنظمة الإشعارات
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Dart
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: stable
+    
+    - name: Run notification tests
+      run: |
+        chmod +x scripts/run_tests.sh
+        ./scripts/run_tests.sh
+    
+    - name: Upload test reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-reports
+        path: |
+          test_notifications_report_*.txt
+          test_notifications_report_*.html
+          test_notifications_report_*.json
+        retention-days: 30
+    
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const reportFiles = fs.readdirSync('.')
+            .filter(f => f.startsWith('test_notifications_report_') && f.endsWith('.txt'));
+          
+          if (reportFiles.length > 0) {
+            const report = fs.readFileSync(reportFiles[0], 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 📊 نتائج اختبار الإشعارات\n\n\`\`\`\n${report}\n\`\`\``
+            });
+          }

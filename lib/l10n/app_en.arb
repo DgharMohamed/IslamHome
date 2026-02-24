@@ -1,0 +1,649 @@
+{
+  "appTitle": "Islam Home",
+  "goodMorning": "Good Morning",
+  "goodAfternoon": "Good Afternoon",
+  "goodNight": "Good Night",
+  "prayerTimes": "Prayer Times",
+  "dailyVerse": "Daily Verse",
+  "khatmaProgress": "Khatma Progress",
+  "reachedSurah": "Reached Surah {surah}",
+  "@reachedSurah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreSections": "Explore Sections",
+  "quranMushaf": "Holy Quran",
+  "quranTitle": "The Holy Quran",
+  "quranSubtitle": "Tafsir, Reading & translation",
+  "quranSyncTitle": "Audio-Read Quran",
+  "quranSyncSubtitle": "Sync recitation with text",
+  "propheticHadith": "Prophetic Hadiths",
+  "hadithOfTheDay": "Hadith of the Day",
+  "azkarDuas": "Azkar and Duas",
+  "adhkarOfTheDay": "Daily Adhkar",
+  "radioLive": "Radio & Live",
+  "favoriteReciters": "Favorite Reciters",
+  "viewAll": "View All",
+  "settings": "Settings",
+  "notificationsAthan": "Notifications & Athan",
+  "athanNotifications": "Athan Notifications",
+  "enabledForAll": "Enabled for all prayers",
+  "disabled": "Disabled",
+  "appearanceLanguage": "Appearance & Language",
+  "darkMode": "Dark Mode",
+  "darkModeSubtitle": "Always enabled for eye comfort",
+  "appLanguage": "App Language",
+  "juzMarkers": "Show Juz Markers",
+  "juzMarkersSubtitle": "Display transition badges between Quran parts",
+  "arabic": "Arabic",
+  "aboutApp": "About App",
+  "appVersion": "App Version",
+  "shareApp": "Share App",
+  "rateApp": "Rate App",
+  "selectLanguage": "Select Language",
+  "english": "English",
+  "globalSearch": "Global Search",
+  "searchSurah": "Search surah...",
+  "downloadAll": "Download All",
+  "favorites": "Favorites",
+  "downloads": "Downloads",
+  "quranText": "Quran Text",
+  "tasbeeh": "Tasbeeh",
+  "liveTv": "Live TV",
+  "videos": "Prophetic Biography",
+  "books": "Books",
+  "nextPrayer": "Next Prayer",
+  "currentLocation": "Current Location",
+  "qibla": "Qibla",
+  "fajr": "Fajr",
+  "dhuhr": "Dhuhr",
+  "history": "History",
+  "mushaf": "Holy Mushaf",
+  "pageSavedAsBookmark": "Page {page} saved as bookmark",
+  "readingModeText": "Text Reading Mode",
+  "pageXOf604": "Page {page} of 604",
+  "lastReadMushaf": "Last Read (Page {page})",
+  "@lastReadMushaf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "lastReadAyah": "Last Read ({surah} : {ayah})",
+  "@lastReadAyah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "String"
+      }
+    }
+  },
+  "mushafWithPage": "Holy Mushaf (Page {page})",
+  "@mushafWithPage": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "previous": "Previous",
+  "index": "Index",
+  "next": "Next",
+  "errorLoadingPage": "Error loading page",
+  "surahIndex": "Surah Index",
+  "errorLoadingSurahs": "Error loading surahs",
+  "meccan": "Meccan",
+  "medinan": "Medinan",
+  "ayahsCount": "{count} Ayahs",
+  "pageN": "Page {page}",
+  "showMushaf": "Show Mushaf",
+  "selectTranslation": "Select Translation",
+  "selectTafsir": "Select Tafsir",
+  "chooseTranslation": "Choose Translation",
+  "chooseTafsir": "Choose Tafsir",
+  "chooseSurah": "Choose Surah",
+  "verseN": "Verse {number}",
+  "noTafsirAvailable": "No tafsir available currently",
+  "asr": "Asr",
+  "maghrib": "Maghrib",
+  "isha": "Isha",
+  "noBookmarkSaved": "No bookmark saved",
+  "hadithBooks": "Hadith Books",
+  "nineBooksOfSunnah": "Nine Books of Sunnah",
+  "hadithCount": "{count} Hadith",
+  "page": "Page {number}",
+  "noHadithsAvailableOffline": "No hadiths available offline for this book.\nPlease connect to the internet to download.",
+  "azkar": "Azkar",
+  "duas": "Duas",
+  "selectedDuas": "Selected Duas",
+  "dailyMuslimAzkar": "Daily Muslim Azkar",
+  "morningAzkar": "Morning Azkar",
+  "eveningAzkar": "Evening Azkar",
+  "sleepAzkar": "Sleep Azkar",
+  "wakeUpAzkar": "Wake up Azkar",
+  "mosqueAzkar": "Mosque Azkar",
+  "adhanAzkar": "Adhan Azkar",
+  "wuduAzkar": "Wudu Azkar",
+  "propheticDuas": "Prophetic Duas",
+  "quranDuas": "Quran Duas",
+  "prophetsDuas": "Prophets Duas",
+  "miscellaneousAzkar": "Miscellaneous Azkar",
+  "done": "Done",
+  "startingDownloadAll": "Starting to download all surahs...",
+  "downloadCompleted": "Completed downloading {count} surahs",
+  "@downloadCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchSurah": "Search for surah...",
+  "surahNumber": "Surah No. {number}",
+  "@surahNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "recitationOf": "Recitation of {name}",
+  "@recitationOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "nowPlaying": "Now Playing...",
+  "reciterLabel": "Reciter",
+  "verseOfTheDay": "Verse of the Day",
+  "dailyVerseText": "Indeed, with hardship comes ease * Indeed, with hardship comes ease",
+  "prayerTimesTitle": "Prayer Times",
+  "noPrayerTimesFound": "No prayer times found for these inputs",
+  "cityLabel": "City",
+  "countryLabel": "Country",
+  "updateTimesButton": "Update Times",
+  "prayerTimeError": "Error occurred: {error}",
+  "fajr": "Fajr",
+  "sunrise": "Sunrise",
+  "dhuhr": "Dhuhr",
+  "asr": "Asr",
+  "maghrib": "Maghrib",
+  "isha": "Isha",
+  "nowListening": "Now Listening",
+  "sleepTimer": "Sleep Timer",
+  "share": "Share",
+  "comingSoon": "{feature} will be enabled soon",
+  "startingDownload": "Starting download...",
+  "downloadingSurah": "Downloading {surah}...",
+  "@downloadingSurah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadSuccessful": "Download successful",
+  "downloadFailed": "Download failed: {error}",
+  "downloaded": "Downloaded",
+  "download": "Download",
+  "playlist": "Playlist",
+  "currentPlaylist": "Current Playlist",
+  "audioCount": "{count} audios",
+  "nowPlayingLabel": "Now Playing",
+  "timeRemaining": "Time remaining: {time}",
+  "stopTimer": "Stop Timer",
+  "sleepTimerStopped": "Sleep timer stopped",
+  "timerSetFor": "Timer set for {time}",
+  "surahIdNotFound": "Surah identifier not found",
+  "errorLoadingText": "Error loading text",
+  "shareRecitationText": "Listen to {title} by {reciter} via Islamic Library App.\n\n{link}",
+  "minutes": "{count} minutes",
+  "timerOption": "{count} minutes",
+  "@timerOption": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "readingModeOnlyForQuran": "Reading mode is only available for the Holy Quran",
+  "liveTvTitle": "Live TV",
+  "religiousChannelsDescription": "Religious channels 24/7",
+  "videoPlayerError": "Unable to play video",
+  "checkInternetConnection": "Please check your internet connection and try again",
+  "retry": "Retry",
+  "islamicRadioTitle": "Islamic Radio",
+  "liveRadioDescription": "Live broadcast 24/7",
+  "searchRadioHint": "Search for station...",
+  "videoLibraryTitle": "Prophetic Biography",
+  "searchVideoHint": "Search biography...",
+  "all": "All",
+  "favoritesTitle": "Favorites",
+  "reciters": "Reciters",
+  "surahs": "Surahs",
+  "noFavoriteReciters": "No favorite reciters",
+  "noFavoriteSurahs": "No favorite surahs",
+  "noFavoriteHadiths": "No favorite hadiths",
+  "unknownReciter": "Unknown",
+  "downloadsTitle": "Downloads",
+  "downloadedSurahs": "Downloaded Surahs",
+  "downloadedLibraryDescription": "Your downloaded audio library",
+  "libraryEmpty": "Library is empty",
+  "downloadedFilesWillAppearHere": "Downloaded files will appear here",
+  "downloadedSurahCount": "{count} downloaded",
+  "audioFile": "Audio File",
+  "deleteFileQuestion": "Delete File?",
+  "deleteFileConfirmation": "Are you sure you want to permanently delete this file?",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "booksLibraryTitle": "Books Library",
+  "articlesAndBooksTitle": "Articles & Books",
+  "searchLibraryHint": "Search library...",
+  "booksLabel": "Books",
+  "articlesLabel": "Articles",
+  "audiosLabel": "Audio",
+  "noSearchResults": "No search results",
+  "downloadButton": "Download",
+  "pageCount": "Page {page}",
+  "allRecitersTitle": "All Reciters",
+  "chooseYourFavoriteReciter": "Choose your favorite reciter",
+  "searchForReciter": "Search for a reciter...",
+  "noResultsFound": "No results found",
+  "trySearchingWithOtherWords": "Try searching with other words",
+  "errorOccurred": "An error occurred",
+  "mainMenu": "Main Menu",
+  "readingMedia": "Reading & Media",
+  "utilitiesTools": "Utilities & Tools",
+  "appNameEnglish": "Islam Home",
+  "appNameArabic": "Bait Al-Islam",
+  "home": "Home",
+  "hadith": "Hadith",
+  "surahName": "{name}",
+  "@surahName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reciterName": "{name}",
+  "@reciterName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "useLocation": "Use Current Location",
+  "locationServicesDisabled": "Location services are disabled.",
+  "locationPermissionsDenied": "Location permissions are denied.",
+  "locationPermissionsPermanentlyDenied": "Location permissions are permanently denied, we cannot request permissions.",
+  "failedToGetLocation": "Failed to get location: {error}",
+  "@failedToGetLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "currentLocation": "Current Location",
+  "updateLocation": "Update Location",
+  "howDoYouFeel": "How do you feel right now?",
+  "moodAnxious": "Anxious",
+  "moodSad": "Sad",
+  "moodHappy": "Happy",
+  "moodLost": "Lost",
+  "moodTired": "Tired",
+  "becauseYouFeel": "Because you feel {mood}",
+  "surahSharh": "Surah Ash-Sharh",
+  "descAnxious": "Remember that with hardship comes ease. This surah brings peace to anxious hearts.",
+  "actionReadSurah": "Read Surah",
+  "surahYusuf": "Surah Yusuf",
+  "descSad": "A story of patience and relief after hardship. A balm for sad hearts.",
+  "surahRahman": "Surah Ar-Rahman",
+  "descHappy": "The best way to thank Allah for His blessings. Which of your Lord's favors will you deny?",
+  "surahFatiha": "Surah Al-Fatiha",
+  "descLost": "The Mother of the Book and a prayer for guidance to the straight path.",
+  "sleepAzkar": "Sleep Adhkar",
+  "descTired": "Rest your soul and calm your mind with the remembrance of Allah before sleep.",
+  "actionGoToAzkar": "Go to Adhkar",
+  "surahDuha": "Surah Ad-Duha",
+  "descDuha": "Your Lord has not forsaken you. A divine message for every heart feeling distressed.",
+  "actionGoToDua": "Go to Supplications",
+  "startTasbeeh": "Start Tasbeeh",
+  "rememberAllah": "Remembrance of Allah",
+  "descHappyDhikr": "Praising Allah increases blessings and sustains happiness.",
+  "allahIsNear": "Allah is Near",
+  "descLostDhikr": "Allah is always close to you, guiding you and hearing your prayers if you lose your way.",
+  "descAnxiousDhikr": "Remembrance of Allah calms anxious hearts. Say: \"Indeed, with hardship comes ease\" and trust in His mercy.",
+  "rewardForTired": "Reward for Tiredness",
+  "descTiredDhikr": "Remember that your tiredness is rewarded, and Allah does not burden a soul beyond its capacity.",
+  "searchHint": "Search Quran, Hadith, Adhkar...",
+  "searchQuranSubtitle": "Quran: {surah} ({ayah})",
+  "@searchQuranSubtitle": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "int"
+      }
+    }
+  },
+  "searchHadithSubtitle": "Hadith: {book} - {chapter}",
+  "@searchHadithSubtitle": {
+    "placeholders": {
+      "book": {
+        "type": "String"
+      },
+      "chapter": {
+        "type": "String"
+      }
+    }
+  },
+  "searchAdhkarSubtitle": "Adhkar: {category}",
+  "@searchAdhkarSubtitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "exploreLibrary": "Explore the Library",
+  "searchDescription": "Search for verses, hadiths, and prayers",
+  "electronicTasbeeh": "Electronic Tasbeeh",
+  "totalTasbeehs": "Total: {count}",
+  "@totalTasbeehs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToCount": "Tap to count",
+  "reset": "Reset",
+  "radio": "Radio",
+  "myAccount": "My Account",
+  "unknownName": "Unknown",
+  "mushafCount": "{count} Surah",
+  "@mushafCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "khatmaPlannerTitle": "Smart Khatma Planner",
+  "khatmaPlannerSubtitle": "Specify the duration to complete the Quran",
+  "startKhatma": "Start Khatma",
+  "days": "Days",
+  "pagesDaily": "Pages daily",
+  "pagesPerPrayer": "Pages per prayer",
+  "remainingToday": "{count} pages remaining today",
+  "@remainingToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onTrack": "You are on track",
+  "setupPlan": "Setup Plan",
+  "cancelPlan": "Cancel Plan",
+  "manageNotificationSettings": "Manage Notification Settings",
+  "manageNotificationSettingsSubtitle": "Open system settings for notifications",
+  "continueYourKhatma": "Continue Your Khatma",
+  "juzAndSurah": "Juz {juz} - {surah}",
+  "@juzAndSurah": {
+    "placeholders": {
+      "juz": {
+        "type": "Object"
+      },
+      "surah": {
+        "type": "Object"
+      }
+    }
+  },
+  "smartSuggestionsForNewPlan": "Smart suggestions for your new plan:",
+  "khatmaInMonth": "Khatma in a month",
+  "oneJuzDaily": "1 Juz daily",
+  "khatmaInTwoMonths": "Khatma in two months",
+  "fifteenPagesDaily": "15 pages daily",
+  "pagesRemainingToday": "{count} pages remaining today",
+  "@pagesRemainingToday": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "khatmaHistory": "Khatma History",
+  "khatmaSettings": "Khatma Settings",
+  "duaKhatm": "Dua for Completing Quran",
+  "mayAllahAccept": "May Allah accept from you",
+  "shareDua": "Share Dua",
+  "mayAllahAcceptAll": "May Allah accept from us and you",
+  "continueReading": "Continue Reading",
+  "activePlans": "Active Plans",
+  "totalAchievement": "Total Achievement",
+  "khatmaCount": "You have completed the Quran {count} times",
+  "@khatmaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currentPageLabel": "Current Page",
+  "remainingLabel": "Remaining",
+  "dailyTargetLabel": "Today's Target",
+  "duration": "Duration",
+  "dailyGoal": "Daily Goal",
+  "khatmaSuccessful": "Khatma Completed Successfully",
+  "noActivePlans": "No active plans currently",
+  "noHistoryYet": "No history recorded yet",
+  "previousAchievements": "Previous Achievements:",
+  "previousKhatmaHistory": "Previous Khatmas History",
+  "newKhatma": "New Khatma",
+  "blessedKhatma": "Blessed Khatma",
+  "noKhatmasRecorded": "No khatmas recorded yet",
+  "khatmCompletedPraise": "Completed with praise to Allah",
+  "daysCount": "{count} Days",
+  "@daysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "prayerAdjustment": "Prayer Time Adjustment",
+  "prayerAdjustmentSubtitle": "Add or subtract minutes (DST)",
+  "adjustMinutes": "Adjust {minutes} minutes",
+  "manualOffset": "Manual Time Offset",
+  "hours": "{count} hours",
+  "hour": "Hour",
+  "adjustHours": "Adjust Hours",
+  "useAutoLocation": "Use Auto Location (GPS)",
+  "moreSettings": "More Settings...",
+  "audioServiceNotReady": "Audio service not ready yet, please try again",
+  "playingInBackground": "Playing clip as background audio",
+  "failedToPlay": "Failed to play clip: {error}",
+  "@failedToPlay": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "later": "Later",
+  "activateNow": "Activate Now",
+  "downloadAllStarted": "Started downloading all to playlist",
+  "noServerLinkError": "Error: No server link for reciter",
+  "playlistPlayError": "Error playing playlist: {error}",
+  "@playlistPlayError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "grantPermission": "Grant Permission",
+  "error": "Error: {error}",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noSensors": "Device does not have sensors",
+  "save": "Save",
+  "playlistNotFound": "Playlist not found",
+  "createNewPlaylist": "Create New Playlist",
+  "playlistImportedSuccessfully": "Playlist imported successfully",
+  "readingSettings": "Reading Settings",
+  "translation": "Translation",
+  "tafsir": "Tafsir",
+  "switchToListView": "Switch to List View",
+  "switchToFlowView": "Switch to Flow View",
+  "surah": "Surah",
+  "pageLabel": "Page",
+  "juz": "Juz",
+  "hizb": "Hizb",
+  "nightMode": "Night Mode",
+  "dayMode": "Day Mode",
+  "lastReadSaved": "Saved as last read",
+  "lastReadUpdated": "Last read time updated",
+  "lastReadReplaced": "Replaced {prevSurah}:{prevAyah} with {newSurah}:{newAyah}",
+  "@lastReadReplaced": {
+    "placeholders": {
+      "prevSurah": {
+        "type": "String"
+      },
+      "prevAyah": {
+        "type": "int"
+      },
+      "newSurah": {
+        "type": "String"
+      },
+      "newAyah": {
+        "type": "int"
+      }
+    }
+  },
+  "lastReadSaveFailed": "Failed to save. Please try again.",
+  "narrator": "Narrator",
+  "book": "Book",
+  "chapter": "Chapter",
+  "copy": "Copy",
+  "copiedToClipboard": "Copied to clipboard",
+  "jumpToHadith": "Jump to Hadith",
+  "searchHadith": "Search Hadith...",
+  "bookmark": "Bookmark",
+  "hijriAdjustment": "Hijri Date Adjustment",
+  "hijriAdjustmentSubtitle": "Add or subtract days for regional accuracy",
+  "adjustDays": "Adjust {days} days",
+  "fontSettings": "Font Settings",
+  "mushafFontSize": "Mushaf Font Size",
+  "translationFontSize": "Translation Font Size",
+  "playlists": "Playlists",
+  "addToPlaylist": "Add to playlist",
+  "noPlaylistsYet": "No playlists yet",
+  "playlistCreated": "Playlist created successfully",
+  "deletePlaylist": "Delete Playlist",
+  "renamePlaylist": "Rename Playlist",
+  "playlistNameHint": "Playlist name...",
+  "create": "Create",
+  "surahsCount": "{count} Surahs",
+  "@surahsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noPlaylistsMessage": "No playlists found. Create one from the favorites section.",
+  "addedToPlaylist": "Added to {playlistName}",
+  "duaKhatmQuran": "Quran Completion Dua",
+  "lastRead": "Last Read",
+  "chooseReciter": "Choose Reciter",
+  "fontSize": "Font Size",
+  "search": "Search",
+  "errorPlayingAudio": "Error playing audio: {message}",
+  "@errorPlayingAudio": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "nightMode": "Night Mode",
+  "dayMode": "Day Mode",
+  "navigatedToAyah": "Navigated to {surah} - Ayah {ayah}",
+  "@navigatedToAyah": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "ayah": {
+        "type": "int"
+      }
+    }
+  },
+  "error": "Error: {message}",
+  "@error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "setTarget": "Set Target",
+  "tasbeehHistory": "Tasbeeh History",
+  "noTasbeehToday": "No tasbeeh recorded today",
+  "dailySummary": "Today's Summary",
+  "hourlyBreakdown": "Activity by Hour",
+  "detailedLog": "Detailed Log",
+  "weeklyActivity": "Weekly Activity",
+  "streakDays": "{count} day streak",
+  "@streakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayTotal": "Today",
+  "allTimeTasbeehs": "All-time total",
+  "setCompleteTitle": "Set Complete!",
+  "setCompleteSubtitle": "May Allah accept your dhikr",
+  "history": "History",
+  "totalLabel": "Total",
+  "calculationMethodTitle": "Calculation Method",
+  "sidebarMainQuran": "Home & Quran",
+  "sidebarTools": "Muslim Tools",
+  "sidebarContent": "Islamic Content",
+  "sidebarOther": "Other",
+  "sidebarTagline": "Spiritual Journey & Library",
+  "sira": "Life of the Prophet",
+  "prophetLife": "Life of the Prophet ﷺ",
+  "allSections": "All",
+  "activeDownloads": "Active",
+  "completedDownloads": "Completed",
+  "downloadingTab": "Downloading",
+  "downloadedTab": "Downloaded",
+  "noActiveDownloads": "No active downloads",
+  "noActiveDownloadsDesc": "You can download Surahs to listen offline later",
+  "quranSection": "The Holy Quran",
+  "seerahSection": "Prophetic Biography",
+  "emptyDownloadsHistory": "Download history is empty",
+  "emptyDownloadsHistoryDesc": "You haven't downloaded any Surahs yet"
+}

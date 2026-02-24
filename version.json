@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "build_number": "1",
+  "apk": "https://github.com/DgharMohamed/IslamHome/raw/artifacts/app-release.apk",
+  "notes_en": "",
+  "notes_ar": "",
+  "force_update": false
+}

@@ -1,0 +1,81 @@
+# مثال على تكوين GitLab CI لاختبار الإشعارات
+# قم بنسخ هذا الملف إلى .gitlab-ci.yml لتفعيله
+
+stages:
+  - test
+  - report
+
+variables:
+  DART_VERSION: "stable"
+
+# Cache للتسريع
+cache:
+  paths:
+    - .dart_tool/
+    - .pub-cache/
+
+# اختبار الإشعارات
+test_notifications:
+  stage: test
+  image: dart:$DART_VERSION
+  
+  before_script:
+    - dart --version
+    - echo "🚀 بدء اختبار أنظمة الإشعارات"
+  
+  script:
+    - chmod +x scripts/run_tests.sh
+    - ./scripts/run_tests.sh
+  
+  artifacts:
+    name: "test-reports-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - test_notifications_report_*.txt
+      - test_notifications_report_*.html
+      - test_notifications_report_*.json
+    expire_in: 30 days
+    when: always
+  
+  only:
+    changes:
+      - lib/services/notification_service.dart
+      - lib/services/quran_audio_handler.dart
+      - lib/services/download_service.dart
+      - scripts/test_notifications.dart
+      - .gitlab-ci.yml
+
+# إنشاء تقرير HTML
+generate_report:
+  stage: report
+  image: dart:$DART_VERSION
+  
+  dependencies:
+    - test_notifications
+  
+  script:
+    - echo "📊 إنشاء التقارير"
+    - ls -la test_notifications_report_*
+  
+  artifacts:
+    name: "html-report-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - test_notifications_report_*.html
+    expire_in: 30 days
+  
+  only:
+    - main
+    - develop
+
+# إشعار عند الفشل
+notify_failure:
+  stage: report
+  image: alpine:latest
+  
+  script:
+    - echo "❌ فشلت بعض الاختبارات"
+    - echo "يرجى مراجعة التقارير"
+  
+  when: on_failure
+  only:
+    - main
+    - develop
