@@ -5,7 +5,6 @@ import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/data/models/adhkar_model.dart';
 import 'package:islam_home/data/models/hadith_model.dart';
-import 'package:islam_home/data/models/quran_content_model.dart';
 import 'package:islam_home/core/utils/quran_utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
@@ -50,7 +49,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final quranService = ref.read(quranServiceProvider);
       final hadithService = ref.read(hadithServiceProvider);
       final azkarService = ref.read(azkarServiceProvider);
 
@@ -59,20 +57,38 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       final l10n = AppLocalizations.of(ref.context)!;
       final isArabic = Localizations.localeOf(ref.context).languageCode == 'ar';
 
-      // 1. Search Quran
-      final quranResults = await quranService.searchVerses(query);
-      for (var ayah in quranResults) {
-        allResults.add(
-          SearchResult(
-            title: ayah.text ?? '',
-            subtitle: l10n.searchQuranSubtitle(
-              ayah.surah?.name ?? '',
-              ayah.numberInSurah ?? 0,
+      // 1. Search Quran (Qurani.ai + Quranpedia)
+      final quranApi = ref.read(quranApiServiceProvider);
+      try {
+        final general = await quranApi.searchGeneralQuran(query, limit: 20);
+        for (final item in general) {
+          allResults.add(
+            SearchResult(
+              title: _extractQuranSearchTitle(item),
+              subtitle: _extractQuranSearchSubtitle(item, source: 'Qurani.ai'),
+              type: SearchType.quran,
+              data: item,
             ),
-            type: SearchType.quran,
-            data: ayah,
-          ),
-        );
+          );
+        }
+      } catch (e) {
+        debugPrint('Qurani search failed: $e');
+      }
+
+      try {
+        final pedia = await quranApi.searchQuranpedia(query, 'surahs');
+        for (final item in pedia) {
+          allResults.add(
+            SearchResult(
+              title: _extractQuranSearchTitle(item),
+              subtitle: _extractQuranSearchSubtitle(item, source: 'Quranpedia'),
+              type: SearchType.quran,
+              data: item,
+            ),
+          );
+        }
+      } catch (e) {
+        debugPrint('Quranpedia search failed: $e');
       }
 
       // 2. Search Hadith
@@ -92,13 +108,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       }
 
       // 3. Search Adhkar
-      final adhkarResults = await azkarService.searchAdhkar(query);
+      final adhkarResults = await azkarService.search(query);
       for (var dhikr in adhkarResults) {
         allResults.add(
           SearchResult(
-            title:
-                (isArabic ? dhikr.zekrText : dhikr.english) ?? dhikr.zekrText,
-            subtitle: l10n.searchAdhkarSubtitle(dhikr.category ?? ''),
+            title: isArabic ? dhikr.textAr : dhikr.textEn,
+            subtitle: l10n.searchAdhkarSubtitle(dhikr.category),
             type: SearchType.adhkar,
             data: dhikr,
           ),
@@ -248,19 +263,55 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
+  String _extractQuranSearchTitle(Map<String, dynamic> item) {
+    final candidates = [
+      item['text_uthmani'],
+      item['text'],
+      item['name'],
+      item['title'],
+      item['englishName'],
+      item['surahName'],
+      item['query'],
+    ];
+    for (final candidate in candidates) {
+      final value = candidate?.toString().trim() ?? '';
+      if (value.isNotEmpty) return value;
+    }
+    return 'Quran Result';
+  }
+
+  String _extractQuranSearchSubtitle(
+    Map<String, dynamic> item, {
+    required String source,
+  }) {
+    final surah = item['surah'] ?? item['surahNumber'] ?? item['chapter_id'];
+    final ayah = item['ayah'] ?? item['ayahNumber'] ?? item['verse_number'];
+    final reference = item['reference'] ?? item['verse_key'];
+    if (reference != null && reference.toString().trim().isNotEmpty) {
+      return '$source • $reference';
+    }
+    if (surah != null && ayah != null) {
+      return '$source • $surah:$ayah';
+    }
+    if (surah != null) {
+      return '$source • Surah $surah';
+    }
+    return source;
+  }
+
   void _handleResultTap(SearchResult result) {
     switch (result.type) {
       case SearchType.quran:
-        final ayah = result.data as Ayah;
-        context.push('/quran-text?surah=${ayah.surah?.number}');
+        context.push('/quran');
         break;
       case SearchType.hadith:
         final _ = result.data as HadithModel;
         context.push('/hadith');
         break;
       case SearchType.adhkar:
-        final _ = result.data as AdhkarModel;
-        context.push('/azkar');
+        final item = result.data as AdhkarModel;
+        final category = Uri.encodeComponent(item.category);
+        context.push('/azkar/details/${item.id}?category=$category');
         break;
     }
   }

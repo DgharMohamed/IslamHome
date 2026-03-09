@@ -106,6 +106,9 @@ class AudioPlayerHandler extends BaseAudioHandler
       final tag = source.tag;
       if (tag is MediaItem) {
         final item = tag.copyWith(duration: _player.duration);
+        debugPrint(
+          '🎵 AudioHandler: Updating mediaItem with extras: ${item.extras}',
+        );
         mediaItem.add(item);
         debugPrint(
           '🎵 AudioHandler: Now playing: ${item.title} by ${item.artist}',

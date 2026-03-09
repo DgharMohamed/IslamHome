@@ -424,10 +424,12 @@ class _HadithCardState extends ConsumerState<HadithCard> {
       await file.writeAsBytes(pngBytes);
 
       if (!mounted) return;
-      final isEnglish = Localizations.localeOf(context).languageCode == 'en';
-      final shareText = isEnglish
-          ? 'Check out this Hadith from the Islamic Library App: ${widget.hadith.english}'
-          : 'اقرأ هذا الحديث من تطبيق المكتبة الإسلامية: ${widget.hadith.arab}';
+      final l10n = AppLocalizations.of(context)!;
+      final locale = Localizations.localeOf(context).languageCode;
+      final hadithText = locale == 'en'
+          ? (widget.hadith.english ?? widget.hadith.arab ?? '')
+          : (widget.hadith.arab ?? widget.hadith.english ?? '');
+      final shareText = l10n.hadithShareText(hadithText);
 
       await SharePlus.instance.share(
         ShareParams(files: [XFile(file.path)], text: shareText),
@@ -438,26 +440,26 @@ class _HadithCardState extends ConsumerState<HadithCard> {
   }
 
   String _getBookName(BuildContext context, String slug) {
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final l10n = AppLocalizations.of(context)!;
     switch (slug.toLowerCase()) {
       case 'bukhari':
-        return isEnglish ? 'Sahih al-Bukhari' : 'صحيح البخاري';
+        return l10n.hadithBookBukhari;
       case 'muslim':
-        return isEnglish ? 'Sahih Muslim' : 'صحيح مسلم';
+        return l10n.hadithBookMuslim;
       case 'abudawud':
-        return isEnglish ? 'Sunan Abu Dawud' : 'سنن أبي داود';
+        return l10n.hadithBookAbuDawud;
       case 'tirmidhi':
-        return isEnglish ? 'Jami\' at-Tirmidhi' : 'جامع الترمذي';
+        return l10n.hadithBookTirmidhi;
       case 'nasai':
-        return isEnglish ? 'Sunan an-Nasa\'i' : 'سنن النسائي';
+        return l10n.hadithBookNasai;
       case 'ibnmajah':
-        return isEnglish ? 'Sunan Ibn Majah' : 'سنن ابن ماجه';
+        return l10n.hadithBookIbnMajah;
       case 'malik':
-        return isEnglish ? 'Muwatta Malik' : 'موطأ مالك';
+        return l10n.hadithBookMalik;
       case 'nawawi':
-        return isEnglish ? 'Forty Hadith Nawawi' : 'الأربعون النووية';
+        return l10n.hadithBookNawawi;
       case 'qudsi':
-        return isEnglish ? 'Hadith Qudsi' : 'الأحاديث القدسية';
+        return l10n.hadithBookQudsi;
       default:
         // Capitalize slug if unknown
         if (slug.isEmpty) return '';

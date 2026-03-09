@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:islam_home/core/utils/responsive_utils.dart';
 
 class FeatureGridWidget extends StatelessWidget {
   const FeatureGridWidget({super.key});
@@ -9,14 +10,28 @@ class FeatureGridWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isWide = ResponsiveUtils.isWide(context);
 
-    final features = [
+    // --- SECTION 1: Quran & Islamic Knowledge ---
+    final quranSection = [
       _FeatureItem(
         title: l10n.quranMushaf,
         subtitle: l10n.quranSubtitle,
         icon: Icons.menu_book_rounded,
         color: const Color(0xFFC2185B),
-        route: '/quran-text',
+        route: '/quran',
+      ),
+      _FeatureItem(
+        title: l10n.audioTafsir,
+        icon: Icons.headset_rounded,
+        color: const Color(0xFF4527A0),
+        route: '/tafsir',
+      ),
+      _FeatureItem(
+        title: l10n.videoLibraryTitle,
+        icon: Icons.video_library_rounded,
+        color: const Color(0xFFBF360C),
+        route: '/video',
       ),
       _FeatureItem(
         title: l10n.azkarDuas,
@@ -30,24 +45,10 @@ class FeatureGridWidget extends StatelessWidget {
         color: const Color(0xFF6A1B9A),
         route: '/hadith',
       ),
-      _FeatureItem(
-        title: l10n.radioLive,
-        icon: Icons.radio_rounded,
-        color: const Color(0xFF2E7D32),
-        route: '/radio',
-      ),
-      _FeatureItem(
-        title: l10n.liveTv,
-        icon: Icons.live_tv_rounded,
-        color: const Color(0xFFE65100),
-        route: '/live-tv',
-      ),
-      _FeatureItem(
-        title: l10n.videoLibraryTitle,
-        icon: Icons.video_library_rounded,
-        color: const Color(0xFFBF360C),
-        route: '/video',
-      ),
+    ];
+
+    // --- SECTION 2: Worship & Prayer Tools ---
+    final worshipSection = [
       _FeatureItem(
         title: l10n.prayerTimes,
         icon: Icons.access_time_filled_rounded,
@@ -66,6 +67,26 @@ class FeatureGridWidget extends StatelessWidget {
         color: const Color(0xFF5D4037),
         route: '/tasbeeh',
       ),
+    ];
+
+    // --- SECTION 3: Media & Entertainment ---
+    final mediaSection = [
+      _FeatureItem(
+        title: l10n.radioLive,
+        icon: Icons.radio_rounded,
+        color: const Color(0xFF2E7D32),
+        route: '/radio',
+      ),
+      _FeatureItem(
+        title: l10n.liveTv,
+        icon: Icons.live_tv_rounded,
+        color: const Color(0xFFE65100),
+        route: '/live-tv',
+      ),
+    ];
+
+    // --- SECTION 4: My Library ---
+    final librarySection = [
       _FeatureItem(
         title: l10n.favorites,
         icon: Icons.favorite_rounded,
@@ -86,20 +107,61 @@ class FeatureGridWidget extends StatelessWidget {
       ),
     ];
 
-    return SizedBox(
-      height: 140, // Increased height for subtitles
-      child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          scrollDirection: Axis.horizontal,
-          itemCount: features.length,
-          separatorBuilder: (context, index) => const SizedBox(width: 12),
-          itemBuilder: (context, index) {
-            return _buildFeatureCard(context, features[index]);
-          },
+    if (isWide) {
+      // On wide screens keep a flat grid
+      final all = [
+        ...quranSection,
+        ...worshipSection,
+        ...mediaSection,
+        ...librarySection,
+      ];
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: ResponsiveUtils.getCrossAxisCount(
+            context,
+            tablet: 3,
+            desktop: 4,
+          ),
+          childAspectRatio: 1.2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
-      ),
+        itemCount: all.length,
+        itemBuilder: (context, index) => _buildFeatureCard(context, all[index]),
+      );
+    }
+
+    // Mobile: Sectioned horizontal rows
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionRow(
+          label: '📖 ${l10n.homeSectionQuranAndSeerah}',
+          items: quranSection,
+          onBuild: (item) => _buildFeatureCard(context, item),
+        ),
+        const SizedBox(height: 24),
+        _SectionRow(
+          label: '🕌 ${l10n.homeSectionWorshipAndPrayer}',
+          items: worshipSection,
+          onBuild: (item) => _buildFeatureCard(context, item),
+        ),
+        const SizedBox(height: 24),
+        _SectionRow(
+          label: '📺 ${l10n.homeSectionMediaAndBroadcast}',
+          items: mediaSection,
+          onBuild: (item) => _buildFeatureCard(context, item),
+        ),
+        const SizedBox(height: 24),
+        _SectionRow(
+          label: '📂 ${l10n.homeSectionMyLibrary}',
+          items: librarySection,
+          onBuild: (item) => _buildFeatureCard(context, item),
+        ),
+      ],
     );
   }
 
@@ -108,7 +170,7 @@ class FeatureGridWidget extends StatelessWidget {
       onTap: item.route != null ? () => context.push(item.route!) : null,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        width: 130, // Wider for text and subtitle
+        width: 120,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.05),
@@ -141,39 +203,84 @@ class FeatureGridWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(item.icon, color: item.color, size: 28),
+              child: Icon(item.icon, color: item.color, size: 26),
             ),
             const SizedBox(height: 8),
             Text(
               item.title,
               style: GoogleFonts.cairo(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Colors.white.withValues(alpha: 0.9),
                 height: 1.1,
               ),
               textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.visible,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            if (item.subtitle != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                item.subtitle!,
-                style: GoogleFonts.cairo(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withValues(alpha: 0.5),
-                  height: 1.1,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// A horizontal section with a header label
+class _SectionRow extends StatelessWidget {
+  final String label;
+  final List<_FeatureItem> items;
+  final Widget Function(_FeatureItem) onBuild;
+
+  const _SectionRow({
+    required this.label,
+    required this.items,
+    required this.onBuild,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.cairo(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Divider(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  height: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 120,
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(
+              context,
+            ).copyWith(overscroll: false),
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => onBuild(items[i]),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

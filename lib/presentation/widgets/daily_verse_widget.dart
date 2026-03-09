@@ -5,7 +5,7 @@ import 'package:islam_home/presentation/widgets/glass_container.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islam_home/presentation/providers/daily_verse_provider.dart';
+import 'package:islam_home/presentation/providers/daily_content_rotation_provider.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 
 class DailyVerseWidget extends ConsumerWidget {
@@ -17,11 +17,9 @@ class DailyVerseWidget extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
     final isArabic = locale.languageCode == 'ar';
 
-    final dailyVerse = ref.watch(dailyVerseProvider);
+    final dailyVerse = ref.watch(rotatingDailyVerseProvider);
     final verse = isArabic ? dailyVerse.text : dailyVerse.translation;
-    final surah = isArabic
-        ? dailyVerse.surah
-        : 'Surah ${dailyVerse.surah.replaceAll('سورة ', '')}';
+    final surah = dailyVerse.surah;
 
     return GlassContainer(
       borderRadius: 24,
@@ -66,9 +64,9 @@ class DailyVerseWidget extends ConsumerWidget {
                     color: Colors.white,
                     height: 1.6,
                   )
-                : GoogleFonts.inter(
+                : GoogleFonts.montserrat(
                     fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                     color: Colors.white,
                     height: 1.5,
                   ),

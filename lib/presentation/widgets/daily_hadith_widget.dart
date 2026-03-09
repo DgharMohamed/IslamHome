@@ -2,29 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
-import 'package:islam_home/presentation/providers/api_providers.dart';
-import 'package:islam_home/data/models/hadith_model.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:islam_home/presentation/providers/daily_content_rotation_provider.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
-
-final dailyHadithProvider = FutureProvider<HadithModel?>((ref) async {
-  final hadithService = ref.watch(hadithServiceProvider);
-  final locale = ref.watch(localeProvider);
-  return hadithService.getRandomHadith(
-    requireEnglish: locale.languageCode == 'en',
-  );
-});
 
 class DailyHadithWidget extends ConsumerWidget {
   const DailyHadithWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dailyHadith = ref.watch(dailyHadithProvider);
+    final l10n = AppLocalizations.of(context)!;
+    final locale = ref.watch(localeProvider);
+    final isArabic = locale.languageCode == 'ar';
+    final dailyHadith = ref.watch(rotatingDailyHadithProvider);
 
     return dailyHadith.when(
       data: (hadith) {
         if (hadith == null) return const SizedBox.shrink();
+        final content = isArabic
+            ? (hadith.arab ?? hadith.english ?? '')
+            : (hadith.english ?? hadith.arab ?? '');
 
         return GlassContainer(
           borderRadius: 24,
@@ -50,7 +48,7 @@ class DailyHadithWidget extends ConsumerWidget {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Hadith of the Day', // Replace with l10n if available
+                    l10n.hadithOfTheDay,
                     style: GoogleFonts.tajawal(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -61,12 +59,20 @@ class DailyHadithWidget extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                hadith.english ?? hadith.arab ?? '',
-                style: GoogleFonts.archivoBlack(
-                  fontSize: 13,
-                  height: 1.5,
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
+                content,
+                style: isArabic
+                    ? GoogleFonts.amiri(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w700,
+                        height: 1.7,
+                        color: Colors.white.withValues(alpha: 0.95),
+                      )
+                    : GoogleFonts.montserrat(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        height: 1.5,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
               ),

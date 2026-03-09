@@ -143,7 +143,7 @@ class TasbeehHistoryScreen extends ConsumerWidget {
             icon: Icons.local_fire_department_rounded,
             iconColor: Colors.orangeAccent,
             value: streak > 0 ? l10n.streakDays(streak) : '—',
-            label: 'Streak',
+            label: l10n.streak,
           ),
           _buildDivider(),
           _buildBannerStat(

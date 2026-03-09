@@ -92,7 +92,10 @@ class PrayerNotifier extends Notifier<PrayerState> {
   }
 
   Future<void> refresh({bool forceRefresh = false}) async {
-    state = state.copyWith(timings: const AsyncValue.loading());
+    final previousTimes = state.timings.asData?.value;
+    if (forceRefresh || previousTimes == null) {
+      state = state.copyWith(timings: const AsyncValue.loading());
+    }
 
     try {
       DailyPrayerTimes? times;
@@ -219,14 +222,19 @@ class PrayerNotifier extends Notifier<PrayerState> {
         }
       }
 
-      state = state.copyWith(timings: AsyncValue.data(times));
+      final effectiveTimes = times ?? previousTimes;
+      state = state.copyWith(timings: AsyncValue.data(effectiveTimes));
 
       // Reschedule Adhan notifications if times are available
-      if (times != null) {
-        _updateAthanSchedules(times);
+      if (effectiveTimes != null) {
+        _updateAthanSchedules(effectiveTimes);
       }
     } catch (e, st) {
-      state = state.copyWith(timings: AsyncValue.error(e, st));
+      if (previousTimes != null) {
+        state = state.copyWith(timings: AsyncValue.data(previousTimes));
+      } else {
+        state = state.copyWith(timings: AsyncValue.error(e, st));
+      }
     }
   }
 
@@ -318,6 +326,15 @@ class PrayerNotifier extends Notifier<PrayerState> {
       return;
     }
 
+    final hasNotificationPermission = await NotificationService()
+        .ensureNotificationPermission();
+    if (!hasNotificationPermission) {
+      debugPrint(
+        '⚠️ Notification permission missing, cannot show Adhan notifications',
+      );
+      return;
+    }
+
     // Load per-prayer enabled state
     final enabledPrayers = {
       'Fajr': box.get('athan_enabled_Fajr', defaultValue: true),
@@ -368,6 +385,11 @@ class PrayerNotifier extends Notifier<PrayerState> {
 
   Future<void> toggleAthan(bool enabled) async {
     if (enabled) {
+      final notificationGranted = await NotificationService()
+          .ensureNotificationPermission();
+      if (!notificationGranted) {
+        debugPrint('🚫 Notification permission not granted');
+      }
       final granted = await NotificationService().requestExactAlarmPermission();
       if (!granted) {
         debugPrint('🚫 Exact alarm permission not granted');

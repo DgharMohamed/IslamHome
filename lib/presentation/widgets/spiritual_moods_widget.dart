@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/presentation/providers/mood_provider.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
 
@@ -64,18 +64,36 @@ class SpiritualMoodsWidget extends ConsumerWidget {
     }
   }
 
+  String _buildAlternativeLabel(
+    BuildContext context,
+    MoodRecommendationSuggestion suggestion,
+  ) {
+    final action = _getLocalizedValue(context, suggestion.recommendation.actionKey);
+    final title = _getLocalizedValue(context, suggestion.recommendation.titleKey);
+    return '$action - $title';
+  }
+
   void _showRecommendation(
     BuildContext context,
     WidgetRef ref,
     Map<String, dynamic> mood,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    final rec = ref.read(moodRecommendationProvider(mood['id'] as String));
-    final moodDisplay = mood['display'] as String;
     final moodId = mood['id'] as String;
+    final suggestions = ref.read(moodRecommendationSuggestionsProvider(moodId));
+    if (suggestions.isEmpty) return;
+
+    final primary = suggestions.first;
+    final alternative = suggestions.length > 1 ? suggestions[1] : null;
+    final hasDistinctAlternative =
+        alternative != null &&
+        alternative.recommendation.route != primary.recommendation.route;
+    final rec = primary.recommendation;
+    final moodDisplay = mood['display'] as String;
 
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => GlassContainer(
@@ -95,49 +113,6 @@ class SpiritualMoodsWidget extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            // Specialized UI for Anxious Mood
-            if (moodId == 'anxious') ...[
-              Text(
-                'السكينة والهدوء',
-                style: GoogleFonts.cairo(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white10),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.amiri(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'سورة الشرح - آية ٥',
-                      style: GoogleFonts.tajawal(
-                        fontSize: 12,
-                        color: Colors.white38,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
-
             Icon(
               mood['icon'] as IconData,
               color: mood['color'] as Color,
@@ -161,6 +136,24 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                 color: AppTheme.primaryColor,
               ),
             ),
+            const SizedBox(height: 8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Text(
+                primary.reason,
+                style: GoogleFonts.tajawal(
+                  fontSize: 13,
+                  color: Colors.white60,
+                  height: 1.4,
+                ),
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               _getLocalizedValue(context, rec.descKey),
@@ -172,59 +165,66 @@ class SpiritualMoodsWidget extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 32),
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        context.push(rec.route);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor,
-                        foregroundColor: Colors.black,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: Text(
-                        _getLocalizedValue(context, rec.actionKey),
-                        style: GoogleFonts.cairo(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await ref
+                      .read(moodEngineProvider.notifier)
+                      .recordActionTap(rec.route);
+                  context.push(rec.route);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.black,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                if (moodId == 'anxious') ...[
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    height: 56,
-                    width: 56,
-                    child: IconButton.filled(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        context.push('/quran-text?surah=94');
-                      },
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: const Icon(
-                        Icons.headset_rounded,
-                        color: Colors.white,
-                      ),
+                child: Text(
+                  _getLocalizedValue(context, rec.actionKey),
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
+            if (hasDistinctAlternative) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await ref
+                        .read(moodEngineProvider.notifier)
+                        .recordActionTap(alternative!.recommendation.route);
+                    context.push(alternative.recommendation.route);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                ],
-              ],
-            ),
+                  child: Text(
+                    _buildAlternativeLabel(context, alternative!),
+                    style: GoogleFonts.cairo(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
           ],
         ),
@@ -239,19 +239,19 @@ class SpiritualMoodsWidget extends ConsumerWidget {
       {
         'id': 'anxious',
         'display': l10n.moodAnxious,
-        'icon': Icons.air_rounded, // Line style
+        'icon': Icons.air_rounded,
         'color': Colors.orangeAccent,
       },
       {
         'id': 'sad',
         'display': l10n.moodSad,
-        'icon': Icons.cloud_outlined, // Line style
+        'icon': Icons.cloud_outlined,
         'color': Colors.lightBlueAccent,
       },
       {
         'id': 'happy',
         'display': l10n.moodHappy,
-        'icon': Icons.light_mode_outlined, // Line style
+        'icon': Icons.light_mode_outlined,
         'color': Colors.amberAccent,
       },
       {
@@ -295,7 +295,13 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                 return Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: InkWell(
-                    onTap: () => _showRecommendation(context, ref, mood),
+                    onTap: () async {
+                      await ref
+                          .read(moodEngineProvider.notifier)
+                          .selectMood(mood['id'] as String);
+                      if (!context.mounted) return;
+                      _showRecommendation(context, ref, mood);
+                    },
                     borderRadius: BorderRadius.circular(24),
                     child: Container(
                       width: 80,
@@ -303,9 +309,7 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                         color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: (mood['color'] as Color).withValues(
-                            alpha: 0.15,
-                          ),
+                          color: (mood['color'] as Color).withValues(alpha: 0.15),
                         ),
                       ),
                       child: Column(

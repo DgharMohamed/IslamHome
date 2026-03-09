@@ -47,6 +47,12 @@ class DownloadService {
     final dir = await _getDownloadDirectory();
     if (type == 'seerah') {
       return '$dir/seerah/$reciterId/$surahNumber.mp3';
+    } else if (type == 'general') {
+      // Need to sanitize moshafType/album name just in case
+      final safeType = moshafType.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+      return '$dir/general/$safeType/$reciterId/$surahNumber.mp3';
+    } else if (type == 'tafsir') {
+      return '$dir/tafsir/$reciterId/$surahNumber.mp3';
     }
     return '$dir/$reciterId/$moshafType/$surahNumber.mp3';
   }
@@ -69,6 +75,7 @@ class DownloadService {
   void addToQueue({
     required String url,
     required String reciterId,
+    required String reciterName,
     required String moshafType,
     required int surahNumber,
     required String title,
@@ -84,6 +91,7 @@ class DownloadService {
     final request = DownloadRequest(
       url: url,
       reciterId: reciterId,
+      reciterName: reciterName,
       moshafType: moshafType,
       surahNumber: surahNumber,
       title: title,
@@ -279,6 +287,7 @@ class DownloadService {
 class DownloadRequest {
   final String url;
   final String reciterId;
+  final String reciterName;
   final String moshafType;
   final int surahNumber;
   final String title;
@@ -289,6 +298,7 @@ class DownloadRequest {
   DownloadRequest({
     required this.url,
     required this.reciterId,
+    required this.reciterName,
     required this.moshafType,
     required this.surahNumber,
     required this.title,
@@ -300,6 +310,7 @@ class DownloadRequest {
   Map<String, dynamic> toJson() => {
     'url': url,
     'reciterId': reciterId,
+    'reciterName': reciterName,
     'moshafType': moshafType,
     'surahNumber': surahNumber,
     'title': title,
@@ -312,6 +323,7 @@ class DownloadRequest {
       DownloadRequest(
         url: json['url'],
         reciterId: json['reciterId'],
+        reciterName: json['reciterName'] ?? json['reciterId'],
         moshafType: json['moshafType'],
         surahNumber: json['surahNumber'],
         title: json['title'],

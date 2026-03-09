@@ -2,21 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
-import 'package:islam_home/presentation/providers/daily_verse_provider.dart';
-import 'package:islam_home/presentation/providers/api_providers.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:islam_home/presentation/providers/daily_content_rotation_provider.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
-import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:islam_home/data/models/hadith_model.dart';
-
-final _dailyHadithProvider = FutureProvider<HadithModel?>((ref) async {
-  final hadithService = ref.watch(hadithServiceProvider);
-  final locale = ref.watch(localeProvider);
-  return hadithService.getRandomHadith(
-    requireEnglish: locale.languageCode == 'en',
-  );
-});
 
 class DailyInspirationWidget extends ConsumerStatefulWidget {
   const DailyInspirationWidget({super.key});
@@ -43,7 +33,7 @@ class _DailyInspirationWidgetState
     return Column(
       children: [
         SizedBox(
-          height: 320, // Increased height to accommodate longer texts
+          height: 320,
           child: ScrollConfiguration(
             behavior: ScrollConfiguration.of(
               context,
@@ -78,25 +68,21 @@ class _DailyInspirationWidgetState
 
 class _VerseCard extends ConsumerWidget {
   final AppLocalizations l10n;
+
   const _VerseCard({required this.l10n});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
     final isArabic = locale.languageCode == 'ar';
-    final dailyVerse = ref.watch(dailyVerseProvider);
-
-    final verse = isArabic ? dailyVerse.text : dailyVerse.translation;
-    final surah = isArabic
-        ? dailyVerse.surah
-        : 'Surah ${dailyVerse.surah.replaceAll('سورة ', '')}';
+    final verse = ref.watch(rotatingDailyVerseProvider);
 
     return _BaseCard(
       title: l10n.verseOfTheDay,
       icon: Icons.auto_awesome,
       color: const Color(0xFFC2185B),
-      content: verse,
-      subtitle: surah,
+      content: isArabic ? verse.text : verse.translation,
+      subtitle: verse.surah,
       isArabicContent: isArabic,
     );
   }
@@ -104,11 +90,12 @@ class _VerseCard extends ConsumerWidget {
 
 class _HadithCard extends ConsumerWidget {
   final AppLocalizations l10n;
+
   const _HadithCard({required this.l10n});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dailyHadithAsync = ref.watch(_dailyHadithProvider);
+    final dailyHadithAsync = ref.watch(rotatingDailyHadithProvider);
 
     return dailyHadithAsync.when(
       data: (hadith) {
@@ -116,33 +103,16 @@ class _HadithCard extends ConsumerWidget {
         final locale = ref.watch(localeProvider);
         final isArabic = locale.languageCode == 'ar';
         final content = isArabic
-            ? (hadith.arab ?? '')
+            ? (hadith.arab ?? hadith.english ?? '')
             : (hadith.english ?? hadith.arab ?? '');
-
-        // Book name mapping
-        final bookNames = {
-          'bukhari': {'en': 'Sahih al-Bukhari', 'ar': 'صحيح البخاري'},
-          'muslim': {'en': 'Sahih Muslim', 'ar': 'صحيح مسلم'},
-          'abudawud': {'en': 'Sunan Abu Dawud', 'ar': 'سنن أبي داود'},
-          'tirmidhi': {'en': "Jami' at-Tirmidhi", 'ar': 'جامع الترمذي'},
-          'nasai': {'en': "Sunan an-Nasa'i", 'ar': 'سنن النسائي'},
-          'ibnmajah': {'en': 'Sunan Ibn Majah', 'ar': 'سنن ابن ماجه'},
-          'malik': {'en': 'Muwatta Malik', 'ar': 'موطأ مالك'},
-          'nawawi': {'en': "An-Nawawi's Forty", 'ar': 'الأربعين النووية'},
-          'qudsi': {'en': '40 Hadith Qudsi', 'ar': 'الحديث القدسي'},
-        };
-
-        final bookSlug = hadith.book ?? '';
-        final bookNameMap =
-            bookNames[bookSlug] ?? {'en': bookSlug, 'ar': bookSlug};
-        final bookName = isArabic ? bookNameMap['ar']! : bookNameMap['en']!;
+        final subtitle = '${hadith.book ?? ''} - ${hadith.number ?? ''}';
 
         return _BaseCard(
           title: l10n.hadithOfTheDay,
           icon: Icons.format_quote_rounded,
-          color: const Color(0xFF9C27B0), // Brand: Hadith Purple
+          color: const Color(0xFF9C27B0),
           content: content,
-          subtitle: '$bookName - ${hadith.number}',
+          subtitle: subtitle,
           isArabicContent: isArabic,
         );
       },
@@ -154,28 +124,29 @@ class _HadithCard extends ConsumerWidget {
 
 class _AdhkarCard extends ConsumerWidget {
   final AppLocalizations l10n;
+
   const _AdhkarCard({required this.l10n});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final dailyAdhkarAsync = ref.watch(rotatingDailyAdhkarProvider);
     final locale = ref.watch(localeProvider);
     final isArabic = locale.languageCode == 'ar';
 
-    final content = isArabic
-        ? 'أَلا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ'
-        : 'Unquestionably, by the remembrance of Allah hearts are assured.';
-
-    final subtitle = isArabic
-        ? 'سورة الرعد - آية ٢٨'
-        : 'Surah Ar-Ra\'d - Verse 28';
-
-    return _BaseCard(
-      title: l10n.adhkarOfTheDay,
-      icon: Icons.favorite_rounded,
-      color: const Color(0xFF2196F3), // Brand: Adhkar Blue
-      content: content,
-      subtitle: subtitle,
-      isArabicContent: isArabic,
+    return dailyAdhkarAsync.when(
+      data: (dhikr) {
+        if (dhikr == null) return const SizedBox.shrink();
+        return _BaseCard(
+          title: l10n.adhkarOfTheDay,
+          icon: Icons.favorite_rounded,
+          color: const Color(0xFF2196F3),
+          content: isArabic ? dhikr.textAr : dhikr.textEn,
+          subtitle: dhikr.category,
+          isArabicContent: isArabic,
+        );
+      },
+      loading: () => _LoadingCard(title: l10n.adhkarOfTheDay),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }
@@ -244,9 +215,9 @@ class _BaseCard extends StatelessWidget {
                             color: Colors.white,
                             height: 1.4,
                           )
-                        : GoogleFonts.inter(
+                        : GoogleFonts.montserrat(
                             fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.normal,
                             color: Colors.white,
                             height: 1.4,
                           ),
@@ -272,6 +243,7 @@ class _BaseCard extends StatelessWidget {
 
 class _LoadingCard extends StatelessWidget {
   final String title;
+
   const _LoadingCard({required this.title});
 
   @override

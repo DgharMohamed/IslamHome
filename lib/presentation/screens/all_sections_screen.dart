@@ -15,21 +15,21 @@ class AllSectionsScreen extends StatelessWidget {
     final categories = [
       _CategoryData(
         title: l10n.quranMushaf,
-        icon: Icons.bookmark_rounded,
-        color: const Color(0xFFC2185B),
-        route: '/quran-text',
-      ),
-      _CategoryData(
-        title: l10n.mushaf,
         icon: Icons.menu_book_rounded,
-        color: const Color(0xFFAD1457),
-        route: '/mushaf',
+        color: const Color(0xFFC2185B),
+        route: '/quran',
       ),
       _CategoryData(
         title: l10n.propheticHadith,
         icon: Icons.menu_book_rounded,
         color: const Color(0xFF6A1B9A),
         route: '/hadith',
+      ),
+      _CategoryData(
+        title: l10n.audioTafsir,
+        icon: Icons.headset_rounded,
+        color: const Color(0xFF4527A0), // Deep Purple
+        route: '/tafsir',
       ),
       _CategoryData(
         title: l10n.sira,

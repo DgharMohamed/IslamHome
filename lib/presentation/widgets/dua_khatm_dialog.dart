@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:islam_home/presentation/providers/khatma_provider.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -371,22 +370,6 @@ class _DuaKhatmDialogState extends ConsumerState<DuaKhatmDialog>
                             await Future.delayed(
                               const Duration(milliseconds: 800),
                             );
-                            final activePlan = ref
-                                .read(khatmaProvider)
-                                .activePlan;
-                            if (activePlan != null) {
-                              await ref
-                                  .read(khatmaProvider.notifier)
-                                  .completeKhatma(activePlan.id);
-                            } else {
-                              // If they finished without a plan, still call complete to reset progress
-                              // Note: completeKhatma currently requires a planId, maybe I should make it nullable
-                              // or just return if no plan.
-                              await ref
-                                  .read(khatmaProvider.notifier)
-                                  .completeKhatma('');
-                            }
-
                             if (context.mounted) {
                               Navigator.pop(context);
                             }
@@ -509,7 +492,7 @@ class _DuaCard extends StatelessWidget {
             style: GoogleFonts.montserrat(
               fontSize: 12,
               color: _gold.withValues(alpha: 0.6),
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],

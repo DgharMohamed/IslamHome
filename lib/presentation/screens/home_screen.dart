@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
-import 'package:go_router/go_router.dart';
 import 'package:islam_home/presentation/widgets/daily_inspiration_widget.dart';
 import 'package:islam_home/presentation/widgets/spiritual_moods_widget.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:islam_home/presentation/providers/prayer_notifier.dart';
-
 import 'package:islam_home/presentation/widgets/home_header_widget.dart';
 import 'package:islam_home/presentation/widgets/feature_grid_widget.dart';
-import 'package:islam_home/presentation/widgets/smart_khatma_widget.dart';
-import 'package:islam_home/presentation/widgets/glass_container.dart';
+import 'package:islam_home/presentation/widgets/khatma_dashboard_card.dart';
+import 'package:islam_home/presentation/providers/daily_content_rotation_provider.dart';
+import 'package:islam_home/core/services/home_widget_sync_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,7 +24,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(dailyContentRotationProvider.notifier).rotateOnHomeEnter();
+      await syncDailyContentHomeWidget(ref);
       _checkAdhanOnboarding();
     });
   }
@@ -43,7 +44,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _showAdhanOnboardingDialog() {
     final l10n = AppLocalizations.of(context)!;
-    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
 
     showDialog(
       context: context,
@@ -77,9 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         content: Text(
-          isArabic
-              ? 'هل ترغب في تفعيل تنبيهات الآذان لكل صلاة؟ يمكنك دائماً تغيير هذا من إعدادات مواقيت الصلاة.'
-              : 'Would you like to enable Adhan notifications for prayer times? You can always change this in Prayer Times settings.',
+          l10n.athanOnboardingPrompt,
           style: GoogleFonts.cairo(color: Colors.white70),
           textAlign: TextAlign.center,
         ),
@@ -135,7 +133,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     debugPrint('🏠 HomeScreen: build started');
-    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       extendBodyBehindAppBar: true, // Allow header to go behind status bar
@@ -147,59 +144,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
             // 2. Main Content
             Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 100), // Spacing
+              padding: const EdgeInsets.only(top: 12, bottom: 160), // Spacing
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Slim Floating Search Bar
+                  // Khatma Dashboard (daily continuation first)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: KhatmaDashboardCard(),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Daily Inspiration (ayah / hadith / adhkar)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: InkWell(
-                      onTap: () => context.push('/search'),
-                      child: GlassContainer(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        borderRadius: 20,
-                        opacity: 0.1,
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.search_rounded,
-                              color: Colors.white54,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              l10n.globalSearch,
-                              style: GoogleFonts.tajawal(
-                                color: Colors.white38,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.tune_rounded,
-                                color: Colors.white38,
-                                size: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: DailyInspirationWidget(),
                   ),
 
                   const SizedBox(height: 24),
 
-                  // Spiritual Moods - MOVED TO TOP
+                  // Spiritual Moods (personal guidance)
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
                     child: SpiritualMoodsWidget(),
@@ -207,75 +172,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   const SizedBox(height: 32),
 
-                  // Feature Grid
+                  // Feature Grid (exploration after daily essentials)
                   const FeatureGridWidget(),
-
-                  const SizedBox(height: 32),
-
-                  // Reading Progress (Dynamic)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildSectionTitle(
-                      context,
-                      l10n.khatmaProgress,
-                      l10n,
-                      onPressed: () {
-                        context.push('/khatma');
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: SmartKhatmaWidget(),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Daily Inspiration Carousel
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: DailyInspirationWidget(),
-                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSectionTitle(
-    BuildContext context,
-    String title,
-    AppLocalizations l10n, {
-    VoidCallback? onPressed,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: GoogleFonts.cairo(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        if (onPressed != null)
-          TextButton(
-            onPressed: onPressed,
-            child: Text(
-              l10n.viewAll,
-              style: GoogleFonts.cairo(
-                color: AppTheme.primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ),
-      ],
     );
   }
 }

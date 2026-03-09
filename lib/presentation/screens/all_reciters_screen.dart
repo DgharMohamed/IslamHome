@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/core/utils/scaffold_utils.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
+import 'package:islam_home/core/utils/responsive_utils.dart';
 
 class AllRecitersScreen extends ConsumerStatefulWidget {
   const AllRecitersScreen({super.key});
@@ -312,9 +313,13 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
       sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1, // Layout adjusted below if screen is wide
-          childAspectRatio: 3.5,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: ResponsiveUtils.getCrossAxisCount(
+            context,
+            tablet: 2,
+            desktop: 3,
+          ),
+          childAspectRatio: ResponsiveUtils.isMobile(context) ? 3.5 : 2.5,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),
@@ -330,9 +335,13 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
       sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          childAspectRatio: 3.5,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: ResponsiveUtils.getCrossAxisCount(
+            context,
+            tablet: 2,
+            desktop: 3,
+          ),
+          childAspectRatio: ResponsiveUtils.isMobile(context) ? 3.5 : 2.5,
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
         ),

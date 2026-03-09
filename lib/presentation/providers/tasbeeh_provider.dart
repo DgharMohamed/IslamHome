@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:islam_home/data/models/tasbeeh_model.dart';
 import 'package:islam_home/data/services/tasbeeh_service.dart';
 
@@ -13,12 +14,20 @@ class TasbeehNotifier extends Notifier<List<TasbeehModel>> {
 
   @override
   List<TasbeehModel> build() {
-    // Hive boxes are already opened in main.dart, so we can access them synchronously.
-    return _service.getDhikrList();
+    // Hive boxes are opened in main.dart; still guard against corrupted local data.
+    try {
+      return _service.getDhikrList();
+    } catch (e) {
+      debugPrint('TasbeehNotifier: failed to load dhikr list: $e');
+      return const [];
+    }
   }
 
   Future<void> increment(String id) async {
-    final dhikr = state.firstWhere((d) => d.id == id);
+    if (state.isEmpty) return;
+    final index = state.indexWhere((d) => d.id == id);
+    if (index == -1) return;
+    final dhikr = state[index];
     final newCount = dhikr.count + 1;
     final isTargetReached = newCount >= dhikr.target;
 
@@ -53,22 +62,27 @@ class TasbeehNotifier extends Notifier<List<TasbeehModel>> {
   }
 
   Future<void> reset(String id) async {
+    final index = state.indexWhere((d) => d.id == id);
+    if (index == -1) return;
     state = [
       for (final dhikr in state)
         if (dhikr.id == id) dhikr.copyWith(count: 0) else dhikr,
     ];
 
-    final updatedDhikr = state.firstWhere((d) => d.id == id);
+    final updatedDhikr = state[index];
     await _service.updateDhikr(updatedDhikr);
   }
 
   Future<void> updateTarget(String id, int target) async {
+    final index = state.indexWhere((d) => d.id == id);
+    if (index == -1) return;
+    final safeTarget = target < 1 ? 1 : target;
     state = [
       for (final dhikr in state)
-        if (dhikr.id == id) dhikr.copyWith(target: target) else dhikr,
+        if (dhikr.id == id) dhikr.copyWith(target: safeTarget) else dhikr,
     ];
 
-    final updatedDhikr = state.firstWhere((d) => d.id == id);
+    final updatedDhikr = state[index];
     await _service.updateDhikr(updatedDhikr);
   }
 
@@ -87,15 +101,24 @@ final activeDhikrProvider = NotifierProvider<ActiveDhikrNotifier, String?>(
 );
 
 class ActiveDhikrNotifier extends Notifier<String?> {
+  static const String _activeDhikrKey = 'active_dhikr_id';
+  static const String _defaultDhikrId = 'subhanallah';
+
   @override
   String? build() {
-    // Return null initially. The UI or first list load will handle selection.
-    return null;
+    final box = Hive.box('settings_box');
+    final raw = box.get(_activeDhikrKey);
+    if (raw is String && raw.isNotEmpty) {
+      return raw;
+    }
+    return _defaultDhikrId;
   }
 
   void set(String? id) {
     if (state != id) {
-      state = id;
+      final safeId = (id == null || id.isEmpty) ? _defaultDhikrId : id;
+      state = safeId;
+      Hive.box('settings_box').put(_activeDhikrKey, safeId);
     }
   }
 }

@@ -7,16 +7,16 @@ part of 'hadith_model.dart';
 // **************************************************************************
 
 HadithModel _$HadithModelFromJson(Map<String, dynamic> json) => HadithModel(
-      id: json['id'] as String?,
-      number: (json['hadithnumber'] as num?)?.toInt(),
-      arab: json['text'] as String?,
-      english: json['english'] as String?,
-      narrator: json['narrator'] as String?,
-      book: json['book'] as String?,
-      bookSlug: json['bookSlug'] as String?,
-      chapter: json['chapter'] as String?,
-      grade: json['grade'] as String?,
-    );
+  id: json['id'] as String?,
+  number: (json['hadithnumber'] as num?)?.toInt(),
+  arab: json['text'] as String?,
+  english: json['english'] as String?,
+  narrator: json['narrator'] as String?,
+  book: json['book'] as String?,
+  bookSlug: json['bookSlug'] as String?,
+  chapter: json['chapter'] as String?,
+  grade: json['grade'] as String?,
+);
 
 Map<String, dynamic> _$HadithModelToJson(HadithModel instance) =>
     <String, dynamic>{
@@ -32,15 +32,15 @@ Map<String, dynamic> _$HadithModelToJson(HadithModel instance) =>
     };
 
 HadithBook _$HadithBookFromJson(Map<String, dynamic> json) => HadithBook(
-      id: json['id'] as String?,
-      name: json['name'] as String?,
-      nameAr: json['nameAr'] as String?,
-      available: (json['available'] as num?)?.toInt(),
-      totalHadiths: (json['totalHadiths'] as num?)?.toInt(),
-      chapters: (json['chapters'] as List<dynamic>?)
-          ?.map((e) => HadithChapter.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+  id: json['id'] as String?,
+  name: json['name'] as String?,
+  nameAr: json['nameAr'] as String?,
+  available: (json['available'] as num?)?.toInt(),
+  totalHadiths: (json['totalHadiths'] as num?)?.toInt(),
+  chapters: (json['chapters'] as List<dynamic>?)
+      ?.map((e) => HadithChapter.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$HadithBookToJson(HadithBook instance) =>
     <String, dynamic>{

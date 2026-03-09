@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,9 +7,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:islam_home/presentation/widgets/glass_container.dart';
-import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 class MiniPlayerWidget extends ConsumerWidget {
   const MiniPlayerWidget({super.key});
@@ -42,174 +42,189 @@ class MiniPlayerWidget extends ConsumerWidget {
 
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               decoration: BoxDecoration(
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.4),
+                    color: Colors.black.withValues(alpha: 0.25),
                     blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    offset: const Offset(0, 8),
                   ),
                   BoxShadow(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.15),
-                    blurRadius: 25,
-                    spreadRadius: -5,
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                    blurRadius: 15,
+                    spreadRadius: -2,
                   ),
                 ],
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: GlassContainer(
-                  borderRadius: 24,
-                  blur: 25,
-                  opacity: 0.1,
-                  borderColor: Colors.white.withValues(alpha: 0.15),
-                  padding: EdgeInsets.zero,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => context.push('/player'),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 10, 16, 10),
-                            child: Row(
-                              children: [
-                                // Premium Mini Artwork
-                                Hero(
-                                  tag: 'artwork',
-                                  child: Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: metadata?.artUri != null
-                                          ? CachedNetworkImage(
-                                              imageUrl: metadata!.artUri!
-                                                  .toString(),
-                                              fit: BoxFit.cover,
-                                              placeholder: (context, url) =>
-                                                  _buildFallbackArt(metadata),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      _buildFallbackArt(
-                                                        metadata,
-                                                      ),
-                                            )
-                                          : _buildFallbackArt(metadata),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                // Metadata
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        metadata?.title ?? l10n.nowPlaying,
-                                        style: GoogleFonts.tajawal(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                          height: 1.5,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        metadata?.artist ?? l10n.reciterLabel,
-                                        style: GoogleFonts.tajawal(
-                                          fontSize: 11,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.6,
-                                          ),
-                                          height: 1.3,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                // Play/Pause Button
-                                _ControlButton(
-                                  onPressed: () {
-                                    if (playing == true) {
-                                      audioService.pause();
-                                    } else {
-                                      audioService.resume();
-                                    }
-                                  },
-                                  icon: playing == true
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                  isPrimary: true,
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Subtle Progress Line
-                          StreamBuilder<Duration>(
-                            stream: audioService.player.positionStream,
-                            builder: (context, positionSnapshot) {
-                              final position =
-                                  positionSnapshot.data ?? Duration.zero;
-                              final duration =
-                                  audioService.player.duration ?? Duration.zero;
-                              final double progress =
-                                  duration.inMilliseconds > 0
-                                  ? (position.inMilliseconds /
-                                            duration.inMilliseconds)
-                                        .clamp(0.0, 1.0)
-                                  : 0.0;
-
-                              return Stack(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => context.push('/player'),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                12,
+                                10,
+                                16,
+                                10,
+                              ),
+                              child: Row(
                                 children: [
-                                  Container(
-                                    height: 2,
-                                    width: double.infinity,
-                                    color: Colors.white.withValues(alpha: 0.05),
-                                  ),
-                                  FractionallySizedBox(
-                                    widthFactor: progress,
+                                  // Premium Mini Artwork
+                                  Hero(
+                                    tag: 'artwork',
                                     child: Container(
-                                      height: 2,
+                                      width: 44,
+                                      height: 44,
                                       decoration: BoxDecoration(
-                                        color: AppTheme.primaryColor,
+                                        borderRadius: BorderRadius.circular(12),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppTheme.primaryColor
-                                                .withValues(alpha: 0.5),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, -1),
+                                            color: Colors.black.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
                                           ),
                                         ],
                                       ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: metadata?.artUri != null
+                                            ? CachedNetworkImage(
+                                                imageUrl: metadata!.artUri!
+                                                    .toString(),
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    _buildFallbackArt(metadata),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        _buildFallbackArt(
+                                                          metadata,
+                                                        ),
+                                              )
+                                            : _buildFallbackArt(metadata),
+                                      ),
                                     ),
                                   ),
+                                  const SizedBox(width: 14),
+                                  // Metadata
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          metadata?.title ?? l10n.nowPlaying,
+                                          style: GoogleFonts.tajawal(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: Colors.white,
+                                            height: 1.5,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          metadata?.artist ?? l10n.reciterLabel,
+                                          style: GoogleFonts.tajawal(
+                                            fontSize: 11,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.6,
+                                            ),
+                                            height: 1.3,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // Play/Pause Button
+                                  _ControlButton(
+                                    onPressed: () {
+                                      if (playing == true) {
+                                        audioService.pause();
+                                      } else {
+                                        audioService.resume();
+                                      }
+                                    },
+                                    icon: playing == true
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                    isPrimary: true,
+                                  ),
                                 ],
-                              );
-                            },
-                          ),
-                        ],
+                              ),
+                            ),
+                            // Subtle Progress Line
+                            StreamBuilder<Duration>(
+                              stream: audioService.player.positionStream,
+                              builder: (context, positionSnapshot) {
+                                final position =
+                                    positionSnapshot.data ?? Duration.zero;
+                                final duration =
+                                    audioService.player.duration ??
+                                    Duration.zero;
+                                final double progress =
+                                    duration.inMilliseconds > 0
+                                    ? (position.inMilliseconds /
+                                              duration.inMilliseconds)
+                                          .clamp(0.0, 1.0)
+                                    : 0.0;
+
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      height: 2,
+                                      width: double.infinity,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                    ),
+                                    FractionallySizedBox(
+                                      widthFactor: progress,
+                                      child: Container(
+                                        height: 2,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primaryColor,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppTheme.primaryColor
+                                                  .withValues(alpha: 0.5),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, -1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

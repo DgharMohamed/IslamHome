@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Service responsible for scheduling and managing Islamic prayer (Adhan)
 /// notifications with audio playback.
@@ -43,6 +45,8 @@ class NotificationService {
     'Maghrib': 'المغرب',
     'Isha': 'العشاء',
   };
+  static const int _dailyVerseNotificationId = 710;
+  static const int _dailyDhikrNotificationId = 711;
 
   // ──────────────────────────────────────────────────────────────────────────
   // Initialization
@@ -52,6 +56,7 @@ class NotificationService {
     if (_initialized) return;
 
     tz_data.initializeTimeZones();
+    await _configureLocalTimezone();
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -65,6 +70,7 @@ class NotificationService {
     await _plugin.initialize(
       const InitializationSettings(android: androidSettings, iOS: iosSettings),
     );
+    await ensureNotificationPermission();
 
     // Create notification channels
     if (Platform.isAndroid) {
@@ -98,10 +104,37 @@ class NotificationService {
           showBadge: true,
         ),
       );
+
+      // Daily content channel
+      await androidPlugin?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'daily_content_channel',
+          'المحتوى اليومي',
+          description: 'إشعارات آية اليوم والمحتوى الإيماني',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+          showBadge: true,
+        ),
+      );
     }
 
     _initialized = true;
     debugPrint('🔔 NotificationService: initialized');
+  }
+
+  Future<void> _configureLocalTimezone() async {
+    try {
+      final timezoneName = await FlutterTimezone.getLocalTimezone();
+      if (tz.timeZoneDatabase.locations.containsKey(timezoneName)) {
+        tz.setLocalLocation(tz.getLocation(timezoneName));
+        debugPrint('🔔 Timezone set to $timezoneName');
+      } else {
+        debugPrint('🔔 Timezone "$timezoneName" not found in TZ database');
+      }
+    } catch (e) {
+      debugPrint('🔔 Failed to configure timezone: $e');
+    }
   }
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -136,6 +169,89 @@ class NotificationService {
       return await holdsExactAlarmPermission();
     } catch (e) {
       debugPrint('🔔 requestExactAlarmPermission error: $e');
+      return true;
+    }
+  }
+
+  Future<bool> holdsNotificationPermission() async {
+    try {
+      if (Platform.isAndroid) {
+        final plugin = _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
+        final enabled = await plugin?.areNotificationsEnabled();
+        return enabled ?? true;
+      }
+
+      if (Platform.isIOS) {
+        final status = await Permission.notification.status;
+        return status.isGranted;
+      }
+    } catch (e) {
+      debugPrint('🔔 holdsNotificationPermission error: $e');
+    }
+
+    return true;
+  }
+
+  Future<bool> ensureNotificationPermission() async {
+    try {
+      if (Platform.isAndroid) {
+        final plugin = _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
+
+        final enabled = await plugin?.areNotificationsEnabled();
+        if (enabled ?? true) return true;
+
+        await plugin?.requestNotificationsPermission();
+        final afterRequest = await plugin?.areNotificationsEnabled();
+        return afterRequest ?? false;
+      }
+
+      if (Platform.isIOS) {
+        final plugin = _plugin
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
+        return await plugin?.requestPermissions(
+              alert: true,
+              badge: true,
+              sound: true,
+            ) ??
+            true;
+      }
+    } catch (e) {
+      debugPrint('🔔 ensureNotificationPermission error: $e');
+    }
+
+    return true;
+  }
+
+  Future<bool> isIgnoringBatteryOptimizations() async {
+    if (!Platform.isAndroid) return true;
+    try {
+      final status = await Permission.ignoreBatteryOptimizations.status;
+      return status.isGranted;
+    } catch (e) {
+      debugPrint('🔔 isIgnoringBatteryOptimizations error: $e');
+      return true;
+    }
+  }
+
+  Future<bool> requestIgnoreBatteryOptimizations() async {
+    if (!Platform.isAndroid) return true;
+    try {
+      final result = await Permission.ignoreBatteryOptimizations.request();
+      if (result.isGranted) return true;
+
+      // Some OEM ROMs ignore direct requests; opening settings is the fallback.
+      await openAppSettings();
+      return await isIgnoringBatteryOptimizations();
+    } catch (e) {
+      debugPrint('🔔 requestIgnoreBatteryOptimizations error: $e');
       return true;
     }
   }
@@ -338,6 +454,76 @@ class NotificationService {
       );
     } catch (e) {
       debugPrint('🔔 showTestNotification error: $e');
+    }
+  }
+
+  Future<bool> showDailyVerseNotification({
+    required String title,
+    required String body,
+    String? subtitle,
+  }) async {
+    if (!_initialized) await init();
+    final hasPermission = await holdsNotificationPermission();
+    if (!hasPermission) return false;
+
+    try {
+      final safeBody = body.trim().isEmpty ? subtitle ?? '' : body.trim();
+      final trimmed = safeBody.length > 220
+          ? '${safeBody.substring(0, 220)}...'
+          : safeBody;
+
+      const androidDetails = AndroidNotificationDetails(
+        'daily_content_channel',
+        'المحتوى اليومي',
+        channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+
+      await _plugin.show(
+        _dailyVerseNotificationId,
+        title,
+        trimmed,
+        const NotificationDetails(android: androidDetails),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('🔔 showDailyVerseNotification error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> showDailyDhikrNotification({
+    required String title,
+    required String body,
+    String? subtitle,
+  }) async {
+    if (!_initialized) await init();
+    final hasPermission = await holdsNotificationPermission();
+    if (!hasPermission) return false;
+
+    try {
+      final base = body.trim().isEmpty ? (subtitle ?? '') : body.trim();
+      final trimmed = base.length > 220 ? '${base.substring(0, 220)}...' : base;
+
+      const androidDetails = AndroidNotificationDetails(
+        'daily_content_channel',
+        'المحتوى اليومي',
+        channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+
+      await _plugin.show(
+        _dailyDhikrNotificationId,
+        title,
+        trimmed,
+        const NotificationDetails(android: androidDetails),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('🔔 showDailyDhikrNotification error: $e');
+      return false;
     }
   }
 

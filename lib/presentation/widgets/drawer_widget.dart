@@ -13,7 +13,6 @@ class DrawerWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final bool isArabic = l10n.localeName == 'ar';
     return Drawer(
       backgroundColor: AppTheme.backgroundColor,
       elevation: 0,
@@ -56,10 +55,13 @@ class DrawerWidget extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.mosque_rounded,
-                    color: AppTheme.primaryColor,
-                    size: 32,
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/icon/app_icon.png',
+                      width: 32,
+                      height: 32,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -74,9 +76,7 @@ class DrawerWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isArabic
-                      ? 'رحلة روحية ومكتبة'
-                      : 'Spiritual Journey & Library',
+                  l10n.sidebarAppDescription,
                   style: GoogleFonts.tajawal(
                     color: AppTheme.primaryColor.withValues(alpha: 0.6),
                     fontSize: 12,
@@ -93,9 +93,7 @@ class DrawerWidget extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               physics: const BouncingScrollPhysics(),
               children: [
-                _buildSectionHeader(
-                  isArabic ? 'الرئيسية والقرآن' : 'Main & Quran',
-                ),
+                _buildSectionHeader(l10n.home),
                 _buildDrawerItem(
                   Icons.home_rounded,
                   l10n.home,
@@ -103,10 +101,55 @@ class DrawerWidget extends ConsumerWidget {
                   context,
                   ref,
                 ),
+
+                const SizedBox(height: 20),
+                _buildSectionHeader(l10n.homeSectionQuranAndSeerah),
                 _buildDrawerItem(
                   Icons.menu_book_rounded,
-                  l10n.quranTitle,
-                  '/quran-text',
+                  l10n.quranMushaf,
+                  '/quran',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.people_alt_rounded,
+                  l10n.reciters,
+                  '/all-reciters',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.headset_rounded,
+                  l10n.audioTafsir,
+                  '/tafsir',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.video_library_rounded,
+                  l10n.videoLibraryTitle,
+                  '/video',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.import_contacts_rounded,
+                  l10n.azkarDuas,
+                  '/azkar',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.history_edu_rounded,
+                  l10n.propheticHadith,
+                  '/hadith',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.auto_awesome_rounded,
+                  l10n.sira,
+                  '/sira',
                   context,
                   ref,
                 ),
@@ -145,11 +188,18 @@ class DrawerWidget extends ConsumerWidget {
                     ),
 
                 const SizedBox(height: 20),
-                _buildSectionHeader(isArabic ? 'أدوات المسلم' : 'Muslim Tools'),
+                _buildSectionHeader(l10n.homeSectionWorshipAndPrayer),
                 _buildDrawerItem(
                   Icons.access_time_filled_rounded,
                   l10n.prayerTimes,
                   '/prayer-times',
+                  context,
+                  ref,
+                ),
+                _buildDrawerItem(
+                  Icons.compass_calibration_rounded,
+                  l10n.qibla,
+                  '/qibla',
                   context,
                   ref,
                 ),
@@ -160,35 +210,12 @@ class DrawerWidget extends ConsumerWidget {
                   context,
                   ref,
                 ),
-                _buildDrawerItem(
-                  Icons.import_contacts_rounded,
-                  l10n.azkarDuas,
-                  '/azkar',
-                  context,
-                  ref,
-                ),
-                _buildDrawerItem(
-                  Icons.history_edu_rounded,
-                  l10n.hadith,
-                  '/hadith',
-                  context,
-                  ref,
-                ),
-                _buildDrawerItem(
-                  Icons.auto_awesome_rounded,
-                  l10n.sira,
-                  '/sira',
-                  context,
-                  ref,
-                ),
 
                 const SizedBox(height: 20),
-                _buildSectionHeader(
-                  isArabic ? 'المحتوى الإسلامي' : 'Islamic Content',
-                ),
+                _buildSectionHeader(l10n.homeSectionMediaAndBroadcast),
                 _buildDrawerItem(
                   Icons.radio_rounded,
-                  l10n.radio,
+                  l10n.radioLive,
                   '/radio',
                   context,
                   ref,
@@ -200,23 +227,9 @@ class DrawerWidget extends ConsumerWidget {
                   context,
                   ref,
                 ),
-                _buildDrawerItem(
-                  Icons.video_collection_rounded,
-                  l10n.videos,
-                  '/video',
-                  context,
-                  ref,
-                ),
 
                 const SizedBox(height: 20),
-                _buildSectionHeader(isArabic ? 'أخرى' : 'Other'),
-                _buildDrawerItem(
-                  Icons.people_alt_rounded,
-                  l10n.reciters,
-                  '/all-reciters',
-                  context,
-                  ref,
-                ),
+                _buildSectionHeader(l10n.homeSectionMyLibrary),
                 _buildDrawerItem(
                   Icons.favorite_rounded,
                   l10n.favorites,
@@ -238,6 +251,7 @@ class DrawerWidget extends ConsumerWidget {
                   context,
                   ref,
                 ),
+
                 const SizedBox(height: 32),
               ],
             ),
@@ -304,10 +318,10 @@ class DrawerWidget extends ConsumerWidget {
             final lastReadPos = ref.read(lastReadPositionProvider).value;
             if (lastReadPos != null) {
               context.push(
-                '/quran-text?surah=${lastReadPos.surahNumber}&ayah=${lastReadPos.ayahNumber}',
+                '/quran?surah=${lastReadPos.surahNumber}&ayah=${lastReadPos.ayahNumber}',
               );
             } else {
-              context.push('/quran-text');
+              context.push('/quran');
             }
           } else {
             context.push(route);

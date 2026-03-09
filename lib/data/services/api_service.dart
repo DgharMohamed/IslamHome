@@ -9,14 +9,17 @@ import 'package:islam_home/data/models/adhkar_model.dart';
 import 'package:islam_home/data/models/hadith_model.dart';
 import 'package:islam_home/data/models/video_model.dart';
 import 'package:islam_home/data/models/riwaya_model.dart';
-import 'package:islam_home/data/models/quran_content_model.dart';
-import 'package:islam_home/data/services/local_quran_service.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
+import 'package:islam_home/data/models/qf_recitation_model.dart';
 
 class ApiService {
-  final Dio _dio = Dio();
-  final LocalQuranService _offlineQuran = LocalQuranService();
+  final Dio _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
 
   static const String _recitersApi = 'https://mp3quran.net/api/v3';
   static const String _quranCdnApi =
@@ -26,30 +29,12 @@ class ApiService {
   static const String _hadithCdnApi =
       'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1';
   static const String _hadithApiLegacy = 'https://api.hadith.gading.dev';
+  static const String _quranFoundationApi = 'https://api.quran.com/api/v4';
+  static const String _quranFoundationAudioBase = 'https://verses.quran.com/';
+
+  String get quranFoundationAudioBase => _quranFoundationAudioBase;
 
   // Edition mapping: old identifier -> new CDN identifier
-  static const Map<String, String> _editionMap = {
-    'quran-uthmani': 'ara-quranacademy',
-    'quran-simple': 'ara-quransimple',
-    'en.sahih': 'eng-ummmuhammad',
-    'en.asad': 'eng-muhammadasad',
-    'en.pickthall': 'eng-mohammedmarmadu',
-    'en.yusufali': 'eng-abdullahyusufal',
-    'en.hilali': 'eng-muhammadtaqiudd',
-    'ar.jalalayn': 'ara-jalaladdinalmah',
-    'ar.muyassar': 'ara-muyassar',
-    'ar.tanweer': 'ara-tanweer',
-    'ar.waseet': 'ara-waseet',
-    'ur.ahmedali': 'urd-ahmedali',
-    'tr.ates': 'tur-suleymanates',
-    'fr.hamidullah': 'fra-muhammadhamidul',
-    'tr.diyanet': 'tur-diyanetisleri',
-    'ur.jalandhry': 'urd-fatehmuhammadja',
-    'id.indonesian': 'ind-indonesianislam',
-    'ru.kuliev': 'rus-elmirkuliev',
-    'de.bubenheim': 'deu-asfbubenheimand',
-    'es.cortes': 'spa-juliocortes',
-  };
 
   static const Map<String, String> _hadithBookMap = {
     'bukhari': 'ara-bukhari',
@@ -63,13 +48,6 @@ class ApiService {
     'darimi': 'ara-darimi',
     'qudsi': 'ara-qudsi',
   };
-
-  // Cached Quran info for verse metadata
-  Map<String, dynamic>? _cachedQuranInfo;
-  Future<Map<String, dynamic>>? _infoFuture;
-
-  // Cache for page data to avoid repeated processing/fetching
-  final Map<int, QuranSurahContent> _pageCache = {};
 
   // --- Reciters Service ---
   Future<List<Reciter>> getReciters({
@@ -147,6 +125,44 @@ class ApiService {
     }
   }
 
+  // --- Quran Foundation Reciters ---
+  Future<List<QFRecitation>> getQFReciters({String language = 'ar'}) async {
+    try {
+      final response = await _dio.get(
+        '$_quranFoundationApi/resources/recitations',
+        queryParameters: {'language': language},
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['recitations'];
+        return data.map((json) => QFRecitation.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint('API Error (getQFReciters): $e');
+      return [];
+    }
+  }
+
+  /// Fetches audio files for a specific chapter and reciter from Quran Foundation
+  Future<List<dynamic>> getQFAudioForChapter(
+    int reciterId,
+    int chapterId,
+  ) async {
+    try {
+      final response = await _dio.get(
+        '$_quranFoundationApi/quran/recitations/$reciterId',
+        queryParameters: {'chapter_number': chapterId},
+      );
+      if (response.statusCode == 200) {
+        return response.data['audio_files'] ?? [];
+      }
+      return [];
+    } catch (e) {
+      debugPrint('API Error (getQFAudioForChapter): $e');
+      return [];
+    }
+  }
+
   // --- Prayer Times Service ---
   Future<PrayerTimesModel?> getPrayerTimesByCity(
     String city,
@@ -198,438 +214,6 @@ class ApiService {
       debugPrint('API Error (getPrayerTimesByLocation): $e');
       return null;
     }
-  }
-
-  // --- Quran Service ---
-
-  /// Resolves an edition identifier to the new CDN format.
-  String _resolveEdition(String edition) {
-    return _editionMap[edition] ?? edition;
-  }
-
-  /// Fetches and caches Quran info (chapters, verse metadata).
-  Future<Map<String, dynamic>> _getQuranInfo() async {
-    if (_cachedQuranInfo != null) return _cachedQuranInfo!;
-    if (_infoFuture != null) return _infoFuture!;
-
-    _infoFuture = (() async {
-      try {
-        final response = await _dio.get('$_quranCdnApi/info.min.json');
-        if (response.statusCode == 200) {
-          final data = response.data;
-          _cachedQuranInfo = data is String
-              ? await compute(_parseJson, data)
-              : data as Map<String, dynamic>;
-          return _cachedQuranInfo!;
-        }
-      } catch (e) {
-        debugPrint('Failed to fetch Quran info: $e');
-      } finally {
-        _infoFuture = null;
-      }
-      return <String, dynamic>{};
-    })();
-
-    return _infoFuture!;
-  }
-
-  // Helper for compute
-  static Map<String, dynamic> _parseJson(String jsonString) {
-    return json.decode(jsonString) as Map<String, dynamic>;
-  }
-
-  Future<List<Surah>> getSurahs() async {
-    // Try offline first
-    try {
-      return await _offlineQuran.getSurahs();
-    } catch (e) {
-      debugPrint('Offline surahs not available, fetching online: $e');
-    }
-
-    // Fallback to new CDN API
-    try {
-      final info = await _getQuranInfo();
-      if (info.isNotEmpty && info['chapters'] != null) {
-        final List<dynamic> chapters = info['chapters'];
-        return chapters.map((ch) {
-          return Surah.fromJson({
-            'number': ch['chapter'],
-            'name': ch['arabicname'] ?? ch['name'],
-            'englishName': ch['englishname'] ?? ch['name'],
-            'revelationType': ch['revelation'] ?? 'Mecca',
-            'numberOfAyahs': (ch['verses'] as List?)?.length ?? 0,
-          });
-        }).toList();
-      }
-      throw Exception('Failed to load surahs from CDN');
-    } catch (e) {
-      debugPrint('CDN Error (getSurahs): $e');
-      // Ultimate fallback to old API
-      try {
-        final response = await _dio.get('$_alQuranApi/surah');
-        if (response.statusCode == 200) {
-          final List<dynamic> data = response.data['data'];
-          return data.map((json) => Surah.fromJson(json)).toList();
-        }
-      } catch (e2) {
-        debugPrint('Legacy API Error (getSurahs): $e2');
-      }
-      rethrow;
-    }
-  }
-
-  Future<List<QuranEdition>> getQuranEditions() async {
-    try {
-      final response = await _dio.get('$_quranCdnApi/editions.min.json');
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> editionsMap =
-            response.data as Map<String, dynamic>;
-        return editionsMap.entries.map((entry) {
-          final ed = entry.value as Map<String, dynamic>;
-          return QuranEdition(
-            identifier: ed['name'] as String?,
-            language: ed['language'] as String?,
-            name: ed['author'] as String?,
-            englishName: ed['author'] as String?,
-            format: 'text',
-            type:
-                (ed['direction'] == 'rtl' &&
-                    (ed['language'] as String?)?.toLowerCase() == 'arabic')
-                ? 'quran'
-                : 'translation',
-          );
-        }).toList();
-      }
-      return [];
-    } catch (e) {
-      debugPrint('CDN Error (getQuranEditions): $e');
-      // Fallback to old API
-      try {
-        final response = await _dio.get('$_alQuranApi/edition');
-        if (response.statusCode == 200) {
-          final List<dynamic> data = response.data['data'];
-          return data
-              .map((json) => QuranEdition.fromJson(json))
-              .where((ed) => ed.format == 'text')
-              .toList();
-        }
-      } catch (e2) {
-        debugPrint('Legacy API Error (getQuranEditions): $e2');
-      }
-      return [];
-    }
-  }
-
-  Future<QuranSurahContent?> getQuranSurah(
-    int surahNumber, {
-    String edition = 'ar.alafasy',
-  }) async {
-    // Try offline first for supported editions
-    if (edition == 'quran-uthmani' || edition == 'en.sahih') {
-      try {
-        final offlineData = await _offlineQuran.getQuranSurah(
-          surahNumber,
-          edition: edition,
-        );
-        if (offlineData != null) return offlineData;
-      } catch (e) {
-        debugPrint('Offline surah not available, fetching online: $e');
-      }
-    }
-
-    // Fetch from new CDN API
-    try {
-      final resolvedEdition = _resolveEdition(edition);
-      final response = await _dio.get(
-        '$_quranCdnApi/editions/$resolvedEdition/$surahNumber.min.json',
-      );
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final List<dynamic> verses = data['chapter'] ?? [];
-
-        // Get verse metadata from info endpoint
-        final info = await _getQuranInfo();
-        final List<dynamic>? chapters = info['chapters'] as List<dynamic>?;
-        Map<String, dynamic>? chapterInfo;
-        List<dynamic>? verseMeta;
-        if (chapters != null && surahNumber <= chapters.length) {
-          chapterInfo = chapters[surahNumber - 1] as Map<String, dynamic>;
-          verseMeta = chapterInfo['verses'] as List<dynamic>?;
-        }
-
-        final ayahs = verses.map((v) {
-          final verseNum = v['verse'] as int;
-          // Get metadata for this verse
-          Map<String, dynamic>? meta;
-          if (verseMeta != null && verseNum <= verseMeta.length) {
-            meta = verseMeta[verseNum - 1] as Map<String, dynamic>;
-          }
-          return Ayah(
-            number: verseNum,
-            text: v['text'] as String?,
-            numberInSurah: verseNum,
-            juz: meta?['juz'] as int?,
-            manzil: meta?['manzil'] as int?,
-            page: meta?['page'] as int?,
-            ruku: meta?['ruku'] as int?,
-            hizbQuarter: meta?['maqra'] as int?,
-            sajda: meta?['sajda'],
-            hizb: meta?['maqra'] != null
-                ? ((meta!['maqra'] as int) - 1) ~/ 4 + 1
-                : null,
-          );
-        }).toList();
-
-        return QuranSurahContent(
-          number: surahNumber,
-          name:
-              chapterInfo?['arabicname'] as String? ??
-              chapterInfo?['name'] as String?,
-          ayahs: ayahs,
-        );
-      }
-    } catch (e) {
-      debugPrint('CDN Error (getQuranSurah): $e');
-    }
-
-    // Ultimate fallback to old API
-    try {
-      final response = await _dio.get(
-        '$_alQuranApi/surah/$surahNumber/$edition',
-      );
-      if (response.statusCode == 200) {
-        return QuranSurahContent.fromJson(response.data['data']);
-      }
-    } catch (e) {
-      debugPrint('Legacy API Error (getQuranSurah): $e');
-    }
-    return null;
-  }
-
-  Future<QuranSurahContent?> getQuranPage(
-    int pageNumber, {
-    String edition = 'quran-uthmani',
-  }) async {
-    // Check memory cache first
-    if (_pageCache.containsKey(pageNumber)) return _pageCache[pageNumber];
-
-    // Try offline first
-    if (edition == 'quran-uthmani') {
-      try {
-        final offlineData = await _offlineQuran.getQuranPage(
-          pageNumber,
-          edition: edition,
-        );
-        if (offlineData != null) return offlineData;
-      } catch (e) {
-        debugPrint('Offline page not available, fetching online: $e');
-      }
-    }
-
-    // Fetch page from CDN by finding which surahs/verses belong to this page
-    try {
-      final info = await _getQuranInfo();
-      final List<dynamic>? chapters = info['chapters'] as List<dynamic>?;
-      if (chapters == null) throw Exception('No chapter info available');
-
-      final resolvedEdition = _resolveEdition(edition);
-      final List<Ayah> pageAyahs = [];
-
-      // Find all verses on this page
-      for (final ch in chapters) {
-        final chapterNum = ch['chapter'] as int;
-        final List<dynamic> verses = ch['verses'] as List<dynamic>;
-        final versesOnPage = verses.where((v) => v['page'] == pageNumber);
-
-        if (versesOnPage.isNotEmpty) {
-          // Fetch the chapter text for this edition
-          try {
-            final response = await _dio.get(
-              '$_quranCdnApi/editions/$resolvedEdition/$chapterNum.min.json',
-            );
-            if (response.statusCode == 200) {
-              final data = response.data as Map<String, dynamic>;
-              final List<dynamic> chapterVerses = data['chapter'] ?? [];
-
-              for (final meta in versesOnPage) {
-                final verseNum = meta['verse'] as int;
-                String? text;
-                for (final cv in chapterVerses) {
-                  if (cv['verse'] == verseNum) {
-                    text = cv['text'] as String?;
-                    break;
-                  }
-                }
-                pageAyahs.add(
-                  Ayah(
-                    number: verseNum,
-                    text: text,
-                    numberInSurah: verseNum,
-                    juz: meta['juz'] as int?,
-                    manzil: meta['manzil'] as int?,
-                    page: meta['page'] as int?,
-                    ruku: meta['ruku'] as int?,
-                    hizbQuarter: meta['maqra'] as int?,
-                    sajda: meta['sajda'],
-                    hizb: meta['maqra'] != null
-                        ? ((meta['maqra'] as int) - 1) ~/ 4 + 1
-                        : null,
-                    surah: Surah(
-                      number: chapterNum,
-                      name: ch['arabicname'] as String?,
-                      englishName: ch['englishname'] as String?,
-                    ),
-                  ),
-                );
-              }
-            }
-          } catch (e) {
-            debugPrint('Error fetching chapter $chapterNum for page: $e');
-          }
-        }
-      }
-
-      if (pageAyahs.isNotEmpty) {
-        final content = QuranSurahContent(number: pageNumber, ayahs: pageAyahs);
-        _pageCache[pageNumber] = content;
-        return content;
-      }
-    } catch (e) {
-      debugPrint('CDN Error (getQuranPage): $e');
-    }
-
-    // Ultimate fallback to old API
-    try {
-      final response = await _dio.get('$_alQuranApi/page/$pageNumber/$edition');
-      if (response.statusCode == 200) {
-        return QuranSurahContent.fromJson(response.data['data']);
-      }
-    } catch (e) {
-      debugPrint('Legacy API Error (getQuranPage): $e');
-    }
-    return null;
-  }
-
-  Future<List<QuranEdition>> getTafsirEditions() async {
-    // The new CDN API doesn't have a separate tafsir endpoint,
-    // so we return known tafsir editions from the editions list.
-    const tafsirEditions = [
-      {
-        'identifier': 'ara-jalaladdinalmah',
-        'name': 'Tafsir al-Jalalayn',
-        'language': 'Arabic',
-      },
-      {
-        'identifier': 'ara-kingfahadquranc',
-        'name': 'King Fahad Quran Complex',
-        'language': 'Arabic',
-      },
-      {
-        'identifier': 'ara-sirajtafseer',
-        'name': 'Siraj Tafseer',
-        'language': 'Arabic',
-      },
-      {
-        'identifier': 'ind-jalaladdinalmah',
-        'name': 'Tafsir al-Jalalayn (Indonesian)',
-        'language': 'Indonesian',
-      },
-      {
-        'identifier': 'ara-muyassar',
-        'name': 'Al-Muyassar',
-        'language': 'Arabic',
-      },
-      {'identifier': 'ara-tanweer', 'name': 'At-Tanweer', 'language': 'Arabic'},
-      {'identifier': 'ara-waseet', 'name': 'Al-Waseet', 'language': 'Arabic'},
-      {
-        'identifier': 'eng-safiurrahmanalm',
-        'name': 'Tafsir Ibn Kathir (English)',
-        'language': 'English',
-      },
-    ];
-    return tafsirEditions
-        .map(
-          (t) => QuranEdition(
-            identifier: t['identifier'],
-            name: t['name'],
-            englishName: t['name'],
-            language: t['language'],
-            format: 'text',
-            type: 'tafsir',
-          ),
-        )
-        .toList();
-  }
-
-  Future<String?> getAyahTafsir(
-    int surahNumber,
-    int ayahNumber, {
-    String edition = 'ara-muyassar',
-  }) async {
-    // Map of all locally available tafsir editions (both ar.xxx and ara-xxx formats)
-    const offlineEditionMap = {
-      'ar.jalalayn': 'ar.jalalayn',
-      'ar.muyassar': 'ar.muyassar',
-      'ar.tanweer': 'ar.tanweer',
-      'ar.waseet': 'ar.waseet',
-      'ara-jalaladdinalmah': 'ar.jalalayn',
-      'ara-muyassar': 'ar.muyassar',
-      'ara-tanweer': 'ar.tanweer',
-      'ara-waseet': 'ar.waseet',
-      // English Translations
-      'en.ahmedali': 'en.ahmedali',
-      'en.asad': 'en.asad',
-      'en.hilali': 'en.hilali',
-      'en.pickthall': 'en.pickthall',
-      'en.yusufali': 'en.yusufali',
-    };
-
-    // Try offline first for all locally available tafsir editions
-    if (offlineEditionMap.containsKey(edition)) {
-      try {
-        final localEdition = offlineEditionMap[edition]!;
-        final offlineData = await _offlineQuran.getAyahTafsir(
-          surahNumber,
-          ayahNumber,
-          edition: localEdition,
-        );
-        if (offlineData != null) return offlineData;
-      } catch (e) {
-        debugPrint('Offline tafsir not available, fetching online: $e');
-      }
-    }
-
-    // Fetch from CDN - get the whole chapter and extract the verse
-    try {
-      final resolvedEdition = _resolveEdition(edition);
-      final response = await _dio.get(
-        '$_quranCdnApi/editions/$resolvedEdition/$surahNumber.min.json',
-      );
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final List<dynamic> verses = data['chapter'] ?? [];
-        for (final v in verses) {
-          if (v['verse'] == ayahNumber) {
-            return v['text'] as String?;
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('CDN Error (getAyahTafsir): $e');
-    }
-
-    // Ultimate fallback to old API
-    try {
-      final response = await _dio.get(
-        '$_alQuranApi/ayah/$surahNumber:$ayahNumber/$edition',
-      );
-      if (response.statusCode == 200) {
-        return response.data['data']['text'];
-      }
-    } catch (e) {
-      debugPrint('Legacy API Error (getAyahTafsir): $e');
-    }
-    return null;
   }
 
   // --- Hadith Service ---
@@ -946,32 +530,32 @@ class ApiService {
       {
         'title': 'دروس من السيرة النبوية ( ٦ )',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A6%20%29.mp3',
+            '%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A6%20%29.mp3',
       },
       {
         'title': 'دروس من السيرة النبوية ( ٧ )',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A7%20%29.mp3',
+            '%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A7%20%29.mp3',
       },
       {
         'title': 'دروس من السيرة النبوية ( ٨ )',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A8%20%29.mp3',
+            '%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A8%20%29.mp3',
       },
       {
         'title': 'دروس من السيرة النبوية ( ٩ )',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A9%20%29.mp3',
+            '%D8%AF%D8%B1%20%D9%88%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%28%20%D9%A9%20%29.mp3',
       },
       {
         'title': 'مواقف من السيرة النبوية',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D9%85%D8%AD%D8%A7%D8%B6%D8%B1%D8%A9%20%D8%A8%D8%B9%D9%86%D9%88%D8%A7%D9%86%20%28%20%D9%85%D9%88%D8%A7%D9%82%D9%81%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%29%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%A9%20%D8%AD%D9%81%D8%B1%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B7%D9%86.mp3',
+            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D9%85%D8%AD%D8%A7%D8%B6%D8%B1%D8%A9%20%D8%A8%D8%B9%D9%86%D9%88%D8%A7%D9%86%20%28%20%D9%85%D9%88%D8%A7%D9%82%D9%81%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D9%8A%D8%A9%20%29%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%A9%20%D8%AD%D9%81%D8%B1%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B7%D9%86.mp3',
       },
       {
         'title': 'صفحات من السيرة النبوية',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D9%85%D8%AD%D8%A7%D8%B6%D8%B1%D8%A9%20%D8%A8%D8%B9%D9%86%D9%88%D8%A7%D9%86%20%28%20%D8%B5%D9%81%D8%AD%D8%A7%D8%AA%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%29%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%A9%20%D8%AD%D9%81%D8%B1%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B7%D9%86.mp3',
+            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D9%85%D8%AD%D8%A7%D8%B6%D8%B1%D8%A9%20%D8%A8%D8%B9%D9%86%D9%88%D8%A7%D9%86%20%28%20%D8%B5%D9%81%D8%AD%D8%A7%D8%AA%20%D9%85%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A9%20%D8%A7%D9%84%D9%86%D8%A8%D9%88%D9%8A%D8%A9%20%29%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D9%86%D8%A9%20%D8%AD%D9%81%D8%B1%20%D8%A7%D9%84%D8%A8%D8%A7%D8%B7%D9%86.mp3',
       },
       {
         'title': 'نفحات من السيرة النبوية',
@@ -986,7 +570,7 @@ class ApiService {
       {
         'title': 'هجرة الرسول صلى الله عليه وسلم',
         'file':
-            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D9%82%D8%B5%D8%A9%20%D9%87%D8%AC%D8%B1%D8%A9%20%D8%A7%D9%84%D8%B1%D8%B3%D9%88%D9%84%20%D8%B5%D9%84%D9%89%20%D8%A7%D9%84%D9%84%D9%87%20%D8%B9%D9%84%D9%8A%D8%A9%20%D9%88%D8%B3%D9%84%D9%85.mp3',
+            '%D8%AF%20%D8%A7%D9%84%D8%B9%D8%B1%D9%8A%D9%81%D9%8A%20%D9%82%D8%B5%D8%A9%20%D9%87%D8%AC%D8%B1%D8%A9%20%D8%A7%D9%84%D8%B1%D8%B3%D9%88%D9%84%20%D8%B5%D9%84%D9%89%20%D8%A7%D9%84%D9%84%D9%87%20%D8%B9%D9%84%D9%8A%D8%A9%20%D9%88%D9%81%D9%84%D9%85.mp3',
       },
     ];
 
@@ -1076,8 +660,38 @@ class ApiService {
     return {'reciters': filteredReciters, 'surahs': filteredSurahs};
   }
 
-  // --- Quran Search ---
-  Future<List<Ayah>> searchQuran(String query) async {
-    return _offlineQuran.searchVerses(query);
+  // --- General App Data Needs ---
+  Future<List<Surah>> getSurahs() async {
+    try {
+      final response = await _dio.get('$_quranCdnApi/info.min.json');
+      if (response.statusCode == 200 && response.data['chapters'] != null) {
+        final List<dynamic> chapters = response.data['chapters'];
+        return chapters.map((ch) {
+          return Surah.fromJson({
+            'number': ch['chapter'],
+            'name': ch['arabicname'] ?? ch['name'],
+            'englishName': ch['englishname'] ?? ch['name'],
+            'revelationType': ch['revelation'] ?? 'Mecca',
+            'numberOfAyahs': (ch['verses'] as List?)?.length ?? 0,
+          });
+        }).toList();
+      }
+    } catch (e) {
+      debugPrint('CDN Surahs fetch error: $e');
+    }
+    // Fallback
+    try {
+      final response = await _dio.get('$_alQuranApi/surah');
+      final data = response.data['data'] as List;
+      return data.map((json) => Surah.fromJson(json)).toList();
+    } catch (e2) {
+      debugPrint('Legacy Surahs fetch error: $e2');
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> searchQuran(String query) async {
+    // Return empty list safely for now as search is being refactored
+    return [];
   }
 }

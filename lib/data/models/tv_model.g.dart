@@ -6,12 +6,10 @@ part of 'tv_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-TvModel _$TvModelFromJson(Map<String, dynamic> json) => TvModel(
-      name: json['name'] as String?,
-      url: json['url'] as String?,
-    );
+TvModel _$TvModelFromJson(Map<String, dynamic> json) =>
+    TvModel(name: json['name'] as String?, url: json['url'] as String?);
 
 Map<String, dynamic> _$TvModelToJson(TvModel instance) => <String, dynamic>{
-      'name': instance.name,
-      'url': instance.url,
-    };
+  'name': instance.name,
+  'url': instance.url,
+};

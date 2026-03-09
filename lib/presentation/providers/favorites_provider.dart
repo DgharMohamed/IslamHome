@@ -8,7 +8,15 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
   @override
   Map<String, List<dynamic>> build() {
     _loadFavorites();
-    return {'reciters': [], 'surahs': [], 'playlists': [], 'hadiths': []};
+    return {
+      'reciters': [],
+      'surahs': [],
+      'ayahs': [],
+      'playlists': [],
+      'hadiths': [],
+      'tafsir': [],
+      'seerah': [],
+    };
   }
 
   final _box = Hive.box('favorites');
@@ -16,15 +24,20 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
   void _loadFavorites() {
     final recitersJson = _box.get('reciters', defaultValue: '[]');
     final surahsJson = _box.get('surahs', defaultValue: '[]');
+    final ayahsJson = _box.get('ayahs', defaultValue: '[]');
     final playlistsJson = _box.get('playlists', defaultValue: '[]');
-
     final hadithsJson = _box.get('hadiths', defaultValue: '[]');
+    final tafsirJson = _box.get('tafsir', defaultValue: '[]');
+    final seerahJson = _box.get('seerah', defaultValue: '[]');
 
     state = {
       'reciters': jsonDecode(recitersJson),
       'surahs': jsonDecode(surahsJson),
+      'ayahs': jsonDecode(ayahsJson),
       'playlists': jsonDecode(playlistsJson),
       'hadiths': jsonDecode(hadithsJson),
+      'tafsir': jsonDecode(tafsirJson),
+      'seerah': jsonDecode(seerahJson),
     };
   }
 
@@ -75,6 +88,107 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
     final itemKey = '${surahNumber}_$reciterId';
     return state['surahs']!.any(
       (item) => '${item['surah_number']}_${item['reciter_id']}' == itemKey,
+    );
+  }
+
+  // --- Ayah Methods ---
+
+  void toggleFavoriteAyah(int surah, int ayah) {
+    final list = List<dynamic>.from(state['ayahs']!);
+    final itemKey = '${surah}_$ayah';
+    final index = list.indexWhere(
+      (item) => '${item['surah']}_${item['ayah']}' == itemKey,
+    );
+
+    if (index >= 0) {
+      list.removeAt(index);
+    } else {
+      list.add({
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'surah': surah,
+        'ayah': ayah,
+        'created_at': DateTime.now().millisecondsSinceEpoch,
+      });
+    }
+
+    state = {...state, 'ayahs': list};
+    _box.put('ayahs', jsonEncode(list));
+  }
+
+  bool isFavoriteAyah(int surah, int ayah) {
+    final itemKey = '${surah}_$ayah';
+    return state['ayahs']!.any(
+      (item) => '${item['surah']}_${item['ayah']}' == itemKey,
+    );
+  }
+
+  // --- Tafsir Methods ---
+
+  void toggleFavoriteTafsir({
+    required String tafsirName,
+    required dynamic surahPart,
+  }) {
+    final list = List<dynamic>.from(state['tafsir']!);
+    final itemKey = '${tafsirName}_${surahPart.id}';
+    final index = list.indexWhere(
+      (item) => '${item['tafsir_name']}_${item['part_id']}' == itemKey,
+    );
+
+    if (index >= 0) {
+      list.removeAt(index);
+    } else {
+      list.add({
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'part_id': surahPart.id,
+        'part_name': surahPart.name,
+        'tafsir_name': tafsirName,
+        'url': surahPart.url,
+        'surah_id': surahPart.surahId,
+        'created_at': DateTime.now().millisecondsSinceEpoch,
+      });
+    }
+
+    state = {...state, 'tafsir': list};
+    _box.put('tafsir', jsonEncode(list));
+  }
+
+  bool isFavoriteTafsir(String tafsirName, int partId) {
+    final itemKey = '${tafsirName}_$partId';
+    return state['tafsir']!.any(
+      (item) => '${item['tafsir_name']}_${item['part_id']}' == itemKey,
+    );
+  }
+
+  // --- Seerah Methods ---
+
+  void toggleFavoriteSeerah(dynamic episode, String scholarName) {
+    final list = List<dynamic>.from(state['seerah']!);
+    final itemKey = '${scholarName}_${episode.id}';
+    final index = list.indexWhere(
+      (item) => '${item['scholar_name']}_${item['episode_id']}' == itemKey,
+    );
+
+    if (index >= 0) {
+      list.removeAt(index);
+    } else {
+      list.add({
+        'id': DateTime.now().millisecondsSinceEpoch.toString(),
+        'episode_id': episode.id,
+        'episode_title': episode.title,
+        'scholar_name': scholarName,
+        'url': episode.url,
+        'created_at': DateTime.now().millisecondsSinceEpoch,
+      });
+    }
+
+    state = {...state, 'seerah': list};
+    _box.put('seerah', jsonEncode(list));
+  }
+
+  bool isFavoriteSeerah(String scholarName, String episodeId) {
+    final itemKey = '${scholarName}_$episodeId';
+    return state['seerah']!.any(
+      (item) => '${item['scholar_name']}_${item['episode_id']}' == itemKey,
     );
   }
 

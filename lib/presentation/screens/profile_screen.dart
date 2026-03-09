@@ -42,13 +42,13 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   _buildMenuItem(
                     icon: Icons.info_rounded,
-                    title: 'عن التطبيق', // Add to l10n later if needed
+                    title: l10n.aboutApp,
                     onTap: () async {
                       final packageInfo = await PackageInfo.fromPlatform();
                       if (!context.mounted) return;
                       showAboutDialog(
                         context: context,
-                        applicationName: 'Islam Home',
+                        applicationName: l10n.appTitle,
                         applicationVersion: packageInfo.version,
                         applicationIcon: const Icon(
                           Icons.mosque,
@@ -58,7 +58,7 @@ class ProfileScreen extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(height: 48),
-                  _buildVersionInfo(),
+                  _buildVersionInfo(l10n),
                 ],
               ),
             ),
@@ -96,7 +96,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'زائر',
+                l10n.guestUser,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -142,14 +142,14 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildVersionInfo() {
+  Widget _buildVersionInfo(AppLocalizations l10n) {
     return FutureBuilder<PackageInfo>(
       future: PackageInfo.fromPlatform(),
       builder: (context, snapshot) {
         final version = snapshot.data?.version ?? '...';
         return Center(
           child: Text(
-            'الإصدار $version',
+            l10n.appVersionLabel(version),
             style: const TextStyle(color: Colors.grey),
           ),
         );

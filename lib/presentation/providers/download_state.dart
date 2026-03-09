@@ -7,6 +7,7 @@ import 'package:islam_home/data/models/surah_model.dart';
 class DownloadItemState {
   final String id;
   final String title;
+  final String reciterName;
   final String url;
   final double progress;
   final DownloadStatus status;
@@ -14,6 +15,7 @@ class DownloadItemState {
   DownloadItemState({
     required this.id,
     required this.title,
+    required this.reciterName,
     required this.url,
     this.progress = 0.0,
     this.status = DownloadStatus.idle,
@@ -23,6 +25,7 @@ class DownloadItemState {
     return DownloadItemState(
       id: id,
       title: title,
+      reciterName: reciterName,
       url: url,
       progress: progress ?? this.progress,
       status: status ?? this.status,
@@ -64,12 +67,13 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
   }
 
   // Helper to add initially
-  void _addState(String id, String title, String url) {
+  void _addState(String id, String title, String reciterName, String url) {
     state = {
       ...state,
       id: DownloadItemState(
         id: id,
         title: title,
+        reciterName: reciterName,
         url: url,
         status: DownloadStatus.idle,
       ),
@@ -106,6 +110,7 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
     _downloadService.addToQueue(
       url: url,
       reciterId: reciter.id.toString(),
+      reciterName: reciter.name ?? 'Unknown',
       moshafType: moshaf.moshafType.toString(),
       surahNumber: surah.number!,
       title: title,
@@ -113,7 +118,7 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
       type: 'quran',
     );
 
-    _addState(id, title, url);
+    _addState(id, title, reciter.name ?? 'Unknown', url);
   }
 
   Future<void> startSeerahDownload({
@@ -132,6 +137,7 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
     _downloadService.addToQueue(
       url: url,
       reciterId: reciterName,
+      reciterName: reciterName,
       moshafType: 'seerah_audio',
       surahNumber: episodeId,
       title: title,
@@ -139,7 +145,52 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
       type: 'seerah',
     );
 
-    _addState(id, title, url);
+    _addState(id, title, reciterName, url);
+  }
+
+  Future<void> startGenericDownload({
+    required String title,
+    required String artist,
+    required String album,
+    required String url,
+    required int idValue,
+  }) async {
+    final id = _generateId(artist, album, idValue, type: 'general');
+
+    _downloadService.addToQueue(
+      url: url,
+      reciterId: artist,
+      reciterName: artist,
+      moshafType: album,
+      surahNumber: idValue,
+      title: title,
+      id: id,
+      type: 'general',
+    );
+
+    _addState(id, title, artist, url);
+  }
+
+  Future<void> startTafsirDownload({
+    required String tafsirName,
+    required String title,
+    required String url,
+    required int surahId,
+  }) async {
+    final id = _generateId(tafsirName, 'tafsir_audio', surahId, type: 'tafsir');
+
+    _downloadService.addToQueue(
+      url: url,
+      reciterId: tafsirName,
+      reciterName: tafsirName,
+      moshafType: 'tafsir_audio',
+      surahNumber: surahId,
+      title: title,
+      id: id,
+      type: 'tafsir',
+    );
+
+    _addState(id, title, tafsirName, url);
   }
 
   Future<void> downloadAll({
@@ -186,6 +237,28 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
     );
   }
 
+  Future<bool> isGenericDownloaded(
+    String artist,
+    String album,
+    int idValue,
+  ) async {
+    return _downloadService.isFileDownloaded(
+      artist,
+      album,
+      idValue,
+      type: 'general',
+    );
+  }
+
+  Future<bool> isTafsirDownloaded(String tafsirName, int surahId) async {
+    return _downloadService.isFileDownloaded(
+      tafsirName,
+      'tafsir_audio',
+      surahId,
+      type: 'tafsir',
+    );
+  }
+
   Future<void> deleteFile(Reciter reciter, Moshaf moshaf, Surah surah) async {
     await _downloadService.deleteDownload(
       reciter.id.toString(),
@@ -219,6 +292,18 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
       episodeId,
       type: 'seerah',
     );
+    await _downloadService.removeFromHistory(id);
+
+    if (state.containsKey(id)) {
+      final newState = Map<String, DownloadItemState>.from(state);
+      newState.remove(id);
+      state = newState;
+    }
+  }
+
+  Future<void> deleteTafsirFile(String tafsirName, int surahId) async {
+    await _downloadService.deleteDownload(tafsirName, 'tafsir_audio', surahId);
+    final id = _generateId(tafsirName, 'tafsir_audio', surahId, type: 'tafsir');
     await _downloadService.removeFromHistory(id);
 
     if (state.containsKey(id)) {

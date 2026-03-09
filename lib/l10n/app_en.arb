@@ -6,6 +6,7 @@
   "prayerTimes": "Prayer Times",
   "dailyVerse": "Daily Verse",
   "khatmaProgress": "Khatma Progress",
+  "generalReadingProgress": "General Reading Progress",
   "reachedSurah": "Reached Surah {surah}",
   "@reachedSurah": {
     "placeholders": {
@@ -15,11 +16,16 @@
     }
   },
   "exploreSections": "Explore Sections",
+  "homeSectionQuranAndSeerah": "Quran and Prophetic Biography",
+  "homeSectionWorshipAndPrayer": "Worship and Prayer",
+  "homeSectionMediaAndBroadcast": "Broadcast and Media",
+  "homeSectionMyLibrary": "My Library",
   "quranMushaf": "Holy Quran",
   "quranTitle": "The Holy Quran",
   "quranSubtitle": "Tafsir, Reading & translation",
   "quranSyncTitle": "Audio-Read Quran",
   "quranSyncSubtitle": "Sync recitation with text",
+  "audioTafsir": "Audio Tafsir",
   "propheticHadith": "Prophetic Hadiths",
   "hadithOfTheDay": "Hadith of the Day",
   "azkarDuas": "Azkar and Duas",
@@ -162,6 +168,7 @@
     }
   },
   "nowPlaying": "Now Playing...",
+  "playbackPaused": "Playback Paused",
   "reciterLabel": "Reciter",
   "verseOfTheDay": "Verse of the Day",
   "dailyVerseText": "Indeed, with hardship comes ease * Indeed, with hardship comes ease",
@@ -400,6 +407,22 @@
   "cancelPlan": "Cancel Plan",
   "manageNotificationSettings": "Manage Notification Settings",
   "manageNotificationSettingsSubtitle": "Open system settings for notifications",
+  "notificationDiagnosticsTitle": "Notification Diagnostics",
+  "notificationDiagnosticsSubtitle": "Check real permission status for reliable Adhan alerts",
+  "notificationDiagnosticsHealthy": "Notification setup is healthy",
+  "notificationDiagnosticsNeedsFix": "Some settings need fixing",
+  "notificationPermissionTitle": "Notifications Permission",
+  "notificationPermissionSubtitle": "Must be enabled to receive Adhan and reminder alerts",
+  "exactAlarmPermissionTitle": "Exact Alarms Permission",
+  "exactAlarmPermissionSubtitle": "Required on Android 12+ to fire Adhan on exact time",
+  "batteryOptimizationTitle": "Battery Optimization",
+  "batteryOptimizationSubtitle": "Disable optimization for this app to prevent delayed or blocked Adhan",
+  "notRequiredOnThisDevice": "Not required on this device",
+  "fixNow": "Fix now",
+  "enabled": "Enabled",
+  "requiresFix": "Needs fix",
+  "refreshStatus": "Refresh status",
+  "openSystemSettings": "Open system settings",
   "continueYourKhatma": "Continue Your Khatma",
   "juzAndSurah": "Juz {juz} - {surah}",
   "@juzAndSurah": {
@@ -432,6 +455,7 @@
   "shareDua": "Share Dua",
   "mayAllahAcceptAll": "May Allah accept from us and you",
   "continueReading": "Continue Reading",
+  "continueListening": "Continue Listening",
   "activePlans": "Active Plans",
   "totalAchievement": "Total Achievement",
   "khatmaCount": "You have completed the Quran {count} times",
@@ -622,7 +646,10 @@
     }
   },
   "todayTotal": "Today",
+  "today": "Today",
   "allTimeTasbeehs": "All-time total",
+  "total": "Total",
+  "streak": "Streak",
   "setCompleteTitle": "Set Complete!",
   "setCompleteSubtitle": "May Allah accept your dhikr",
   "history": "History",
@@ -633,6 +660,7 @@
   "sidebarContent": "Islamic Content",
   "sidebarOther": "Other",
   "sidebarTagline": "Spiritual Journey & Library",
+  "sidebarAppDescription": "Your daily Islamic companion",
   "sira": "Life of the Prophet",
   "prophetLife": "Life of the Prophet ﷺ",
   "allSections": "All",
@@ -645,5 +673,240 @@
   "quranSection": "The Holy Quran",
   "seerahSection": "Prophetic Biography",
   "emptyDownloadsHistory": "Download history is empty",
-  "emptyDownloadsHistoryDesc": "You haven't downloaded any Surahs yet"
+  "emptyDownloadsHistoryDesc": "You haven't downloaded any Surahs yet",
+  "khatmaV2Title": "New Khatma Track",
+  "khatmaV2TypeStepTitle": "What is your goal?",
+  "khatmaV2Reading": "General Reading",
+  "khatmaV2ReadingDesc": "A complete reading of the Holy Quran",
+  "khatmaV2Memorization": "Memorization",
+  "khatmaV2MemorizationDesc": "Focus on Hifz with smart tracking",
+  "khatmaV2Revision": "Revision",
+  "khatmaV2RevisionDesc": "Strengthen your previous memorization",
+  "khatmaV2Listening": "Listening",
+  "khatmaV2ListeningDesc": "Gradual Quran listening with daily tracking",
+  "khatmaV2DetailsStepTitle": "Track Details",
+  "khatmaV2TitleLabel": "Title (e.g. Ramadan Khatma)",
+  "khatmaV2Range": "Range",
+  "khatmaV2StartPage": "Start Page",
+  "khatmaV2EndPage": "End Page",
+  "khatmaV2SchedulingStepTitle": "Scheduling & Engine",
+  "khatmaV2DurationDays": "Duration (Days)",
+  "khatmaV2QuickDurations": "Quick presets",
+  "khatmaV2EnginePrefs": "Engine Preferences",
+  "khatmaV2SmartRemediation": "Smart Remediation",
+  "khatmaV2SmartRemediationDesc": "Automatically adjusts your goal if you miss a day",
+  "khatmaV2FixedDaily": "Fixed Daily Goal",
+  "khatmaV2FixedDailyDesc": "Never changes, even if progress falls behind",
+  "khatmaV2StartJourney": "Start Journey",
+  "khatmaV2Continue": "Continue",
+  "khatmaV2Back": "Back",
+  "khatmaV2MyKhatma": "My {type} Khatma",
+  "khatmaV2NoActive": "No Active Khatma",
+  "khatmaV2StartJourneyDesc": "Start a new journey with the smart Khatma system.",
+  "khatmaV2SetupNew": "Setup New Khatma",
+  "khatmaV2DeleteTrack": "Delete this track",
+  "khatmaV2DeleteTrackTitle": "Delete track?",
+  "khatmaV2DeleteTrackBody": "\"{title}\" and all its progress will be permanently deleted.",
+  "@khatmaV2DeleteTrackBody": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "khatmaV2RecordPage": "Record Page {page}",
+  "khatmaV2SelectTrack": "Select Track",
+  "khatmaV2ProgressSaved": "Progress saved to {track}",
+  "khatmaV2TrackTypeSuffix": "{type} TRACK",
+  "khatmaV2UnitLabel": "Tracking Unit",
+  "khatmaV2UnitPage": "Pages",
+  "khatmaV2UnitJuz": "Juz (Parts)",
+  "khatmaV2StartJuz": "Start Juz",
+  "khatmaV2EndJuz": "End Juz",
+  "khatmaV2JuzCount": "Total Juz",
+  "khatmaV2RecordJuz": "Record Juz {juz}",
+  "khatmaV2UnitPageSingle": "page",
+  "khatmaV2UnitJuzSingle": "juz",
+  "khatmaHeatmapLess": "Less",
+  "khatmaHeatmapMore": "More",
+  "khatmaSettings": "Khatma Settings",
+  "khatmaV2UnitSurah": "Surahs",
+  "khatmaV2UnitSurahSingle": "surah",
+  "khatmaV2StartSurah": "Start Surah",
+  "khatmaV2EndSurah": "End Surah",
+  "khatmaV2RecordSurah": "Record Surah {surah}",
+  "khatmaV2ValidationRangeOrder": "Start must be less than or equal to end.",
+  "khatmaV2ValidationStartOutOfRange": "Start value must be between 1 and {max}.",
+  "@khatmaV2ValidationStartOutOfRange": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "khatmaV2ValidationEndOutOfRange": "End value must be between 1 and {max}.",
+  "@khatmaV2ValidationEndOutOfRange": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "khatmaV2ValidationDurationDays": "Duration must be at least 1 day.",
+  "playAyah": "Play Ayah",
+  "testNotification": "Test Notification",
+  "testNotificationSubtitle": "Tap to verify alerts are working",
+  "locationPermissionRequired": "Location Permission Required",
+  "unableToStartAudioTryAgain": "Unable to start audio right now. Please try again.",
+  "guestUser": "Guest",
+  "appVersionLabel": "Version {version}",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "reciterNoSurahsAvailable": "No surahs available for this reciter",
+  "back": "Back",
+  "adhkarTitle": "Adhkar",
+  "adhkarSearchTooltip": "Search",
+  "adhkarFavoritesTooltip": "Favorites",
+  "noAdhkarDataFound": "No adhkar data found",
+  "noAdhkarInCategory": "No adhkar in this category",
+  "searchAdhkarHint": "Search in Arabic, English or category",
+  "typeToSearchAdhkar": "Type to search adhkar",
+  "noAdhkarMatches": "No matches found",
+  "favoriteAdhkarTitle": "Favorite Adhkar",
+  "noFavoriteAdhkar": "No favorites yet",
+  "dhikrDetailsTitle": "Dhikr Details",
+  "toggleFavorite": "Toggle favorite",
+  "dhikrNotFound": "Dhikr not found",
+  "referenceLabel": "Reference",
+  "repeatCounter": "Repeat Counter",
+  "completedThisDhikr": "Completed this dhikr",
+  "countLabel": "Count",
+  "adhkarCategoryMorning": "Morning Adhkar",
+  "adhkarCategoryEvening": "Evening Adhkar",
+  "adhkarCategorySleep": "Sleep Adhkar",
+  "adhkarCategoryPrayer": "Prayer Adhkar",
+  "adhkarCategoryAfterPrayer": "After Prayer",
+  "adhkarCategoryMosque": "Mosque Adhkar",
+  "adhkarCategoryFood": "Food Adhkar",
+  "adhkarCategoryTravel": "Travel Adhkar",
+  "adhkarCategoryHome": "Home Adhkar",
+  "adhkarCategoryGeneral": "General Adhkar",
+  "adhkarCategoryTasbeeh": "Tasbeeh",
+  "adhkarCategoryQuranDua": "Quranic Duas",
+  "athanOnboardingPrompt": "Would you like to enable Adhan notifications for prayer times? You can always change this in Prayer Times settings.",
+  "adhanAlertsMayNotWork": "Adhan alerts might not work",
+  "enableExactAlarmsFromSettings": "Please enable \"Exact Alarms\" in system settings.",
+  "enable": "Enable",
+  "prePrayerReminders": "Pre-Prayer Reminders",
+  "prePrayerReminderSubtitle": "Reminder to prepare and read Azkar {minutes} mins before",
+  "@prePrayerReminderSubtitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "remindBefore": "Remind before",
+  "previewAdhanSound": "Preview Adhan Sound",
+  "tapToListen": "Tap to listen"
+  ,
+  "playlistPlayAll": "Play All",
+  "noSurahsInPlaylist": "No surahs in this playlist",
+  "playlistShareText": "Playlist: {name}\nListen via Islamic Library App:\nislamiclibrary://playlist?data={data}",
+  "@playlistShareText": {
+    "placeholders": {
+      "name": {},
+      "data": {}
+    }
+  },
+  "favoritesEmptyHint": "Add your first item from {section} and it will appear here.",
+  "@favoritesEmptyHint": {
+    "placeholders": {
+      "section": {}
+    }
+  },
+  "openSectionLabel": "Open {section}",
+  "@openSectionLabel": {
+    "placeholders": {
+      "section": {}
+    }
+  },
+  "noFavoriteTafsirClips": "No favorite tafsir clips",
+  "noFavoriteSeerahClips": "No favorite seerah clips",
+  "chooseYourLanguage": "Choose Your Language",
+  "languageArabicSubtitle": "Arabic",
+  "languageEnglishSubtitle": "English",
+  "permissionsCannotBeRevokedInApp": "Permissions cannot be revoked inside the app. Please change them from device settings.",
+  "permissionDeniedEnableFromSettings": "Permission denied. Please enable it from settings.",
+  "welcome": "Welcome",
+  "permissionsSetupSubtitle": "Let's set up your experience",
+  "permissionsNotificationsTitle": "Notifications & Background Play",
+  "permissionsNotificationsSubtitle": "Stay notified and keep audio playing",
+  "permissionsLocationTitle": "Prayer Times & Qibla",
+  "permissionsLocationSubtitle": "Accurate prayer times based on GPS",
+  "permissionsUpdatesTitle": "Automatic Updates",
+  "permissionsUpdatesSubtitle": "Allow app to update from within",
+  "startNow": "Start Now",
+  "calculationMethodDescription": "Choose the prayer times calculation method for your region",
+  "finishSetup": "Finish Setup",
+  "storySectionTitle": "The Story",
+  "keyEventsTitle": "Key Events",
+  "keyLessonTitle": "Key Lesson",
+  "tasbeehSessionCount": "Session {count}",
+  "@tasbeehSessionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setActiveListeningTrack": "Set Active Listening Track",
+  "currentActiveTrack": "Current active",
+  "chooseActiveListeningTrack": "Choose Active Listening Track",
+  "activeListeningTrackSetMessage": "\"{title}\" is now the active listening track",
+  "@activeListeningTrackSetMessage": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "clearActiveTrack": "Clear Active Track",
+  "muslimWorldLeague": "Muslim World League"
+  ,
+  "mushafSettings": "Mushaf Settings",
+  "themeLabel": "Theme",
+  "riwayaSettings": "Riwaya Settings",
+  "chooseQuranRecitationStyle": "Choose Quran recitation style",
+  "downloadMoreRiwayat": "Download more riwayat",
+  "available": "Available",
+  "tafsirLabel": "Tafsir",
+  "playVerseAudio": "Play verse",
+  "noTranslationAvailable": "No translation available.",
+  "failedToLoadTranslation": "Failed to load translation."
+  ,
+  "hadithShareText": "Check out this Hadith from the Islamic Library App: {text}",
+  "@hadithShareText": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "hadithBookBukhari": "Sahih al-Bukhari",
+  "hadithBookMuslim": "Sahih Muslim",
+  "hadithBookAbuDawud": "Sunan Abu Dawud",
+  "hadithBookTirmidhi": "Jami' at-Tirmidhi",
+  "hadithBookNasai": "Sunan an-Nasa'i",
+  "hadithBookIbnMajah": "Sunan Ibn Majah",
+  "hadithBookMalik": "Muwatta Malik",
+  "hadithBookNawawi": "Forty Hadith Nawawi",
+  "hadithBookQudsi": "Hadith Qudsi",
+  "reciterUnavailableNow": "Sorry, this reciter is not available right now.",
+  "unableToLoadPlayableAyahAudio": "Unable to load playable ayah audio for this selection.",
+  "noDataAvailable": "No data available.",
+  "chooseTafsirSource": "Choose Tafsir Source",
+  "noTafsirSourcesAvailable": "No tafsir sources are currently available.",
+  "fullIndex": "Full Index",
+  "theme": "Theme",
+  "riwaya": "Riwaya"
+  ,
+  "manualLocationInput": "Manual Input"
 }

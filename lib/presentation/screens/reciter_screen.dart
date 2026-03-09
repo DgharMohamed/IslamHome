@@ -66,7 +66,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
 
     // Error state if no moshaf
     if (moshaf == null || surahListRaw.isEmpty) {
-      return _buildErrorScreen(l10n, 'لا توجد سور متاحة للقارئ');
+      return _buildErrorScreen(l10n, l10n.reciterNoSurahsAvailable);
     }
 
     // Watch surahsProvider ONCE outside the list
@@ -294,7 +294,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                   backgroundColor: AppTheme.primaryColor,
                   foregroundColor: Colors.white,
                 ),
-                child: const Text('رجوع'),
+                child: Text(l10n.back),
               ),
             ],
           ),
@@ -370,8 +370,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
         opacity: 0.05,
         child: TextField(
           controller: _searchController,
-          onChanged: (value) =>
-              setState(() => searchQuery = value.toLowerCase()),
+          onChanged: (value) => setState(() => searchQuery = value),
           style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
           decoration: InputDecoration(
             hintText: l10n.searchSurah,
@@ -433,7 +432,8 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
 
       // Filter by search
       if (searchQuery.isNotEmpty &&
-          !surahName.toLowerCase().contains(searchQuery)) {
+          !QuranUtils.matchesSearch(surahName, searchQuery) &&
+          !QuranUtils.matchesSearch(surahId, searchQuery)) {
         continue;
       }
 
@@ -535,6 +535,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
 
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: AppTheme.backgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

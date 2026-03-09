@@ -1,97 +1,118 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:islam_home/data/models/hadith_model.dart';
+import 'package:islam_home/data/services/api_service.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class LocalHadithService {
-  // Cache for loaded hadiths
+  LocalHadithService({ApiService? apiService})
+    : _apiService = apiService ?? ApiService();
+
+  final ApiService _apiService;
+
+  static const Map<String, String> _bundledAssetByBook = {
+    'nawawi': 'assets/data/nawawi/nawawi.json',
+    'qudsi': 'assets/data/qudsi/qudsi.json',
+  };
+
+  static const Map<String, String> _legacyBundledAssetByBook = {
+    'bukhari': 'assets/data/hadith/bukhari.json',
+    'muslim': 'assets/data/hadith/muslim.json',
+    'abudawud': 'assets/data/hadith/abudawud.json',
+    'tirmidhi': 'assets/data/hadith/tirmidhi.json',
+    'nasai': 'assets/data/hadith/nasai.json',
+    'ibnmajah': 'assets/data/hadith/ibnmajah.json',
+    'malik': 'assets/data/hadith/malik.json',
+    'nawawi': 'assets/data/nawawi/nawawi.json',
+    'qudsi': 'assets/data/qudsi/qudsi.json',
+  };
+
+  static const Map<String, String> _remoteEditionByBook = {
+    'bukhari': 'ara-bukhari',
+    'muslim': 'ara-muslim',
+    'abudawud': 'ara-abudawud',
+    'tirmidhi': 'ara-tirmidhi',
+    'nasai': 'ara-nasai',
+    'ibnmajah': 'ara-ibnmajah',
+    'malik': 'ara-malik',
+    'qudsi': 'ara-qudsi',
+  };
+
   Map<String, List<HadithModel>>? _hadithCache;
 
-  /// Load all Hadiths from local JSON files
+  /// Loads already available hadith content (bundled lightweight data + downloaded books).
   Future<Map<String, List<HadithModel>>> loadAllHadiths() async {
-    if (_hadithCache != null) return _hadithCache!;
+    _hadithCache ??= <String, List<HadithModel>>{};
 
     try {
-      _hadithCache = {};
-
-      // Load Bukhari
-      final bukhariHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/bukhari.json',
-        'bukhari',
-      );
-      _hadithCache!['bukhari'] = bukhariHadiths;
-
-      // Load Muslim
-      final muslimHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/muslim.json',
-        'muslim',
-      );
-      _hadithCache!['muslim'] = muslimHadiths;
-
-      // Load Abu Dawud
-      final abudawudHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/abudawud.json',
-        'abudawud',
-      );
-      _hadithCache!['abudawud'] = abudawudHadiths;
-
-      // Load Tirmidhi
-      final tirmidhiHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/tirmidhi.json',
-        'tirmidhi',
-      );
-      _hadithCache!['tirmidhi'] = tirmidhiHadiths;
-
-      // Load Nasa'i
-      final nasaiHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/nasai.json',
-        'nasai',
-      );
-      _hadithCache!['nasai'] = nasaiHadiths;
-
-      // Load Ibn Majah
-      final ibnmajahHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/ibnmajah.json',
-        'ibnmajah',
-      );
-      _hadithCache!['ibnmajah'] = ibnmajahHadiths;
-
-      // Load Malik
-      final malikHadiths = await _loadHadithsFromFile(
-        'assets/data/hadith/malik.json',
-        'malik',
-      );
-      _hadithCache!['malik'] = malikHadiths;
-
-      // Load Nawawi
-      final nawawiHadiths = await _loadHadithsFromFile(
-        'assets/data/nawawi/nawawi.json',
-        'nawawi',
-      );
-      _hadithCache!['nawawi'] = nawawiHadiths;
-
-      // Load Qudsi
-      final qudsiHadiths = await _loadHadithsFromFile(
-        'assets/data/qudsi/qudsi.json',
-        'qudsi',
-      );
-      _hadithCache!['qudsi'] = qudsiHadiths;
+      await _loadBundledBooksIntoCache();
+      await _loadDownloadedBooksIntoCache();
 
       return _hadithCache!;
     } catch (e) {
       debugPrint('Error loading Hadiths: $e');
-      return {};
+      return _hadithCache ?? <String, List<HadithModel>>{};
     }
   }
 
-  /// Load Hadiths from a specific file
-  Future<List<HadithModel>> _loadHadithsFromFile(
-    String path,
+  Future<Directory> _getHadithDirectory() async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final hadithDir = Directory(p.join(appDir.path, 'hadith_books'));
+    if (!await hadithDir.exists()) {
+      await hadithDir.create(recursive: true);
+    }
+    return hadithDir;
+  }
+
+  Future<File> _getHadithFile(String bookSlug) async {
+    final dir = await _getHadithDirectory();
+    return File(p.join(dir.path, '$bookSlug.json'));
+  }
+
+  Future<void> _loadBundledBooksIntoCache() async {
+    for (final entry in _bundledAssetByBook.entries) {
+      if (_hadithCache!.containsKey(entry.key)) continue;
+      final hadiths = await _loadHadithsFromAsset(entry.value, entry.key);
+      if (hadiths.isNotEmpty) {
+        _hadithCache![entry.key] = hadiths;
+      }
+    }
+  }
+
+  Future<void> _loadDownloadedBooksIntoCache() async {
+    Directory dir;
+    try {
+      dir = await _getHadithDirectory();
+    } catch (_) {
+      return;
+    }
+
+    final files = await dir
+        .list()
+        .where((e) => e is File)
+        .cast<File>()
+        .toList();
+    for (final file in files) {
+      if (p.extension(file.path).toLowerCase() != '.json') continue;
+      final bookSlug = p.basenameWithoutExtension(file.path);
+      if (_hadithCache!.containsKey(bookSlug)) continue;
+      final hadiths = await _loadHadithsFromDisk(bookSlug);
+      if (hadiths.isNotEmpty) {
+        _hadithCache![bookSlug] = hadiths;
+      }
+    }
+  }
+
+  Future<List<HadithModel>> _loadHadithsFromAsset(
+    String assetPath,
     String bookSlug,
   ) async {
     try {
-      final jsonString = await rootBundle.loadString(path);
-      debugPrint('Loaded $path: ${jsonString.length} chars');
+      final jsonString = await rootBundle.loadString(assetPath);
       final jsonData = json.decode(jsonString);
 
       List<HadithModel> hadiths = [];
@@ -113,11 +134,79 @@ class LocalHadithService {
         }).toList();
       }
 
-      debugPrint('Parsed ${hadiths.length} hadiths from $path');
-
       return hadiths;
     } catch (e) {
-      debugPrint('Error loading from $path: $e');
+      debugPrint('Error loading from asset $assetPath: $e');
+      return [];
+    }
+  }
+
+  Future<List<HadithModel>> _loadHadithsFromDisk(String bookSlug) async {
+    try {
+      final file = await _getHadithFile(bookSlug);
+      if (!await file.exists()) return [];
+
+      final jsonString = await file.readAsString();
+      final decoded = json.decode(jsonString);
+      if (decoded is! List) return [];
+
+      return decoded.whereType<Map>().map((item) {
+        final map = Map<String, dynamic>.from(item);
+        map['bookSlug'] ??= bookSlug;
+        map['book'] ??= bookSlug;
+        return HadithModel.fromJson(map);
+      }).toList();
+    } catch (e) {
+      debugPrint('Error reading downloaded hadith book $bookSlug: $e');
+      return [];
+    }
+  }
+
+  Future<void> _saveHadithsToDisk(
+    String bookSlug,
+    List<HadithModel> hadiths,
+  ) async {
+    try {
+      final file = await _getHadithFile(bookSlug);
+      final serialized = hadiths.map((hadith) {
+        final map = hadith.toJson();
+        map['bookSlug'] ??= bookSlug;
+        map['book'] ??= bookSlug;
+        return map;
+      }).toList();
+      await file.writeAsString(json.encode(serialized));
+    } catch (e) {
+      debugPrint('Error saving downloaded hadith book $bookSlug: $e');
+    }
+  }
+
+  Future<List<HadithModel>> _downloadBookFromApi(
+    String bookSlug,
+    String editionName,
+  ) async {
+    try {
+      final remote = await _apiService.getHadiths(editionName);
+      if (remote.isEmpty) return [];
+
+      final normalized = remote.map((hadith) {
+        final number = hadith.number ?? 0;
+        return HadithModel(
+          id: hadith.id ?? '${bookSlug}_$number',
+          number: hadith.number,
+          arab: hadith.arab,
+          english: hadith.english,
+          narrator: hadith.narrator,
+          book: hadith.book ?? bookSlug,
+          bookSlug: bookSlug,
+          chapter: hadith.chapter,
+          grade: hadith.grade,
+        );
+      }).toList();
+
+      await _saveHadithsToDisk(bookSlug, normalized);
+      return normalized;
+    } catch (e) {
+      debugPrint('Error downloading hadith book $bookSlug: $e');
       return [];
     }
   }
@@ -161,7 +250,30 @@ class LocalHadithService {
   /// Get Hadiths by book
   Future<List<HadithModel>> getHadithsByBook(String bookKey) async {
     final allHadiths = await loadAllHadiths();
-    return allHadiths[bookKey] ?? [];
+    final cached = allHadiths[bookKey];
+    if (cached != null && cached.isNotEmpty) {
+      return cached;
+    }
+
+    final legacyAsset = _legacyBundledAssetByBook[bookKey];
+    if (legacyAsset != null) {
+      final legacyData = await _loadHadithsFromAsset(legacyAsset, bookKey);
+      if (legacyData.isNotEmpty) {
+        allHadiths[bookKey] = legacyData;
+        return legacyData;
+      }
+    }
+
+    final remoteEdition = _remoteEditionByBook[bookKey];
+    if (remoteEdition == null) {
+      return [];
+    }
+
+    final downloaded = await _downloadBookFromApi(bookKey, remoteEdition);
+    if (downloaded.isNotEmpty) {
+      allHadiths[bookKey] = downloaded;
+    }
+    return downloaded;
   }
 
   /// Get all available books

@@ -11,7 +11,6 @@ import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
-import 'package:islam_home/presentation/widgets/reading_view.dart';
 import 'package:islam_home/presentation/widgets/player_controls.dart';
 
 class PlayerScreen extends ConsumerStatefulWidget {
@@ -22,8 +21,6 @@ class PlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _PlayerScreenState extends ConsumerState<PlayerScreen> {
-  bool _isReadingMode = false;
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -51,14 +48,14 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Color(0xFF0D1B2A), // Dark blue
-              Color(0xFF1B263B), // Navy
-              Color(0xFF411D13), // Dark Maroon/Reddish
+              const Color(0xFF0F172A), // Slate 900
+              const Color(0xFF1E293B), // Slate 800
+              AppTheme.primaryColor.withValues(alpha: 0.15),
             ],
           ),
         ),
@@ -115,14 +112,24 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                         ],
                                       ),
                                     ),
-                                    Text(
-                                      l10n.nowPlaying,
-                                      style: GoogleFonts.cairo(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
+                                    StreamBuilder<PlayerState>(
+                                      stream:
+                                          audioService.player.playerStateStream,
+                                      builder: (context, snapshot) {
+                                        final isPlaying =
+                                            snapshot.data?.playing ?? false;
+                                        return Text(
+                                          isPlaying
+                                              ? l10n.nowPlaying
+                                              : l10n.playbackPaused,
+                                          style: GoogleFonts.cairo(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        );
+                                      },
                                     ),
                                     Align(
                                       alignment: Alignment.centerRight,
@@ -215,161 +222,113 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                             StreamBuilder<SequenceState?>(
                               stream: audioService.player.sequenceStateStream,
                               builder: (context, snapshot) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    final metadata =
-                                        snapshot.data?.currentSource?.tag
-                                            as MediaItem?;
-                                    final isQuran =
-                                        metadata?.album == 'القرآن الكريم';
-
-                                    if (isQuran) {
-                                      setState(() {
-                                        _isReadingMode = !_isReadingMode;
-                                      });
-                                    } else {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            l10n.readingModeOnlyForQuran,
-                                            style: GoogleFonts.cairo(),
+                                return Hero(
+                                  tag: 'artwork',
+                                  child: Container(
+                                    width:
+                                        (constraints.maxWidth * 0.8) >
+                                            (constraints.maxHeight * 0.35)
+                                        ? (constraints.maxHeight * 0.35)
+                                        : (constraints.maxWidth * 0.8),
+                                    height:
+                                        (constraints.maxWidth * 0.8) >
+                                            (constraints.maxHeight * 0.35)
+                                        ? (constraints.maxHeight * 0.35)
+                                        : (constraints.maxWidth * 0.8),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(32),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.3,
                                           ),
-                                          duration: const Duration(seconds: 2),
-                                          backgroundColor: Colors.redAccent,
-                                          behavior: SnackBarBehavior.floating,
+                                          blurRadius: 30,
+                                          spreadRadius: 2,
+                                          offset: const Offset(0, 15),
                                         ),
-                                      );
-                                    }
-                                  },
-                                  child: _isReadingMode
-                                      ? ReadingView(
-                                          audioService: audioService,
-                                          constraints: constraints,
-                                        )
-                                      : Hero(
-                                          tag: 'artwork',
-                                          child: Container(
-                                            width:
-                                                (constraints.maxWidth * 0.8) >
-                                                    (constraints.maxHeight *
-                                                        0.35)
-                                                ? (constraints.maxHeight * 0.35)
-                                                : (constraints.maxWidth * 0.8),
-                                            height:
-                                                (constraints.maxWidth * 0.8) >
-                                                    (constraints.maxHeight *
-                                                        0.35)
-                                                ? (constraints.maxHeight * 0.35)
-                                                : (constraints.maxWidth * 0.8),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(32),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withValues(alpha: 0.5),
-                                                  blurRadius: 40,
-                                                  spreadRadius: -5,
-                                                  offset: const Offset(0, 20),
-                                                ),
-                                                BoxShadow(
-                                                  color: AppTheme.primaryColor
-                                                      .withValues(alpha: 0.15),
-                                                  blurRadius: 30,
-                                                  spreadRadius: -10,
-                                                ),
-                                              ],
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(32),
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(
+                                          sigmaX: 10,
+                                          sigmaY: 10,
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.2,
                                             ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(32),
-                                              child: BackdropFilter(
-                                                filter: ImageFilter.blur(
-                                                  sigmaX: 10,
-                                                  sigmaY: 10,
-                                                ),
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white
-                                                        .withValues(
-                                                          alpha: 0.05,
-                                                        ),
+                                            borderRadius: BorderRadius.circular(
+                                              32,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.1,
+                                              ),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: StreamBuilder<MediaItem?>(
+                                              stream:
+                                                  audioService.mediaItemStream,
+                                              builder: (context, snapshot) {
+                                                final metadata = snapshot.data;
+                                                final artUri = metadata?.artUri
+                                                    ?.toString();
+                                                final isQuran =
+                                                    metadata?.album ==
+                                                    'القرآن الكريم';
+
+                                                if (artUri != null &&
+                                                    artUri.isNotEmpty) {
+                                                  return ClipRRect(
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                           32,
                                                         ),
-                                                    border: Border.all(
-                                                      color: Colors.white
-                                                          .withValues(
-                                                            alpha: 0.1,
-                                                          ),
-                                                      width: 1,
-                                                    ),
-                                                  ),
-                                                  child: Center(
-                                                    child: StreamBuilder<MediaItem?>(
-                                                      stream: audioService
-                                                          .mediaItemStream,
-                                                      builder: (context, snapshot) {
-                                                        final metadata =
-                                                            snapshot.data;
-                                                        final artUri = metadata
-                                                            ?.artUri
-                                                            ?.toString();
-                                                        final isQuran =
-                                                            metadata?.album ==
-                                                            'القرآن الكريم';
-
-                                                        if (artUri != null &&
-                                                            artUri.isNotEmpty) {
-                                                          return ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  32,
-                                                                ),
-                                                            child: CachedNetworkImage(
-                                                              imageUrl: artUri,
-                                                              fit: BoxFit.cover,
-                                                              width: double
-                                                                  .infinity,
-                                                              height: double
-                                                                  .infinity,
-                                                              placeholder: (context, url) => Center(
-                                                                child: CircularProgressIndicator(
-                                                                  color: AppTheme
-                                                                      .primaryColor
-                                                                      .withValues(
-                                                                        alpha:
-                                                                            0.5,
-                                                                      ),
-                                                                ),
-                                                              ),
-                                                              errorWidget:
-                                                                  (
-                                                                    context,
-                                                                    url,
-                                                                    error,
-                                                                  ) =>
-                                                                      _buildFallbackIcon(
-                                                                        isQuran,
-                                                                      ),
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: artUri,
+                                                      fit: BoxFit.cover,
+                                                      width: double.infinity,
+                                                      height: double.infinity,
+                                                      placeholder:
+                                                          (
+                                                            context,
+                                                            url,
+                                                          ) => Center(
+                                                            child: CircularProgressIndicator(
+                                                              color: AppTheme
+                                                                  .primaryColor
+                                                                  .withValues(
+                                                                    alpha: 0.5,
+                                                                  ),
                                                             ),
-                                                          );
-                                                        }
-
-                                                        return _buildFallbackIcon(
-                                                          isQuran,
-                                                        );
-                                                      },
+                                                          ),
+                                                      errorWidget:
+                                                          (
+                                                            context,
+                                                            url,
+                                                            error,
+                                                          ) =>
+                                                              _buildFallbackIcon(
+                                                                isQuran,
+                                                              ),
                                                     ),
-                                                  ),
-                                                ),
-                                              ),
+                                                  );
+                                                }
+                                                return _buildFallbackIcon(
+                                                  isQuran,
+                                                );
+                                              },
                                             ),
                                           ),
                                         ),
+                                      ),
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -389,24 +348,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                   ),
                                   child: Row(
                                     children: [
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.favorite_border_rounded,
-                                          color: Colors.white70,
-                                          size: 28,
-                                        ),
-                                        onPressed: () {},
-                                      ),
-                                      const Spacer(),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                              Localizations.localeOf(
-                                                    context,
-                                                  ).languageCode ==
-                                                  'ar'
-                                              ? CrossAxisAlignment.end
-                                              : CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               metadata.title,
@@ -416,13 +361,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                                 fontWeight: FontWeight.bold,
                                                 height: 1.5,
                                               ),
-                                              textAlign:
-                                                  Localizations.localeOf(
-                                                        context,
-                                                      ).languageCode ==
-                                                      'ar'
-                                                  ? TextAlign.right
-                                                  : TextAlign.left,
+                                              textAlign: TextAlign.start,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -433,13 +372,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                                 color: Colors.white60,
                                                 fontSize: 16,
                                               ),
-                                              textAlign:
-                                                  Localizations.localeOf(
-                                                        context,
-                                                      ).languageCode ==
-                                                      'ar'
-                                                  ? TextAlign.right
-                                                  : TextAlign.left,
+                                              textAlign: TextAlign.start,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -488,202 +421,211 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B).withValues(alpha: 0.98),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.85),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1.0,
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: StreamBuilder<SequenceState?>(
-            stream: audioService.player.sequenceStateStream,
-            builder: (context, snapshot) {
-              final state = snapshot.data;
-              final sequence = state?.sequence ?? [];
-              final currentIndex = state?.currentIndex ?? 0;
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 25,
+                offset: const Offset(0, -10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            child: StreamBuilder<SequenceState?>(
+              stream: audioService.player.sequenceStateStream,
+              builder: (context, snapshot) {
+                final state = snapshot.data;
+                final sequence = state?.sequence ?? [];
+                final currentIndex = state?.currentIndex ?? 0;
 
-              return Column(
-                children: [
-                  const SizedBox(height: 12),
-                  Center(
-                    child: Container(
-                      width: 48,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(2.5),
+                return Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Center(
+                      child: Container(
+                        width: 48,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(2.5),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.queue_music_rounded,
-                          color: AppTheme.primaryColor,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          l10n.currentPlaylist,
-                          style: GoogleFonts.cairo(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.queue_music_rounded,
+                            color: AppTheme.primaryColor,
+                            size: 24,
                           ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          l10n.audioCount(sequence.length.toString()),
-                          style: GoogleFonts.cairo(
-                            color: Colors.white54,
-                            fontSize: 14,
+                          const SizedBox(width: 12),
+                          Text(
+                            l10n.currentPlaylist,
+                            style: GoogleFonts.cairo(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
+                          const Spacer(),
+                          Text(
+                            l10n.audioCount(sequence.length.toString()),
+                            style: GoogleFonts.cairo(
+                              color: Colors.white54,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Divider(height: 1, color: Colors.white12),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: sequence.length,
-                      padding: const EdgeInsets.only(bottom: 32),
-                      itemBuilder: (context, index) {
-                        final metadata = sequence[index].tag as MediaItem;
-                        final isCurrent = index == currentIndex;
+                    const SizedBox(height: 16),
+                    const Divider(height: 1, color: Colors.white12),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: sequence.length,
+                        padding: const EdgeInsets.only(bottom: 32),
+                        itemBuilder: (context, index) {
+                          final metadata = sequence[index].tag as MediaItem;
+                          final isCurrent = index == currentIndex;
 
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: isCurrent
-                                ? AppTheme.primaryColor.withValues(alpha: 0.08)
-                                : Colors.transparent,
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Colors.white.withValues(alpha: 0.05),
-                                width: 0.5,
-                              ),
-                              left: isCurrent
-                                  ? const BorderSide(
-                                      color: AppTheme.primaryColor,
-                                      width: 4,
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: isCurrent
+                                  ? AppTheme.primaryColor.withValues(
+                                      alpha: 0.08,
                                     )
-                                  : BorderSide.none,
-                            ),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 8,
-                            ),
-                            onTap: () {
-                              audioService.player.seek(
-                                Duration.zero,
-                                index: index,
-                              );
-                              Navigator.pop(
-                                context,
-                              ); // Close sheet after selection
-                            },
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isCurrent
-                                    ? AppTheme.primaryColor.withValues(
-                                        alpha: 0.2,
-                                      )
-                                    : Colors.white.withValues(alpha: 0.05),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: isCurrent
-                                    ? const Icon(
-                                        Icons.bar_chart_rounded,
+                                  : Colors.transparent,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  width: 0.5,
+                                ),
+                                left: isCurrent
+                                    ? const BorderSide(
                                         color: AppTheme.primaryColor,
-                                        size: 20,
+                                        width: 4,
                                       )
-                                    : Text(
-                                        '${index + 1}',
-                                        style: GoogleFonts.tajawal(
-                                          color: Colors.white54,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
+                                    : BorderSide.none,
+                              ),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 8,
+                              ),
+                              onTap: () {
+                                audioService.player.seek(
+                                  Duration.zero,
+                                  index: index,
+                                );
+                                Navigator.pop(
+                                  context,
+                                ); // Close sheet after selection
+                              },
+                              leading: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: isCurrent
+                                      ? AppTheme.primaryColor.withValues(
+                                          alpha: 0.2,
+                                        )
+                                      : Colors.white.withValues(alpha: 0.05),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Center(
+                                  child: isCurrent
+                                      ? const Icon(
+                                          Icons.bar_chart_rounded,
+                                          color: AppTheme.primaryColor,
+                                          size: 20,
+                                        )
+                                      : Text(
+                                          '${index + 1}',
+                                          style: GoogleFonts.tajawal(
+                                            color: Colors.white54,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
+                                ),
+                              ),
+                              title: Text(
+                                metadata.title,
+                                style: GoogleFonts.tajawal(
+                                  color: isCurrent
+                                      ? AppTheme.primaryColor
+                                      : Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: isCurrent
+                                      ? FontWeight.w900
+                                      : FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(
+                                metadata.artist ?? '',
+                                style: GoogleFonts.tajawal(
+                                  color: Colors.white54,
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: isCurrent
+                                  ? Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
                                       ),
-                              ),
-                            ),
-                            title: Text(
-                              metadata.title,
-                              style: GoogleFonts.tajawal(
-                                color: isCurrent
-                                    ? AppTheme.primaryColor
-                                    : Colors.white,
-                                fontSize: 15,
-                                fontWeight: isCurrent
-                                    ? FontWeight.w800
-                                    : FontWeight.w500,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            subtitle: Text(
-                              metadata.artist ?? '',
-                              style: GoogleFonts.tajawal(
-                                color: Colors.white54,
-                                fontSize: 13,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: isCurrent
-                                ? Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.primaryColor.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
+                                      decoration: BoxDecoration(
                                         color: AppTheme.primaryColor.withValues(
-                                          alpha: 0.3,
+                                          alpha: 0.2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: AppTheme.primaryColor
+                                              .withValues(alpha: 0.3),
                                         ),
                                       ),
-                                    ),
-                                    child: Text(
-                                      l10n.nowPlayingLabel,
-                                      style: GoogleFonts.cairo(
-                                        color: AppTheme.primaryColor,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        height: 1.2,
+                                      child: Text(
+                                        l10n.nowPlayingLabel,
+                                        style: GoogleFonts.cairo(
+                                          color: AppTheme.primaryColor,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.2,
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : null,
-                          ),
-                        );
-                      },
+                                    )
+                                  : null,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -697,113 +639,121 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B).withValues(alpha: 0.98),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                width: 48,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2.5),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.85),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1.0,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.sleepTimer,
-              style: GoogleFonts.cairo(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 16),
+              Text(
+                l10n.sleepTimer,
+                style: GoogleFonts.cairo(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            StreamBuilder<Duration?>(
-              stream: audioService.sleepTimerStream,
-              builder: (context, snapshot) {
-                final remaining = snapshot.data;
-                if (remaining == null) return const SizedBox.shrink();
-                return Text(
-                  l10n.timeRemaining(_formatDuration(remaining)),
-                  style: GoogleFonts.cairo(
-                    color: AppTheme.primaryColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            const Divider(color: Colors.white10),
-            _buildTimerOption(
-              context,
-              audioService,
-              l10n,
-              l10n.timerOption('15'),
-              const Duration(minutes: 15),
-            ),
-            _buildTimerOption(
-              context,
-              audioService,
-              l10n,
-              l10n.timerOption('30'),
-              const Duration(minutes: 30),
-            ),
-            _buildTimerOption(
-              context,
-              audioService,
-              l10n,
-              l10n.timerOption('45'),
-              const Duration(minutes: 45),
-            ),
-            _buildTimerOption(
-              context,
-              audioService,
-              l10n,
-              l10n.timerOption('60'),
-              const Duration(minutes: 60),
-            ),
-            _buildTimerOption(
-              context,
-              audioService,
-              l10n,
-              l10n.timerOption('90'),
-              const Duration(minutes: 90),
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.timer_off_outlined,
-                color: Colors.redAccent,
-              ),
-              title: Text(
-                l10n.stopTimer,
-                style: GoogleFonts.cairo(color: Colors.redAccent),
-              ),
-              onTap: () {
-                audioService.cancelSleepTimer();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      l10n.sleepTimerStopped,
-                      style: GoogleFonts.cairo(),
+              const SizedBox(height: 8),
+              StreamBuilder<Duration?>(
+                stream: audioService.sleepTimerStream,
+                builder: (context, snapshot) {
+                  final remaining = snapshot.data;
+                  if (remaining == null) return const SizedBox.shrink();
+                  return Text(
+                    l10n.timeRemaining(_formatDuration(remaining)),
+                    style: GoogleFonts.cairo(
+                      color: AppTheme.primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-          ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              const Divider(color: Colors.white10),
+              _buildTimerOption(
+                context,
+                audioService,
+                l10n,
+                l10n.timerOption('15'),
+                const Duration(minutes: 15),
+              ),
+              _buildTimerOption(
+                context,
+                audioService,
+                l10n,
+                l10n.timerOption('30'),
+                const Duration(minutes: 30),
+              ),
+              _buildTimerOption(
+                context,
+                audioService,
+                l10n,
+                l10n.timerOption('45'),
+                const Duration(minutes: 45),
+              ),
+              _buildTimerOption(
+                context,
+                audioService,
+                l10n,
+                l10n.timerOption('60'),
+                const Duration(minutes: 60),
+              ),
+              _buildTimerOption(
+                context,
+                audioService,
+                l10n,
+                l10n.timerOption('90'),
+                const Duration(minutes: 90),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.timer_off_outlined,
+                  color: Colors.redAccent,
+                ),
+                title: Text(
+                  l10n.stopTimer,
+                  style: GoogleFonts.cairo(color: Colors.redAccent),
+                ),
+                onTap: () {
+                  audioService.cancelSleepTimer();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        l10n.sleepTimerStopped,
+                        style: GoogleFonts.cairo(),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

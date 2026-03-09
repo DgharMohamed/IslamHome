@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/data/models/sira_model.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 class SiraDetailScreen extends StatelessWidget {
   final SiraStage stage;
@@ -11,6 +12,7 @@ class SiraDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bool isArabic = Localizations.localeOf(context).languageCode == 'ar';
     final languageCode = isArabic ? 'ar' : 'en';
     final events = stage.getEvents(languageCode);
@@ -141,7 +143,7 @@ class SiraDetailScreen extends StatelessWidget {
                 // — Main content —
                 _sectionCard(
                   icon: Icons.menu_book_rounded,
-                  title: isArabic ? 'القصة' : 'The Story',
+                  title: l10n.storySectionTitle,
                   child: Text(
                     stage.getContent(languageCode),
                     textAlign: isArabic ? TextAlign.justify : TextAlign.left,
@@ -154,7 +156,7 @@ class SiraDetailScreen extends StatelessWidget {
                             height: 2.0,
                             color: Colors.white.withValues(alpha: 0.92),
                           )
-                        : GoogleFonts.inter(
+                        : GoogleFonts.montserrat(
                             fontSize: 15,
                             height: 1.7,
                             color: Colors.white.withValues(alpha: 0.92),
@@ -168,7 +170,7 @@ class SiraDetailScreen extends StatelessWidget {
                 if (events.isNotEmpty)
                   _sectionCard(
                     icon: Icons.timeline_rounded,
-                    title: isArabic ? 'أبرز الأحداث' : 'Key Events',
+                    title: l10n.keyEventsTitle,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: events.asMap().entries.map((entry) {
@@ -287,7 +289,7 @@ class SiraDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              isArabic ? 'الدرس المستفاد' : 'Key Lesson',
+                              l10n.keyLessonTitle,
                               style: GoogleFonts.cairo(
                                 color: AppTheme.primaryColor,
                                 fontWeight: FontWeight.bold,

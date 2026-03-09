@@ -1,11 +1,12 @@
 {
-  "appTitle": "إسلام هوم",
+  "appTitle": "بيت الإسلام",
   "goodMorning": "صباح الخير",
   "goodAfternoon": "مساء الخير",
   "goodNight": "ليلة سعيدة",
   "prayerTimes": "مواقيت الصلاة",
   "dailyVerse": "آية اليوم",
   "khatmaProgress": "متابعة الختمة",
+  "generalReadingProgress": "تقدم القراءة العام",
   "reachedSurah": "وصلت إلى سورة {surah}",
   "@reachedSurah": {
     "placeholders": {
@@ -15,11 +16,16 @@
     }
   },
   "exploreSections": "استكشف الأقسام",
+  "homeSectionQuranAndSeerah": "القرآن الكريم والسيرة النبوية",
+  "homeSectionWorshipAndPrayer": "العبادة والصلاة",
+  "homeSectionMediaAndBroadcast": "البث والإعلام",
+  "homeSectionMyLibrary": "مكتبتي",
   "quranMushaf": "المصحف الشريف",
   "quranTitle": "القرآن الكريم",
   "quranSubtitle": "تفسير، قراءة وترجمة",
   "quranSyncTitle": "القرآن الصوتي المقروء",
   "quranSyncSubtitle": "مزامنة التلاوة مع النص",
+  "audioTafsir": "تفسير القرآن المسموع",
   "propheticHadith": "الأحاديث النبوية",
   "hadithOfTheDay": "حديث اليوم",
   "azkarDuas": "الأذكار والأدعية",
@@ -127,7 +133,14 @@
   "downloadSuccessful": "تم التحميل بنجاح",
   "downloadFailed": "فشل التحميل: {error}",
   "electronicTasbeeh": "مسبحة إلكترونية",
-  "totalTasbeehs": "إجمالي التسبيحات",
+  "totalTasbeehs": "إجمالي التسبيحات: {count}",
+  "@totalTasbeehs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "tapToCount": "اضغط في أي مكان في الدائرة للتسبيح",
   "reset": "إعادة تعيين",
   "history": "السجل",
@@ -259,6 +272,7 @@
   "unknownName": "اسم غير معروف",
   "mushafCount": "{count} مصحف",
   "nowPlaying": "جاري التشغيل...",
+  "playbackPaused": "التشغيل متوقف",
   "reciterLabel": "القارئ",
   "verseOfTheDay": "آية اليوم",
   "dailyVerseText": "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا * إِنَّ مَعَ الْعُسْرِ يُسْرًا",
@@ -470,6 +484,22 @@
   "cancelPlan": "إلغاء الخطة",
   "manageNotificationSettings": "إدارة إعدادات الإشعارات",
   "manageNotificationSettingsSubtitle": "فتح إعدادات النظام للإشعارات",
+  "notificationDiagnosticsTitle": "تشخيص الإشعارات",
+  "notificationDiagnosticsSubtitle": "تحقق من حالة الصلاحيات الفعلية لضمان عمل تنبيهات الآذان",
+  "notificationDiagnosticsHealthy": "إعدادات الإشعارات سليمة",
+  "notificationDiagnosticsNeedsFix": "بعض الإعدادات تحتاج إصلاح",
+  "notificationPermissionTitle": "صلاحية الإشعارات",
+  "notificationPermissionSubtitle": "يجب تفعيلها لاستلام تنبيهات الآذان والتذكير",
+  "exactAlarmPermissionTitle": "صلاحية المنبّهات الدقيقة",
+  "exactAlarmPermissionSubtitle": "مطلوبة في أندرويد 12+ لتشغيل تنبيه الآذان في وقته الدقيق",
+  "batteryOptimizationTitle": "تحسين البطارية",
+  "batteryOptimizationSubtitle": "عطّل تحسين البطارية لهذا التطبيق لمنع تأخير أو حظر تنبيهات الآذان",
+  "notRequiredOnThisDevice": "غير مطلوب على هذا الجهاز",
+  "fixNow": "إصلاح الآن",
+  "enabled": "مفعّل",
+  "requiresFix": "يحتاج إصلاح",
+  "refreshStatus": "تحديث الحالة",
+  "openSystemSettings": "فتح إعدادات النظام",
   "continueYourKhatma": "واصل ختمـتك",
   "juzAndSurah": "الجزء {juz} - {surah}",
   "smartSuggestionsForNewPlan": "اقتراحات ذكية لنظامك الجديد:",
@@ -485,6 +515,7 @@
   "shareDua": "مشاركة الدعاء",
   "mayAllahAcceptAll": "تقبل الله منا ومنكم",
   "continueReading": "إكمال القراءة",
+  "continueListening": "إكمال الاستماع",
   "activePlans": "الخطط النشطة",
   "totalAchievement": "إجمالي الإنجاز",
   "khatmaCount": "لقد ختمت القرآن {count} مرات",
@@ -675,7 +706,10 @@
     }
   },
   "todayTotal": "اليوم",
+  "today": "اليوم",
   "allTimeTasbeehs": "إجمالي كل الأوقات",
+  "total": "الإجمالي",
+  "streak": "السلسلة",
   "setCompleteTitle": "اكتملت الجولة!",
   "setCompleteSubtitle": "تقبل الله ذكرك",
   "history": "السجل",
@@ -686,6 +720,7 @@
   "sidebarContent": "المحتوى الإسلامي",
   "sidebarOther": "أخرى",
   "sidebarTagline": "رحلة روحية ومكتبة",
+  "sidebarAppDescription": "رفيقك الإسلامي اليومي",
   "sira": "حياة الرسول",
   "prophetLife": "حياة الرسول ﷺ",
   "allSections": "الكل",
@@ -698,5 +733,238 @@
   "quranSection": "القرآن الكريم",
   "seerahSection": "السيرة النبوية",
   "emptyDownloadsHistory": "سجل التنزيلات فارغ",
-  "emptyDownloadsHistoryDesc": "لم تقم بتنزيل أي سور بعد"
+  "emptyDownloadsHistoryDesc": "لم تقم بتنزيل أي سور بعد",
+  "khatmaV2Title": "ختمة جديدة",
+  "khatmaV2TypeStepTitle": "ما هو هدفك؟",
+  "khatmaV2Reading": "قراءة عامة",
+  "khatmaV2ReadingDesc": "قراءة كاملة للقرآن الكريم",
+  "khatmaV2Memorization": "حفظ",
+  "khatmaV2MemorizationDesc": "التركيز على الحفظ مع متابعة ذكية",
+  "khatmaV2Revision": "مراجعة",
+  "khatmaV2RevisionDesc": "تثبيت حفظك السابق",
+  "khatmaV2Listening": "استماع",
+  "khatmaV2ListeningDesc": "الاستماع المتدرج للقرآن مع تتبع يومي",
+  "khatmaV2DetailsStepTitle": "تفاصيل الختمة",
+  "khatmaV2TitleLabel": "العنوان (مثلاً: ختمة رمضان)",
+  "khatmaV2Range": "النطاق",
+  "khatmaV2StartPage": "صفحة البداية",
+  "khatmaV2EndPage": "صفحة النهاية",
+  "khatmaV2SchedulingStepTitle": "الجدولة والمحرك",
+  "khatmaV2DurationDays": "المدة (بالأيام)",
+  "khatmaV2QuickDurations": "مدد سريعة",
+  "khatmaV2EnginePrefs": "تفضيلات المحرك",
+  "khatmaV2SmartRemediation": "المعالجة الذكية",
+  "khatmaV2SmartRemediationDesc": "يعدل هدفك تلقائياً إذا فاتك يوم",
+  "khatmaV2FixedDaily": "هدف يومي ثابت",
+  "khatmaV2FixedDailyDesc": "لا يتغير أبداً، حتى لو تأخر التقدم",
+  "khatmaV2StartJourney": "ابدأ الرحلة",
+  "khatmaV2Continue": "متابعة",
+  "khatmaV2Back": "رجوع",
+  "khatmaV2MyKhatma": "ختمتي لـ {type}",
+  "khatmaV2NoActive": "لا توجد ختمة نشطة",
+  "khatmaV2StartJourneyDesc": "ابدأ رحلة جديدة مع نظام الختمة الذكي.",
+  "khatmaV2SetupNew": "إعداد ختمة جديدة",
+  "khatmaV2DeleteTrack": "حذف هذا المسار",
+  "khatmaV2DeleteTrackTitle": "حذف المسار؟",
+  "khatmaV2DeleteTrackBody": "سيتم حذف \"{title}\" وكل تقدمه بشكل نهائي.",
+  "@khatmaV2DeleteTrackBody": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "khatmaV2RecordPage": "تسجيل صفحة {page}",
+  "khatmaV2SelectTrack": "اختر الختمة",
+  "khatmaV2ProgressSaved": "تم حفظ التقدم في {track}",
+  "khatmaV2TrackTypeSuffix": "مسار {type}",
+  "khatmaV2UnitLabel": "وحدة التتبع",
+  "khatmaV2UnitPage": "صفحات",
+  "khatmaV2UnitJuz": "أجزاء",
+  "khatmaV2StartJuz": "جزء البداية",
+  "khatmaV2EndJuz": "جزء النهاية",
+  "khatmaV2JuzCount": "عدد الأجزاء",
+  "khatmaV2RecordJuz": "تسجيل الجزء {juz}",
+  "khatmaV2UnitPageSingle": "صفحة",
+  "khatmaV2UnitJuzSingle": "جزء",
+  "khatmaHeatmapLess": "أقل",
+  "khatmaHeatmapMore": "أكثر",
+  "khatmaSettings": "إعدادات الختمة",
+  "khatmaV2UnitSurah": "سور",
+  "khatmaV2UnitSurahSingle": "سورة",
+  "khatmaV2StartSurah": "سورة البداية",
+  "khatmaV2EndSurah": "سورة النهاية",
+  "khatmaV2RecordSurah": "تسجيل سورة {surah}",
+  "khatmaV2ValidationRangeOrder": "يجب أن تكون البداية أصغر من أو تساوي النهاية.",
+  "khatmaV2ValidationStartOutOfRange": "قيمة البداية يجب أن تكون بين 1 و {max}.",
+  "@khatmaV2ValidationStartOutOfRange": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "khatmaV2ValidationEndOutOfRange": "قيمة النهاية يجب أن تكون بين 1 و {max}.",
+  "@khatmaV2ValidationEndOutOfRange": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "khatmaV2ValidationDurationDays": "مدة الخطة يجب أن تكون يومًا واحدًا على الأقل.",
+  "playAyah": "استماع للآية",
+  "testNotification": "اختبار الإشعار",
+  "testNotificationSubtitle": "اضغط للتأكد من أن التنبيهات تعمل",
+  "locationPermissionRequired": "إذن الموقع مطلوب",
+  "unableToStartAudioTryAgain": "تعذر تشغيل الصوت الآن. يرجى المحاولة مرة أخرى.",
+  "guestUser": "زائر",
+  "appVersionLabel": "الإصدار {version}",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "reciterNoSurahsAvailable": "لا توجد سور متاحة لهذا القارئ",
+  "back": "رجوع",
+  "adhkarTitle": "الأذكار",
+  "adhkarSearchTooltip": "بحث",
+  "adhkarFavoritesTooltip": "المفضلة",
+  "noAdhkarDataFound": "لا توجد بيانات أذكار",
+  "noAdhkarInCategory": "لا توجد أذكار في هذا القسم",
+  "searchAdhkarHint": "ابحث في النص العربي أو الإنجليزي أو القسم",
+  "typeToSearchAdhkar": "اكتب للبحث في الأذكار",
+  "noAdhkarMatches": "لا توجد نتائج",
+  "favoriteAdhkarTitle": "الأذكار المفضلة",
+  "noFavoriteAdhkar": "لا توجد عناصر في المفضلة",
+  "dhikrDetailsTitle": "تفاصيل الذكر",
+  "toggleFavorite": "تبديل المفضلة",
+  "dhikrNotFound": "الذكر غير موجود",
+  "referenceLabel": "المصدر",
+  "repeatCounter": "عداد التكرار",
+  "completedThisDhikr": "تم إكمال هذا الذكر",
+  "countLabel": "تسبيح",
+  "adhkarCategoryMorning": "أذكار الصباح",
+  "adhkarCategoryEvening": "أذكار المساء",
+  "adhkarCategorySleep": "أذكار النوم",
+  "adhkarCategoryPrayer": "أذكار الصلاة",
+  "adhkarCategoryAfterPrayer": "بعد الصلاة",
+  "adhkarCategoryMosque": "أذكار المسجد",
+  "adhkarCategoryFood": "أذكار الطعام",
+  "adhkarCategoryTravel": "أذكار السفر",
+  "adhkarCategoryHome": "أذكار المنزل",
+  "adhkarCategoryGeneral": "أذكار عامة",
+  "adhkarCategoryTasbeeh": "التسبيح",
+  "adhkarCategoryQuranDua": "أدعية قرآنية",
+  "athanOnboardingPrompt": "هل ترغب في تفعيل تنبيهات الآذان لكل صلاة؟ يمكنك دائماً تغيير هذا من إعدادات مواقيت الصلاة.",
+  "adhanAlertsMayNotWork": "تنبيهات الآذان قد لا تعمل",
+  "enableExactAlarmsFromSettings": "الرجاء تفعيل إذن \"التنبيهات الدقيقة\" من الإعدادات.",
+  "enable": "تفعيل",
+  "prePrayerReminders": "تذكير ما قبل الصلاة",
+  "prePrayerReminderSubtitle": "تنبيه للاستعداد والأذكار قبل الصلاة بـ {minutes} دقيقة",
+  "@prePrayerReminderSubtitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "remindBefore": "وقت التذكير",
+  "previewAdhanSound": "سماع صوت الآذان",
+  "tapToListen": "اضغط للاستماع",
+  "playlistPlayAll": "تشغيل الكل",
+  "noSurahsInPlaylist": "لا توجد سور في هذه القائمة",
+  "playlistShareText": "قائمة تشغيل: {name}\nاستمع إليها عبر تطبيق المكتبة الإسلامية:\nislamiclibrary://playlist?data={data}",
+  "@playlistShareText": {
+    "placeholders": {
+      "name": {},
+      "data": {}
+    }
+  },
+  "favoritesEmptyHint": "أضف أول عنصر من قسم {section} وسيظهر هنا مباشرة.",
+  "@favoritesEmptyHint": {
+    "placeholders": {
+      "section": {}
+    }
+  },
+  "openSectionLabel": "فتح {section}",
+  "@openSectionLabel": {
+    "placeholders": {
+      "section": {}
+    }
+  },
+  "noFavoriteTafsirClips": "لا توجد تفاسير في المفضلة",
+  "noFavoriteSeerahClips": "لا توجد مقاطع سيرة في المفضلة",
+  "chooseYourLanguage": "اختر لغتك",
+  "languageArabicSubtitle": "العربية",
+  "languageEnglishSubtitle": "الإنجليزية",
+  "permissionsCannotBeRevokedInApp": "لا يمكن إلغاء الصلاحيات من داخل التطبيق. يرجى تعديلها من إعدادات الجهاز.",
+  "permissionDeniedEnableFromSettings": "تم رفض الصلاحية. يرجى تفعيلها من الإعدادات.",
+  "welcome": "أهلاً بك",
+  "permissionsSetupSubtitle": "لنقم بإعداد تجربتك",
+  "permissionsNotificationsTitle": "التنبيهات والتشغيل في الخلفية",
+  "permissionsNotificationsSubtitle": "ابق على اطلاع وواصل تشغيل الصوت",
+  "permissionsLocationTitle": "مواقيت الصلاة و القبلة",
+  "permissionsLocationSubtitle": "مواقيت صلاة دقيقة بناءً على الموقع",
+  "permissionsUpdatesTitle": "التحديثات التلقائية",
+  "permissionsUpdatesSubtitle": "السماح للتطبيق بالتحديث من الداخل",
+  "startNow": "ابدأ الآن",
+  "calculationMethodDescription": "اختر طريقة حساب مواقيت الصلاة المناسبة لمنطقتك",
+  "finishSetup": "إتمام الإعداد",
+  "storySectionTitle": "القصة",
+  "keyEventsTitle": "أبرز الأحداث",
+  "keyLessonTitle": "الدرس المستفاد",
+  "tasbeehSessionCount": "الجلسة {count}",
+  "@tasbeehSessionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setActiveListeningTrack": "تحديد مسار الاستماع النشط",
+  "currentActiveTrack": "النشط حاليًا",
+  "chooseActiveListeningTrack": "اختر مسار الاستماع النشط",
+  "activeListeningTrackSetMessage": "تم تعيين \"{title}\" كمسار الاستماع النشط",
+  "@activeListeningTrackSetMessage": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "clearActiveTrack": "إلغاء المسار النشط",
+  "muslimWorldLeague": "رابطة العالم الإسلامي",
+  "mushafSettings": "إعدادات المصحف",
+  "themeLabel": "المظهر",
+  "riwayaSettings": "إعدادات الرواية",
+  "chooseQuranRecitationStyle": "اختر رواية القرآن الكريم",
+  "downloadMoreRiwayat": "تحميل روايات أخرى",
+  "available": "متاح",
+  "tafsirLabel": "التفسير",
+  "playVerseAudio": "تشغيل الآية",
+  "noTranslationAvailable": "لا توجد ترجمة متاحة.",
+  "failedToLoadTranslation": "تعذر تحميل الترجمة."
+  ,
+  "hadithShareText": "اقرأ هذا الحديث من تطبيق المكتبة الإسلامية: {text}",
+  "@hadithShareText": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "hadithBookBukhari": "صحيح البخاري",
+  "hadithBookMuslim": "صحيح مسلم",
+  "hadithBookAbuDawud": "سنن أبي داود",
+  "hadithBookTirmidhi": "جامع الترمذي",
+  "hadithBookNasai": "سنن النسائي",
+  "hadithBookIbnMajah": "سنن ابن ماجه",
+  "hadithBookMalik": "موطأ مالك",
+  "hadithBookNawawi": "الأربعون النووية",
+  "hadithBookQudsi": "الأحاديث القدسية",
+  "reciterUnavailableNow": "عذراً، لا تتوفر تلاوة لهذا القارئ حالياً",
+  "unableToLoadPlayableAyahAudio": "تعذر تحميل مقطع الآية لهذا الاختيار.",
+  "noDataAvailable": "لا توجد بيانات متاحة.",
+  "chooseTafsirSource": "اختر مصدر التفسير",
+  "noTafsirSourcesAvailable": "لا توجد مصادر تفسير متاحة حالياً.",
+  "fullIndex": "الفهرس الكامل",
+  "theme": "المظهر",
+  "riwaya": "الرواية"
+  ,
+  "manualLocationInput": "إدخال يدوي"
 }

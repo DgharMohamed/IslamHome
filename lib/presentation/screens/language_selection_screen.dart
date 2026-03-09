@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
 
@@ -11,6 +12,7 @@ class LanguageSelectionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: Stack(
@@ -43,7 +45,7 @@ class LanguageSelectionScreen extends ConsumerWidget {
                   const SizedBox(height: 32),
 
                   Text(
-                    'اختر اللغة',
+                    l10n.selectLanguage,
                     style: GoogleFonts.cairo(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -51,8 +53,8 @@ class LanguageSelectionScreen extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    'Choose Your Language',
-                    style: GoogleFonts.poppins(
+                    l10n.chooseYourLanguage,
+                    style: GoogleFonts.montserrat(
                       fontSize: 18,
                       color: Colors.white70,
                     ),
@@ -63,8 +65,8 @@ class LanguageSelectionScreen extends ConsumerWidget {
                   _buildLanguageOption(
                     context,
                     ref,
-                    title: 'العربية',
-                    subtitle: 'Arabic',
+                    title: l10n.arabic,
+                    subtitle: l10n.languageArabicSubtitle,
                     locale: const Locale('ar'),
                     icon: '🌙',
                   ),
@@ -74,8 +76,8 @@ class LanguageSelectionScreen extends ConsumerWidget {
                   _buildLanguageOption(
                     context,
                     ref,
-                    title: 'English',
-                    subtitle: 'الإنجليزية',
+                    title: l10n.english,
+                    subtitle: l10n.languageEnglishSubtitle,
                     locale: const Locale('en'),
                     icon: '🌍',
                   ),

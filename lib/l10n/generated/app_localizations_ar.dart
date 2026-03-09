@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'إسلام هوم';
+  String get appTitle => 'بيت الإسلام';
 
   @override
   String get goodMorning => 'صباح الخير';
@@ -30,12 +30,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get khatmaProgress => 'متابعة الختمة';
 
   @override
+  String get generalReadingProgress => 'تقدم القراءة العام';
+
+  @override
   String reachedSurah(String surah) {
     return 'وصلت إلى سورة $surah';
   }
 
   @override
   String get exploreSections => 'استكشف الأقسام';
+
+  @override
+  String get homeSectionQuranAndSeerah => 'القرآن الكريم والسيرة النبوية';
+
+  @override
+  String get homeSectionWorshipAndPrayer => 'العبادة والصلاة';
+
+  @override
+  String get homeSectionMediaAndBroadcast => 'البث والإعلام';
+
+  @override
+  String get homeSectionMyLibrary => 'مكتبتي';
 
   @override
   String get quranMushaf => 'المصحف الشريف';
@@ -51,6 +66,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quranSyncSubtitle => 'مزامنة التلاوة مع النص';
+
+  @override
+  String get audioTafsir => 'تفسير القرآن المسموع';
 
   @override
   String get propheticHadith => 'الأحاديث النبوية';
@@ -279,7 +297,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get electronicTasbeeh => 'مسبحة إلكترونية';
 
   @override
-  String get totalTasbeehs => 'إجمالي التسبيحات';
+  String totalTasbeehs(int count) {
+    return 'إجمالي التسبيحات: $count';
+  }
 
   @override
   String get tapToCount => 'اضغط في أي مكان في الدائرة للتسبيح';
@@ -459,6 +479,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get nowPlaying => 'جاري التشغيل...';
+
+  @override
+  String get playbackPaused => 'التشغيل متوقف';
 
   @override
   String get reciterLabel => 'القارئ';
@@ -866,6 +889,58 @@ class AppLocalizationsAr extends AppLocalizations {
       'فتح إعدادات النظام للإشعارات';
 
   @override
+  String get notificationDiagnosticsTitle => 'تشخيص الإشعارات';
+
+  @override
+  String get notificationDiagnosticsSubtitle =>
+      'تحقق من حالة الصلاحيات الفعلية لضمان عمل تنبيهات الآذان';
+
+  @override
+  String get notificationDiagnosticsHealthy => 'إعدادات الإشعارات سليمة';
+
+  @override
+  String get notificationDiagnosticsNeedsFix => 'بعض الإعدادات تحتاج إصلاح';
+
+  @override
+  String get notificationPermissionTitle => 'صلاحية الإشعارات';
+
+  @override
+  String get notificationPermissionSubtitle =>
+      'يجب تفعيلها لاستلام تنبيهات الآذان والتذكير';
+
+  @override
+  String get exactAlarmPermissionTitle => 'صلاحية المنبّهات الدقيقة';
+
+  @override
+  String get exactAlarmPermissionSubtitle =>
+      'مطلوبة في أندرويد 12+ لتشغيل تنبيه الآذان في وقته الدقيق';
+
+  @override
+  String get batteryOptimizationTitle => 'تحسين البطارية';
+
+  @override
+  String get batteryOptimizationSubtitle =>
+      'عطّل تحسين البطارية لهذا التطبيق لمنع تأخير أو حظر تنبيهات الآذان';
+
+  @override
+  String get notRequiredOnThisDevice => 'غير مطلوب على هذا الجهاز';
+
+  @override
+  String get fixNow => 'إصلاح الآن';
+
+  @override
+  String get enabled => 'مفعّل';
+
+  @override
+  String get requiresFix => 'يحتاج إصلاح';
+
+  @override
+  String get refreshStatus => 'تحديث الحالة';
+
+  @override
+  String get openSystemSettings => 'فتح إعدادات النظام';
+
+  @override
   String get continueYourKhatma => 'واصل ختمـتك';
 
   @override
@@ -913,6 +988,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get continueReading => 'إكمال القراءة';
+
+  @override
+  String get continueListening => 'إكمال الاستماع';
 
   @override
   String get activePlans => 'الخطط النشطة';
@@ -1245,7 +1323,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get todayTotal => 'اليوم';
 
   @override
+  String get today => 'اليوم';
+
+  @override
   String get allTimeTasbeehs => 'إجمالي كل الأوقات';
+
+  @override
+  String get total => 'الإجمالي';
+
+  @override
+  String get streak => 'السلسلة';
 
   @override
   String get setCompleteTitle => 'اكتملت الجولة!';
@@ -1273,6 +1360,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sidebarTagline => 'رحلة روحية ومكتبة';
+
+  @override
+  String get sidebarAppDescription => 'رفيقك الإسلامي اليومي';
 
   @override
   String get sira => 'حياة الرسول';
@@ -1313,4 +1403,549 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get emptyDownloadsHistoryDesc => 'لم تقم بتنزيل أي سور بعد';
+
+  @override
+  String get khatmaV2Title => 'ختمة جديدة';
+
+  @override
+  String get khatmaV2TypeStepTitle => 'ما هو هدفك؟';
+
+  @override
+  String get khatmaV2Reading => 'قراءة عامة';
+
+  @override
+  String get khatmaV2ReadingDesc => 'قراءة كاملة للقرآن الكريم';
+
+  @override
+  String get khatmaV2Memorization => 'حفظ';
+
+  @override
+  String get khatmaV2MemorizationDesc => 'التركيز على الحفظ مع متابعة ذكية';
+
+  @override
+  String get khatmaV2Revision => 'مراجعة';
+
+  @override
+  String get khatmaV2RevisionDesc => 'تثبيت حفظك السابق';
+
+  @override
+  String get khatmaV2Listening => 'استماع';
+
+  @override
+  String get khatmaV2ListeningDesc => 'الاستماع المتدرج للقرآن مع تتبع يومي';
+
+  @override
+  String get khatmaV2DetailsStepTitle => 'تفاصيل الختمة';
+
+  @override
+  String get khatmaV2TitleLabel => 'العنوان (مثلاً: ختمة رمضان)';
+
+  @override
+  String get khatmaV2Range => 'النطاق';
+
+  @override
+  String get khatmaV2StartPage => 'صفحة البداية';
+
+  @override
+  String get khatmaV2EndPage => 'صفحة النهاية';
+
+  @override
+  String get khatmaV2SchedulingStepTitle => 'الجدولة والمحرك';
+
+  @override
+  String get khatmaV2DurationDays => 'المدة (بالأيام)';
+
+  @override
+  String get khatmaV2QuickDurations => 'مدد سريعة';
+
+  @override
+  String get khatmaV2EnginePrefs => 'تفضيلات المحرك';
+
+  @override
+  String get khatmaV2SmartRemediation => 'المعالجة الذكية';
+
+  @override
+  String get khatmaV2SmartRemediationDesc => 'يعدل هدفك تلقائياً إذا فاتك يوم';
+
+  @override
+  String get khatmaV2FixedDaily => 'هدف يومي ثابت';
+
+  @override
+  String get khatmaV2FixedDailyDesc => 'لا يتغير أبداً، حتى لو تأخر التقدم';
+
+  @override
+  String get khatmaV2StartJourney => 'ابدأ الرحلة';
+
+  @override
+  String get khatmaV2Continue => 'متابعة';
+
+  @override
+  String get khatmaV2Back => 'رجوع';
+
+  @override
+  String khatmaV2MyKhatma(Object type) {
+    return 'ختمتي لـ $type';
+  }
+
+  @override
+  String get khatmaV2NoActive => 'لا توجد ختمة نشطة';
+
+  @override
+  String get khatmaV2StartJourneyDesc =>
+      'ابدأ رحلة جديدة مع نظام الختمة الذكي.';
+
+  @override
+  String get khatmaV2SetupNew => 'إعداد ختمة جديدة';
+
+  @override
+  String get khatmaV2DeleteTrack => 'حذف هذا المسار';
+
+  @override
+  String get khatmaV2DeleteTrackTitle => 'حذف المسار؟';
+
+  @override
+  String khatmaV2DeleteTrackBody(Object title) {
+    return 'سيتم حذف \"$title\" وكل تقدمه بشكل نهائي.';
+  }
+
+  @override
+  String khatmaV2RecordPage(Object page) {
+    return 'تسجيل صفحة $page';
+  }
+
+  @override
+  String get khatmaV2SelectTrack => 'اختر الختمة';
+
+  @override
+  String khatmaV2ProgressSaved(Object track) {
+    return 'تم حفظ التقدم في $track';
+  }
+
+  @override
+  String khatmaV2TrackTypeSuffix(Object type) {
+    return 'مسار $type';
+  }
+
+  @override
+  String get khatmaV2UnitLabel => 'وحدة التتبع';
+
+  @override
+  String get khatmaV2UnitPage => 'صفحات';
+
+  @override
+  String get khatmaV2UnitJuz => 'أجزاء';
+
+  @override
+  String get khatmaV2StartJuz => 'جزء البداية';
+
+  @override
+  String get khatmaV2EndJuz => 'جزء النهاية';
+
+  @override
+  String get khatmaV2JuzCount => 'عدد الأجزاء';
+
+  @override
+  String khatmaV2RecordJuz(Object juz) {
+    return 'تسجيل الجزء $juz';
+  }
+
+  @override
+  String get khatmaV2UnitPageSingle => 'صفحة';
+
+  @override
+  String get khatmaV2UnitJuzSingle => 'جزء';
+
+  @override
+  String get khatmaHeatmapLess => 'أقل';
+
+  @override
+  String get khatmaHeatmapMore => 'أكثر';
+
+  @override
+  String get khatmaV2UnitSurah => 'سور';
+
+  @override
+  String get khatmaV2UnitSurahSingle => 'سورة';
+
+  @override
+  String get khatmaV2StartSurah => 'سورة البداية';
+
+  @override
+  String get khatmaV2EndSurah => 'سورة النهاية';
+
+  @override
+  String khatmaV2RecordSurah(Object surah) {
+    return 'تسجيل سورة $surah';
+  }
+
+  @override
+  String get khatmaV2ValidationRangeOrder =>
+      'يجب أن تكون البداية أصغر من أو تساوي النهاية.';
+
+  @override
+  String khatmaV2ValidationStartOutOfRange(int max) {
+    return 'قيمة البداية يجب أن تكون بين 1 و $max.';
+  }
+
+  @override
+  String khatmaV2ValidationEndOutOfRange(int max) {
+    return 'قيمة النهاية يجب أن تكون بين 1 و $max.';
+  }
+
+  @override
+  String get khatmaV2ValidationDurationDays =>
+      'مدة الخطة يجب أن تكون يومًا واحدًا على الأقل.';
+
+  @override
+  String get playAyah => 'استماع للآية';
+
+  @override
+  String get testNotification => 'اختبار الإشعار';
+
+  @override
+  String get testNotificationSubtitle => 'اضغط للتأكد من أن التنبيهات تعمل';
+
+  @override
+  String get locationPermissionRequired => 'إذن الموقع مطلوب';
+
+  @override
+  String get unableToStartAudioTryAgain =>
+      'تعذر تشغيل الصوت الآن. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get guestUser => 'زائر';
+
+  @override
+  String appVersionLabel(Object version) {
+    return 'الإصدار $version';
+  }
+
+  @override
+  String get reciterNoSurahsAvailable => 'لا توجد سور متاحة لهذا القارئ';
+
+  @override
+  String get back => 'رجوع';
+
+  @override
+  String get adhkarTitle => 'الأذكار';
+
+  @override
+  String get adhkarSearchTooltip => 'بحث';
+
+  @override
+  String get adhkarFavoritesTooltip => 'المفضلة';
+
+  @override
+  String get noAdhkarDataFound => 'لا توجد بيانات أذكار';
+
+  @override
+  String get noAdhkarInCategory => 'لا توجد أذكار في هذا القسم';
+
+  @override
+  String get searchAdhkarHint => 'ابحث في النص العربي أو الإنجليزي أو القسم';
+
+  @override
+  String get typeToSearchAdhkar => 'اكتب للبحث في الأذكار';
+
+  @override
+  String get noAdhkarMatches => 'لا توجد نتائج';
+
+  @override
+  String get favoriteAdhkarTitle => 'الأذكار المفضلة';
+
+  @override
+  String get noFavoriteAdhkar => 'لا توجد عناصر في المفضلة';
+
+  @override
+  String get dhikrDetailsTitle => 'تفاصيل الذكر';
+
+  @override
+  String get toggleFavorite => 'تبديل المفضلة';
+
+  @override
+  String get dhikrNotFound => 'الذكر غير موجود';
+
+  @override
+  String get referenceLabel => 'المصدر';
+
+  @override
+  String get repeatCounter => 'عداد التكرار';
+
+  @override
+  String get completedThisDhikr => 'تم إكمال هذا الذكر';
+
+  @override
+  String get countLabel => 'تسبيح';
+
+  @override
+  String get adhkarCategoryMorning => 'أذكار الصباح';
+
+  @override
+  String get adhkarCategoryEvening => 'أذكار المساء';
+
+  @override
+  String get adhkarCategorySleep => 'أذكار النوم';
+
+  @override
+  String get adhkarCategoryPrayer => 'أذكار الصلاة';
+
+  @override
+  String get adhkarCategoryAfterPrayer => 'بعد الصلاة';
+
+  @override
+  String get adhkarCategoryMosque => 'أذكار المسجد';
+
+  @override
+  String get adhkarCategoryFood => 'أذكار الطعام';
+
+  @override
+  String get adhkarCategoryTravel => 'أذكار السفر';
+
+  @override
+  String get adhkarCategoryHome => 'أذكار المنزل';
+
+  @override
+  String get adhkarCategoryGeneral => 'أذكار عامة';
+
+  @override
+  String get adhkarCategoryTasbeeh => 'التسبيح';
+
+  @override
+  String get adhkarCategoryQuranDua => 'أدعية قرآنية';
+
+  @override
+  String get athanOnboardingPrompt =>
+      'هل ترغب في تفعيل تنبيهات الآذان لكل صلاة؟ يمكنك دائماً تغيير هذا من إعدادات مواقيت الصلاة.';
+
+  @override
+  String get adhanAlertsMayNotWork => 'تنبيهات الآذان قد لا تعمل';
+
+  @override
+  String get enableExactAlarmsFromSettings =>
+      'الرجاء تفعيل إذن \"التنبيهات الدقيقة\" من الإعدادات.';
+
+  @override
+  String get enable => 'تفعيل';
+
+  @override
+  String get prePrayerReminders => 'تذكير ما قبل الصلاة';
+
+  @override
+  String prePrayerReminderSubtitle(int minutes) {
+    return 'تنبيه للاستعداد والأذكار قبل الصلاة بـ $minutes دقيقة';
+  }
+
+  @override
+  String get remindBefore => 'وقت التذكير';
+
+  @override
+  String get previewAdhanSound => 'سماع صوت الآذان';
+
+  @override
+  String get tapToListen => 'اضغط للاستماع';
+
+  @override
+  String get playlistPlayAll => 'تشغيل الكل';
+
+  @override
+  String get noSurahsInPlaylist => 'لا توجد سور في هذه القائمة';
+
+  @override
+  String playlistShareText(Object name, Object data) {
+    return 'قائمة تشغيل: $name\nاستمع إليها عبر تطبيق المكتبة الإسلامية:\nislamiclibrary://playlist?data=$data';
+  }
+
+  @override
+  String favoritesEmptyHint(Object section) {
+    return 'أضف أول عنصر من قسم $section وسيظهر هنا مباشرة.';
+  }
+
+  @override
+  String openSectionLabel(Object section) {
+    return 'فتح $section';
+  }
+
+  @override
+  String get noFavoriteTafsirClips => 'لا توجد تفاسير في المفضلة';
+
+  @override
+  String get noFavoriteSeerahClips => 'لا توجد مقاطع سيرة في المفضلة';
+
+  @override
+  String get chooseYourLanguage => 'اختر لغتك';
+
+  @override
+  String get languageArabicSubtitle => 'العربية';
+
+  @override
+  String get languageEnglishSubtitle => 'الإنجليزية';
+
+  @override
+  String get permissionsCannotBeRevokedInApp =>
+      'لا يمكن إلغاء الصلاحيات من داخل التطبيق. يرجى تعديلها من إعدادات الجهاز.';
+
+  @override
+  String get permissionDeniedEnableFromSettings =>
+      'تم رفض الصلاحية. يرجى تفعيلها من الإعدادات.';
+
+  @override
+  String get welcome => 'أهلاً بك';
+
+  @override
+  String get permissionsSetupSubtitle => 'لنقم بإعداد تجربتك';
+
+  @override
+  String get permissionsNotificationsTitle => 'التنبيهات والتشغيل في الخلفية';
+
+  @override
+  String get permissionsNotificationsSubtitle =>
+      'ابق على اطلاع وواصل تشغيل الصوت';
+
+  @override
+  String get permissionsLocationTitle => 'مواقيت الصلاة و القبلة';
+
+  @override
+  String get permissionsLocationSubtitle =>
+      'مواقيت صلاة دقيقة بناءً على الموقع';
+
+  @override
+  String get permissionsUpdatesTitle => 'التحديثات التلقائية';
+
+  @override
+  String get permissionsUpdatesSubtitle => 'السماح للتطبيق بالتحديث من الداخل';
+
+  @override
+  String get startNow => 'ابدأ الآن';
+
+  @override
+  String get calculationMethodDescription =>
+      'اختر طريقة حساب مواقيت الصلاة المناسبة لمنطقتك';
+
+  @override
+  String get finishSetup => 'إتمام الإعداد';
+
+  @override
+  String get storySectionTitle => 'القصة';
+
+  @override
+  String get keyEventsTitle => 'أبرز الأحداث';
+
+  @override
+  String get keyLessonTitle => 'الدرس المستفاد';
+
+  @override
+  String tasbeehSessionCount(int count) {
+    return 'الجلسة $count';
+  }
+
+  @override
+  String get setActiveListeningTrack => 'تحديد مسار الاستماع النشط';
+
+  @override
+  String get currentActiveTrack => 'النشط حاليًا';
+
+  @override
+  String get chooseActiveListeningTrack => 'اختر مسار الاستماع النشط';
+
+  @override
+  String activeListeningTrackSetMessage(Object title) {
+    return 'تم تعيين \"$title\" كمسار الاستماع النشط';
+  }
+
+  @override
+  String get clearActiveTrack => 'إلغاء المسار النشط';
+
+  @override
+  String get muslimWorldLeague => 'رابطة العالم الإسلامي';
+
+  @override
+  String get mushafSettings => 'إعدادات المصحف';
+
+  @override
+  String get themeLabel => 'المظهر';
+
+  @override
+  String get riwayaSettings => 'إعدادات الرواية';
+
+  @override
+  String get chooseQuranRecitationStyle => 'اختر رواية القرآن الكريم';
+
+  @override
+  String get downloadMoreRiwayat => 'تحميل روايات أخرى';
+
+  @override
+  String get available => 'متاح';
+
+  @override
+  String get tafsirLabel => 'التفسير';
+
+  @override
+  String get playVerseAudio => 'تشغيل الآية';
+
+  @override
+  String get noTranslationAvailable => 'لا توجد ترجمة متاحة.';
+
+  @override
+  String get failedToLoadTranslation => 'تعذر تحميل الترجمة.';
+
+  @override
+  String hadithShareText(Object text) {
+    return 'اقرأ هذا الحديث من تطبيق المكتبة الإسلامية: $text';
+  }
+
+  @override
+  String get hadithBookBukhari => 'صحيح البخاري';
+
+  @override
+  String get hadithBookMuslim => 'صحيح مسلم';
+
+  @override
+  String get hadithBookAbuDawud => 'سنن أبي داود';
+
+  @override
+  String get hadithBookTirmidhi => 'جامع الترمذي';
+
+  @override
+  String get hadithBookNasai => 'سنن النسائي';
+
+  @override
+  String get hadithBookIbnMajah => 'سنن ابن ماجه';
+
+  @override
+  String get hadithBookMalik => 'موطأ مالك';
+
+  @override
+  String get hadithBookNawawi => 'الأربعون النووية';
+
+  @override
+  String get hadithBookQudsi => 'الأحاديث القدسية';
+
+  @override
+  String get reciterUnavailableNow =>
+      'عذراً، لا تتوفر تلاوة لهذا القارئ حالياً';
+
+  @override
+  String get unableToLoadPlayableAyahAudio =>
+      'تعذر تحميل مقطع الآية لهذا الاختيار.';
+
+  @override
+  String get noDataAvailable => 'لا توجد بيانات متاحة.';
+
+  @override
+  String get chooseTafsirSource => 'اختر مصدر التفسير';
+
+  @override
+  String get noTafsirSourcesAvailable => 'لا توجد مصادر تفسير متاحة حالياً.';
+
+  @override
+  String get fullIndex => 'الفهرس الكامل';
+
+  @override
+  String get theme => 'المظهر';
+
+  @override
+  String get riwaya => 'الرواية';
+
+  @override
+  String get manualLocationInput => 'إدخال يدوي';
 }

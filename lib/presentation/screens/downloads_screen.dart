@@ -221,34 +221,110 @@ class _ActiveDownloadsTab extends ConsumerWidget {
       );
     }
 
-    final quranActive = allActive
-        .where((e) => e.id.startsWith('quran_'))
-        .toList();
-    final seerahActive = allActive
-        .where((e) => e.id.startsWith('seerah_'))
-        .toList();
+    final categories = <String, Map<String, List<DownloadItemState>>>{};
+    for (final item in allActive) {
+      final category = item.id.startsWith('seerah_')
+          ? 'seerah'
+          : item.id.startsWith('tafsir_')
+          ? 'tafsir'
+          : 'quran';
 
-    return ListView(
+      categories.putIfAbsent(category, () => {});
+      categories[category]!.update(
+        item.reciterName,
+        (list) => list..add(item),
+        ifAbsent: () => [item],
+      );
+    }
+
+    final categoryOrder = ['quran', 'tafsir', 'seerah'];
+    final sortedCategories = categories.keys.toList()
+      ..sort(
+        (a, b) => categoryOrder.indexOf(a).compareTo(categoryOrder.indexOf(b)),
+      );
+
+    return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      children: [
-        if (quranActive.isNotEmpty) ...[
-          _buildSectionHeader(
-            context,
-            l10n.quranSection,
-            Icons.menu_book_rounded,
-          ),
-          ...quranActive.map((item) => _buildDownloadCard(context, ref, item)),
-        ],
-        if (seerahActive.isNotEmpty) ...[
-          if (quranActive.isNotEmpty) const SizedBox(height: 20),
-          _buildSectionHeader(
-            context,
-            l10n.seerahSection,
-            Icons.history_edu_rounded,
-          ),
-          ...seerahActive.map((item) => _buildDownloadCard(context, ref, item)),
-        ],
-      ],
+      itemCount: sortedCategories.length,
+      itemBuilder: (context, catIndex) {
+        final category = sortedCategories[catIndex];
+        final reciters = categories[category]!;
+
+        final categoryTitle = category == 'seerah'
+            ? l10n.seerahSection
+            : category == 'tafsir'
+            ? l10n.audioTafsir
+            : l10n.quranSection;
+
+        final categoryIcon = category == 'seerah'
+            ? Icons.history_edu_rounded
+            : category == 'tafsir'
+            ? Icons.menu_book_rounded
+            : Icons.auto_stories_rounded;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionHeader(context, categoryTitle, categoryIcon),
+            ...reciters.entries.map((entry) {
+              final reciterName = entry.key;
+              final items = entry.value;
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: GlassContainer(
+                  borderRadius: 20,
+                  padding: EdgeInsets.zero,
+                  child: Theme(
+                    data: Theme.of(
+                      context,
+                    ).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          category == 'quran'
+                              ? Icons.person
+                              : Icons.mic_external_on_rounded,
+                          color: AppTheme.primaryColor,
+                        ),
+                      ),
+                      title: Text(
+                        reciterName,
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${items.length} ${l10n.activeDownloads}',
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                      iconColor: Colors.white,
+                      collapsedIconColor: Colors.white54,
+                      childrenPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      children: items
+                          .map((item) => _buildDownloadCard(context, ref, item))
+                          .toList(),
+                    ),
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
     );
   }
 
@@ -258,20 +334,23 @@ class _ActiveDownloadsTab extends ConsumerWidget {
     IconData icon,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12, top: 8),
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: AppTheme.primaryColor.withValues(alpha: 0.7),
-            size: 20,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: AppTheme.primaryColor, size: 20),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Text(
             title,
             style: GoogleFonts.cairo(
-              color: Colors.white70,
-              fontSize: 16,
+              color: Colors.white,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -378,34 +457,115 @@ class _HistoryTab extends ConsumerWidget {
           );
         }
 
-        final quranItems = history.where((e) => e.type == 'quran').toList();
-        final seerahItems = history.where((e) => e.type == 'seerah').toList();
+        final categories = <String, Map<String, List<DownloadRequest>>>{};
+        for (final item in history) {
+          final category = item.type; // already has quran, seerah, tafsir
 
-        return ListView(
+          categories.putIfAbsent(category, () => {});
+          categories[category]!.update(
+            item.reciterName,
+            (list) => list..add(item),
+            ifAbsent: () => [item],
+          );
+        }
+
+        final categoryOrder = ['quran', 'tafsir', 'seerah', 'general'];
+        final sortedCategories = categories.keys.toList()
+          ..sort(
+            (a, b) =>
+                categoryOrder.indexOf(a).compareTo(categoryOrder.indexOf(b)),
+          );
+
+        return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          children: [
-            if (quranItems.isNotEmpty) ...[
-              _buildSectionHeader(
-                context,
-                l10n.quranSection,
-                Icons.menu_book_rounded,
-              ),
-              ...quranItems.map(
-                (item) => _buildHistoryCard(context, ref, item),
-              ),
-            ],
-            if (seerahItems.isNotEmpty) ...[
-              if (quranItems.isNotEmpty) const SizedBox(height: 20),
-              _buildSectionHeader(
-                context,
-                l10n.seerahSection,
-                Icons.history_edu_rounded,
-              ),
-              ...seerahItems.map(
-                (item) => _buildHistoryCard(context, ref, item),
-              ),
-            ],
-          ],
+          itemCount: sortedCategories.length,
+          itemBuilder: (context, catIndex) {
+            final category = sortedCategories[catIndex];
+            final reciters = categories[category]!;
+
+            final categoryTitle = category == 'seerah'
+                ? l10n.seerahSection
+                : category == 'tafsir'
+                ? l10n.audioTafsir
+                : category == 'quran'
+                ? l10n.quranSection
+                : 'أخرى';
+
+            final categoryIcon = category == 'seerah'
+                ? Icons.history_edu_rounded
+                : category == 'tafsir'
+                ? Icons.menu_book_rounded
+                : category == 'quran'
+                ? Icons.auto_stories_rounded
+                : Icons.folder_open_rounded;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionHeader(context, categoryTitle, categoryIcon),
+                ...reciters.entries.map((entry) {
+                  final reciterName = entry.key;
+                  final items = entry.value;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: GlassContainer(
+                      borderRadius: 20,
+                      padding: EdgeInsets.zero,
+                      child: Theme(
+                        data: Theme.of(
+                          context,
+                        ).copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          leading: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.1,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              category == 'quran'
+                                  ? Icons.person
+                                  : Icons.mic_external_on_rounded,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                          title: Text(
+                            reciterName,
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${items.length} ملف محمل',
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                            ),
+                          ),
+                          iconColor: Colors.white,
+                          collapsedIconColor: Colors.white54,
+                          childrenPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          children: items
+                              .map(
+                                (item) => _buildHistoryCard(context, ref, item),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 16),
+              ],
+            );
+          },
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -419,20 +579,23 @@ class _HistoryTab extends ConsumerWidget {
     IconData icon,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12, top: 8),
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: AppTheme.primaryColor.withValues(alpha: 0.7),
-            size: 20,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: AppTheme.primaryColor, size: 20),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Text(
             title,
             style: GoogleFonts.cairo(
-              color: Colors.white70,
-              fontSize: 16,
+              color: Colors.white,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),

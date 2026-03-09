@@ -5,7 +5,7 @@ class DailyVerse {
   final String surah;
   final String translation;
 
-  DailyVerse({
+  const DailyVerse({
     required this.text,
     required this.surah,
     required this.translation,

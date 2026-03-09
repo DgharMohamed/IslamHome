@@ -2,7 +2,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:islam_home/data/services/quran_playback_service.dart';
+import 'package:islam_home/data/services/audio_handler.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -11,29 +11,30 @@ import 'package:islam_home/data/models/video_model.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'dart:async';
 
-// Provider to track the initialization state of QuranPlaybackService
-final quranPlaybackInitializedProvider = StreamProvider<bool>((ref) {
-  return QuranPlaybackService.initializationStream;
-});
-
 // Provider to hold the AudioHandler instance
-// Returns null if not yet initialized to avoid blocking UI
-final audioHandlerProvider = Provider<AudioHandler?>((ref) {
-  final isInitAsync = ref.watch(quranPlaybackInitializedProvider);
-  final isInit = isInitAsync.value ?? QuranPlaybackService.isInitialized;
-  if (!isInit) {
-    return null;
-  }
-  return QuranPlaybackService.audioHandler;
+// Provider to hold the AudioHandler instance
+final audioHandlerProvider = FutureProvider<AudioHandler>((ref) async {
+  return await AudioService.init(
+    builder: () => AudioPlayerHandler(),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.islamhome.app.audio',
+      androidNotificationChannelName: 'Islam Home Audio',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    ),
+  );
 });
 
 // Provider to hold the underlying AudioPlayer for UI streams
 // Returns null if handler not yet initialized
+// Provider to hold the underlying AudioPlayer for UI streams
 final playerProvider = Provider<AudioPlayer?>((ref) {
-  final handler = ref.watch(audioHandlerProvider);
-  if (handler == null) return null;
-  // Both AudioPlayerHandler and QuranAudioHandler have a player property
-  return (handler as dynamic).player;
+  final handlerAsync = ref.watch(audioHandlerProvider);
+  return handlerAsync.when(
+    data: (handler) => (handler as AudioPlayerHandler).player,
+    loading: () => null,
+    error: (_, __) => null,
+  );
 });
 
 class AudioPlayerService {
@@ -44,6 +45,14 @@ class AudioPlayerService {
   final _yt = YoutubeExplode();
 
   AudioPlayerService(this._handler);
+
+  bool _isInterruptionOrAbortError(Object error) {
+    final type = error.runtimeType.toString().toLowerCase();
+    final message = error.toString().toLowerCase();
+    return type.contains('playerinterruptedexception') ||
+        message.contains('playerinterruptedexception') ||
+        message.contains('connection aborted');
+  }
 
   // Expose player and streams for widgets
   AudioPlayer get player => (_handler as dynamic).player;
@@ -116,12 +125,19 @@ class AudioPlayerService {
       debugPrint('🎵 Service: Starting playback');
       await _handler.play();
       debugPrint('🎵 Service: playYoutubeAudio completed successfully');
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('🎵 Service: Youtube Audio Error: $e');
       if (e is TimeoutException) {
         throw Exception('انتهت مهلة انتظار اتصال البث، يرجى المحاولة مرة أخرى');
       }
-      rethrow;
+      if (_isInterruptionOrAbortError(e)) {
+        debugPrint(
+          '[AudioService] Playback interrupted while loading source; skipping transient error.',
+        );
+        return;
+      }
+      debugPrintStack(stackTrace: st);
+      throw Exception('Unable to start playback for this source');
     }
   }
 
@@ -177,8 +193,21 @@ class AudioPlayerService {
         return;
       }
 
+      // Stop and clear before setting new playlist to avoid (0) Source Error on some platforms
+      debugPrint('🎵 Service: Stopping player before new playlist...');
+      await _handler.stop();
+      await Future.delayed(const Duration(milliseconds: 100));
+
       final handler = _handler as dynamic;
-      debugPrint('🎵 Service: Calling handler.setPlaylist...');
+      debugPrint(
+        '🎵 Service: Calling handler.setPlaylist with ${sources.length} items...',
+      );
+      for (var i = 0; i < sources.length; i++) {
+        final source = sources[i];
+        if (source is UriAudioSource) {
+          debugPrint('🎵 Service: Source [$i]: ${source.uri}');
+        }
+      }
       await handler.setPlaylist(sources, initialIndex: initialIndex);
       debugPrint(
         '🎵 Service: handler.setPlaylist completed, waiting for player to be ready...',
@@ -195,10 +224,16 @@ class AudioPlayerService {
       debugPrint(
         '🎵 Service: Play command sent, notification should now be visible',
       );
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('🎵 Service: Playlist Error: $e');
-      debugPrintStack(stackTrace: StackTrace.current);
-      rethrow;
+      if (_isInterruptionOrAbortError(e)) {
+        debugPrint(
+          '[AudioService] Playlist replacement interrupted; skipping transient error.',
+        );
+        return;
+      }
+      debugPrintStack(stackTrace: st);
+      throw Exception('Unable to start playlist playback');
     }
   }
 
@@ -247,6 +282,28 @@ class AudioPlayerService {
       debugPrint('🎵 Service: playVideoPlaylist Error: $e');
     }
   }
+
+  Future<void> playQueue(List<MediaItem> queue, {int initialIndex = 0}) async {
+    try {
+      debugPrint(
+        '🎵 Service: playQueue called with ${queue.length} items, starting at $initialIndex',
+      );
+
+      final sources = queue.map((item) {
+        return AudioSource.uri(Uri.parse(item.id), tag: item);
+      }).toList();
+
+      await setPlaylist(sources: sources, initialIndex: initialIndex);
+    } catch (e) {
+      debugPrint('🎵 Service: playQueue Error: $e');
+    }
+  }
+
+  // Quran audio methods moved to dedicated Quran player or simplified
+  /* 
+  Future<void> playQuranVerse(QuranVerse verse) async { ... }
+  Future<void> playQuranPlaylist(List<QuranVerse> verses, ...) async { ... }
+  */
 
   Future<void> skipForward() async {
     final current = player.position;
@@ -354,6 +411,12 @@ class AudioPlayerService {
   Future<void> resume() async => await _handler.play();
   Future<void> stop() async => await _handler.stop();
   Future<void> seek(Duration position) async => await _handler.seek(position);
+
+  Future<void> skipToNext() async => await _handler.skipToNext();
+  Future<void> skipToPrevious() async => await _handler.skipToPrevious();
+
+  Stream<LoopMode> get loopModeStream => player.loopModeStream;
+  Stream<double> get speedStream => player.speedStream;
 
   // Shuffle and Repeat
   Future<void> toggleShuffle() async {

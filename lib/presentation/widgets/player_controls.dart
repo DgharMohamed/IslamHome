@@ -330,49 +330,49 @@ class PlayerControls extends ConsumerWidget {
                   if (metadata == null) return const SizedBox.shrink();
 
                   final title = metadata.title;
-                  final artist = metadata.artist;
+                  final artist = metadata.artist ?? 'غير معروف';
                   final url = metadata.id;
-                  final album = metadata.album;
+                  final album = metadata.album ?? 'عام';
                   final extras = metadata.extras;
 
-                  final isSeerah = album == 'السيرة النبوية';
                   final downloadNotifier = ref.read(downloadProvider.notifier);
                   final downloadState = ref.watch(downloadProvider);
 
-                  // Extract IDs if possible
-                  final int episodeId = extras?['id'] ?? 0;
+                  // Try to extract an ID or fallback to hash code for uniqueness
+                  final int uniqueId =
+                      extras?['id'] ??
+                      extras?['surahNumber'] ??
+                      url.hashCode.abs();
 
                   return FutureBuilder<bool>(
-                    future: isSeerah
-                        ? downloadNotifier.isSeerahDownloaded(
-                            artist ?? '',
-                            episodeId,
-                          )
-                        : Future.value(false),
+                    future: downloadNotifier.isGenericDownloaded(
+                      artist,
+                      album,
+                      uniqueId,
+                    ),
                     builder: (context, snapshot) {
-                      final bool isDownloaded = snapshot.data ?? false;
-
                       // Identify current download status for progress
-                      final String downloadId = isSeerah
-                          ? 'seerah_${artist}_seerah_audio_$episodeId'
-                          : '';
+                      final String downloadId =
+                          'general_${artist}_${album}_$uniqueId';
                       final activeDownload = downloadState[downloadId];
                       final bool isDownloading =
                           activeDownload?.status == DownloadStatus.downloading;
                       final double progress = activeDownload?.progress ?? 0.0;
 
+                      final bool isDownloaded =
+                          (snapshot.data ?? false) && !isDownloading;
+
                       return TextButton.icon(
                         onPressed: isDownloaded || isDownloading
                             ? null
                             : () async {
-                                if (isSeerah) {
-                                  await downloadNotifier.startSeerahDownload(
-                                    reciterName: artist ?? 'بدر المشاري',
-                                    title: title,
-                                    url: url,
-                                    episodeId: episodeId,
-                                  );
-                                }
+                                await downloadNotifier.startGenericDownload(
+                                  title: title,
+                                  artist: artist,
+                                  album: album,
+                                  url: url,
+                                  idValue: uniqueId,
+                                );
                               },
                         icon: isDownloading
                             ? SizedBox(

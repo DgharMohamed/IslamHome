@@ -198,7 +198,7 @@ class _PrayerTimesWidgetState extends ConsumerState<PrayerTimesWidget> {
                           color: AppTheme.primaryColor,
                           size: 20,
                         ),
-                        tooltip: 'تجربة الأذان',
+                        tooltip: l10n.previewAdhanSound,
                         onPressed: () => NotificationService().testAthan(),
                       ),
                       const SizedBox(width: 8),

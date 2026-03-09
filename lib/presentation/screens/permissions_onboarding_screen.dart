@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 
@@ -72,15 +73,16 @@ class _PermissionsOnboardingScreenState
     setState(() => _isRequesting = true);
 
     try {
+      final l10n = AppLocalizations.of(context)!;
       if (isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'لا يمكن إلغاء الصلاحيات من داخل التطبيق. يرجى تعديلها من إعدادات الجهاز.',
+              l10n.permissionsCannotBeRevokedInApp,
               style: GoogleFonts.cairo(),
             ),
             action: SnackBarAction(
-              label: 'الإعدادات',
+              label: l10n.settings,
               onPressed: () => openAppSettings(),
             ),
           ),
@@ -94,11 +96,11 @@ class _PermissionsOnboardingScreenState
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'تم رفض الصلاحية. يرجى تفعيلها من الإعدادات.',
+                l10n.permissionDeniedEnableFromSettings,
                 style: GoogleFonts.cairo(),
               ),
               action: SnackBarAction(
-                label: 'الإعدادات',
+                label: l10n.settings,
                 onPressed: () => openAppSettings(),
               ),
             ),
@@ -116,6 +118,7 @@ class _PermissionsOnboardingScreenState
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
+        final l10n = AppLocalizations.of(context)!;
         final locale = ref.watch(localeProvider);
         final isArabic = locale.languageCode == 'ar';
 
@@ -133,7 +136,7 @@ class _PermissionsOnboardingScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isArabic ? 'أهلاً بك' : 'Welcome',
+                      l10n.welcome,
                       style: GoogleFonts.cairo(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -142,10 +145,8 @@ class _PermissionsOnboardingScreenState
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isArabic
-                          ? 'لنقم بإعداد تجربتك'
-                          : 'Let\'s set up your experience',
-                      style: GoogleFonts.poppins(
+                      l10n.permissionsSetupSubtitle,
+                      style: GoogleFonts.montserrat(
                         fontSize: 16,
                         color: Colors.white70,
                       ),
@@ -157,12 +158,8 @@ class _PermissionsOnboardingScreenState
                         children: [
                           _buildPermissionTile(
                             icon: Icons.notifications_active_rounded,
-                            title: isArabic
-                                ? 'التنبيهات والتشغيل في الخلفية'
-                                : 'Notifications & Background Play',
-                            subtitle: isArabic
-                                ? 'ابق على اطلاع وواصل تشغيل الصوت'
-                                : 'Stay notified and keep audio playing',
+                            title: l10n.permissionsNotificationsTitle,
+                            subtitle: l10n.permissionsNotificationsSubtitle,
                             status: _notificationsGranted,
                             isArabic: isArabic,
                             onTap: () => _handlePermissionChange(
@@ -176,12 +173,8 @@ class _PermissionsOnboardingScreenState
                           const SizedBox(height: 16),
                           _buildPermissionTile(
                             icon: Icons.location_on_rounded,
-                            title: isArabic
-                                ? 'مواقيت الصلاة و القبلة'
-                                : 'Prayer Times & Qibla',
-                            subtitle: isArabic
-                                ? 'مواقيت صلاة دقيقة بناءً على الموقع'
-                                : 'Accurate prayer times based on GPS',
+                            title: l10n.permissionsLocationTitle,
+                            subtitle: l10n.permissionsLocationSubtitle,
                             status: _locationGranted,
                             isArabic: isArabic,
                             onTap: () => _handlePermissionChange(
@@ -194,12 +187,8 @@ class _PermissionsOnboardingScreenState
                           const SizedBox(height: 16),
                           _buildPermissionTile(
                             icon: Icons.system_update_rounded,
-                            title: isArabic
-                                ? 'التحديثات التلقائية'
-                                : 'Automatic Updates',
-                            subtitle: isArabic
-                                ? 'السماح للتطبيق بالتحديث من الداخل'
-                                : 'Allow app to update from within',
+                            title: l10n.permissionsUpdatesTitle,
+                            subtitle: l10n.permissionsUpdatesSubtitle,
                             status: _installGranted,
                             isArabic: isArabic,
                             onTap: () => _handlePermissionChange(
@@ -229,7 +218,7 @@ class _PermissionsOnboardingScreenState
                           elevation: 0,
                         ),
                         child: Text(
-                          isArabic ? 'ابدأ الآن' : 'Start Now',
+                          l10n.startNow,
                           style: GoogleFonts.cairo(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -285,7 +274,7 @@ class _PermissionsOnboardingScreenState
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54),
+          style: GoogleFonts.montserrat(fontSize: 12, color: Colors.white54),
         ),
         trailing: Switch(
           value: status,

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:islam_home/data/models/prayer_method.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 import 'package:islam_home/presentation/providers/prayer_notifier.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
@@ -43,6 +44,7 @@ class _PrayerMethodSelectionScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final locale = ref.watch(localeProvider);
     final isArabic = locale.languageCode == 'ar';
 
@@ -57,7 +59,7 @@ class _PrayerMethodSelectionScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isArabic ? 'طريقة الحساب' : 'Calculation Method',
+                  l10n.calculationMethodTitle,
                   style: GoogleFonts.cairo(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -66,10 +68,8 @@ class _PrayerMethodSelectionScreenState
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  isArabic
-                      ? 'اختر طريقة حساب مواقيت الصلاة المناسبة لمنطقتك'
-                      : 'Choose the prayer times calculation method for your region',
-                  style: GoogleFonts.poppins(
+                  l10n.calculationMethodDescription,
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     color: Colors.white70,
                   ),
@@ -138,7 +138,7 @@ class _PrayerMethodSelectionScreenState
                       elevation: 0,
                     ),
                     child: Text(
-                      isArabic ? 'إتمام الإعداد' : 'Finish Setup',
+                      l10n.finishSetup,
                       style: GoogleFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

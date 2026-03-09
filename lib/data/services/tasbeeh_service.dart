@@ -1,14 +1,21 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:islam_home/data/models/tasbeeh_model.dart';
 import 'package:islam_home/data/models/tasbeeh_log.dart';
+import 'package:islam_home/data/models/tasbeeh_model.dart';
 
 class TasbeehService {
   static const String _boxName = 'tasbeeh_box';
   static const String _totalCountKey = 'total_tasbeeh_count';
+  static const String _orderVersionKey = 'dhikr_order_version';
+  static const int _currentOrderVersion = 2;
+
+  int _asInt(dynamic value, {int fallback = 0}) {
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? fallback;
+    return fallback;
+  }
 
   Future<void> init() async {
-    // Adapter registration moved to main.dart for earlier initialization,
-    // but kept here as a safeguard during service instantiation.
     if (!Hive.isAdapterRegistered(15)) {
       Hive.registerAdapter(TasbeehModelAdapter());
     }
@@ -42,20 +49,21 @@ class TasbeehService {
   }
 
   List<TasbeehModel> getDhikrList() {
-    // Migration: Check if we need to re-seed data to the traditional order
-    const String orderVersionKey = 'dhikr_order_version';
-    const int currentOrderVersion = 2; // Incremented for traditional order
-    final savedVersion = _settingsBox.get(orderVersionKey, defaultValue: 0);
+    final savedVersion = _asInt(
+      _settingsBox.get(_orderVersionKey, defaultValue: 0),
+    );
 
-    if (_box.isEmpty || savedVersion < currentOrderVersion) {
+    if (_box.isEmpty) {
       _seedInitialData();
-      _settingsBox.put(orderVersionKey, currentOrderVersion);
+      _settingsBox.put(_orderVersionKey, _currentOrderVersion);
+    } else if (savedVersion < _currentOrderVersion) {
+      _ensureDefaultDhikrsExist();
+      _settingsBox.put(_orderVersionKey, _currentOrderVersion);
     }
 
     final list = _box.values.toList();
 
-    // Define the desired traditional order
-    final traditionalOrder = [
+    const traditionalOrder = [
       'subhanallah',
       'alhamdulillah',
       'allahuakbar',
@@ -63,12 +71,13 @@ class TasbeehService {
       'astaghfirullah',
     ];
 
-    // Sort the list based on the traditionalOrder
     list.sort((a, b) {
       final indexA = traditionalOrder.indexOf(a.id);
       final indexB = traditionalOrder.indexOf(b.id);
 
-      // If an ID is not in the list (user added custom), put it at the end
+      if (indexA == -1 && indexB == -1) {
+        return a.id.compareTo(b.id);
+      }
       if (indexA == -1) return 1;
       if (indexB == -1) return -1;
 
@@ -78,8 +87,8 @@ class TasbeehService {
     return list;
   }
 
-  void _seedInitialData() {
-    final initialDhikrs = [
+  List<TasbeehModel> _defaultDhikrs() {
+    return [
       TasbeehModel(
         id: 'subhanallah',
         text: 'Subhan Allah',
@@ -106,11 +115,18 @@ class TasbeehService {
         arabicText: 'أستغفر الله',
       ),
     ];
+  }
 
-    // Clear the box before re-seeding to ensure the new order is respected
-    _box.clear();
+  void _ensureDefaultDhikrsExist() {
+    for (final dhikr in _defaultDhikrs()) {
+      if (!_box.containsKey(dhikr.id)) {
+        _box.put(dhikr.id, dhikr);
+      }
+    }
+  }
 
-    for (var dhikr in initialDhikrs) {
+  void _seedInitialData() {
+    for (final dhikr in _defaultDhikrs()) {
       _box.put(dhikr.id, dhikr);
     }
   }
@@ -129,7 +145,6 @@ class TasbeehService {
     final date = DateTime(now.year, now.month, now.day);
 
     if (isSetComplete) {
-      // For completed sets, always create a new entry
       final log = TasbeehLog(
         dhikrId: dhikrId,
         date: date,
@@ -138,35 +153,30 @@ class TasbeehService {
         timestamp: now,
       );
       await _historyBox.add(log);
-    } else {
-      // For individual increments, we could still aggregate or just log them.
-      // To fulfill "every tasbeeha", let's aggregate for hourly stats but
-      // maybe log as unique if needed.
-      // Let's stick to aggregating by hour for stats, but we'll add a way to
-      // log specific "completed sets" or "milestones".
-
-      final logKey =
-          '${dhikrId}_${now.year}${now.month.pad}${now.day.pad}_${hour.pad}';
-      var log = _historyBox.get(logKey);
-      if (log == null) {
-        log = TasbeehLog(
-          dhikrId: dhikrId,
-          date: date,
-          hour: hour,
-          count: 1,
-          timestamp: now,
-        );
-        await _historyBox.put(logKey, log);
-      } else {
-        log.count += 1;
-        await log.save();
-      }
+      return;
     }
+
+    final logKey =
+        '${dhikrId}_${now.year}${now.month.pad}${now.day.pad}_${hour.pad}';
+    final existing = _historyBox.get(logKey);
+    if (existing == null) {
+      final log = TasbeehLog(
+        dhikrId: dhikrId,
+        date: date,
+        hour: hour,
+        count: count ?? 1,
+        timestamp: now,
+      );
+      await _historyBox.put(logKey, log);
+      return;
+    }
+
+    existing.count += count ?? 1;
+    await existing.save();
   }
 
   List<TasbeehLog> getAllLogsForDay(DateTime date) {
     final startOfDay = DateTime(date.year, date.month, date.day);
-
     return _historyBox.values
         .where((log) => log.date.isAtSameMomentAs(startOfDay))
         .toList()
@@ -187,7 +197,7 @@ class TasbeehService {
     final logs = _historyBox.values.where((log) => log.date == startOfDay);
 
     final stats = <String, int>{};
-    for (var log in logs) {
+    for (final log in logs) {
       stats[log.dhikrId] = (stats[log.dhikrId] ?? 0) + log.count;
     }
     return stats;
@@ -198,14 +208,14 @@ class TasbeehService {
     final logs = _historyBox.values.where((log) => log.date == startOfDay);
 
     final stats = <int, int>{};
-    for (var log in logs) {
+    for (final log in logs) {
       stats[log.hour] = (stats[log.hour] ?? 0) + log.count;
     }
     return stats;
   }
 
   int getTotalCount() {
-    return _settingsBox.get(_totalCountKey, defaultValue: 0);
+    return _asInt(_settingsBox.get(_totalCountKey, defaultValue: 0));
   }
 
   Future<void> incrementTotalCount() async {
@@ -217,10 +227,9 @@ class TasbeehService {
     await _settingsBox.put(_totalCountKey, 0);
   }
 
-  /// Returns total taps per day for the past [days] days (including today).
   Map<DateTime, int> getWeeklyTotals({int days = 7}) {
     final result = <DateTime, int>{};
-    for (int i = 0; i < days; i++) {
+    for (var i = 0; i < days; i++) {
       final day = DateTime.now().subtract(Duration(days: i));
       final startOfDay = DateTime(day.year, day.month, day.day);
       final logs = _historyBox.values.where(
@@ -232,21 +241,17 @@ class TasbeehService {
     return result;
   }
 
-  /// Returns consecutive days (up to today) with at least 1 tasbeeha.
   int getCurrentStreak() {
-    int streak = 0;
+    var streak = 0;
     final today = DateTime.now();
-    for (int i = 0; i < 365; i++) {
+    for (var i = 0; i < 365; i++) {
       final day = today.subtract(Duration(days: i));
       final startOfDay = DateTime(day.year, day.month, day.day);
       final hasTasbeeh = _historyBox.values.any(
         (log) => log.date.isAtSameMomentAs(startOfDay),
       );
-      if (hasTasbeeh) {
-        streak++;
-      } else {
-        break;
-      }
+      if (!hasTasbeeh) break;
+      streak++;
     }
     return streak;
   }

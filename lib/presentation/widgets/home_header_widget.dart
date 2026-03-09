@@ -28,6 +28,7 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
   Timer? _timer;
   String _timeUntilNext = "";
   String _nextPrayerName = "";
+  double _dayProgress = 0.0;
   late AnimationController _animationController;
   final List<Star> _stars = Star.generate(50);
 
@@ -111,9 +112,11 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
 
         if (mounted &&
             (_nextPrayerName != nextName || _timeUntilNext != remStr)) {
+          final progress = (now.hour * 60 + now.minute) / (24 * 60);
           setState(() {
             _nextPrayerName = nextName;
             _timeUntilNext = remStr;
+            _dayProgress = progress;
           });
         }
       });
@@ -188,7 +191,6 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
     }
 
     return Container(
-      height: 420, // Increased to prevent overflow on some screens
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppTheme.primaryColor,
@@ -200,63 +202,65 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
       ),
       child: Stack(
         children: [
-          // 1. Sky Effects (Stars)
+          // 1. Stars (night mode)
           if (showStars)
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: SkyPainter(_animationController.value, _stars),
-                  size: Size.infinite,
-                );
-              },
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: SkyPainter(_animationController.value, _stars),
+                    size: Size.infinite,
+                  );
+                },
+              ),
             ),
 
-          // 2. Mosque Silhouette
+          // 2. Mosque Silhouette (compact)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: CustomPaint(
               painter: MosqueSilhouettePainter(color: mosqueColor),
-              size: const Size(double.infinity, 220),
+              size: const Size(double.infinity, 120),
             ),
           ),
 
-          // 3. Optional celestial body (Moon/Sun)
+          // 3. Celestial body (Moon/Sun)
           if (showStars)
             Positioned(
-              top: 50, // Moved up to avoid overlap with search/menu
-              right: 20, // Moved further right
+              top: 48,
+              right: 20,
               child: Opacity(
                 opacity: 0.6,
                 child: CustomPaint(
                   painter: CrescentMoonPainter(
                     color: Colors.white.withValues(alpha: 0.8),
                   ),
-                  size: const Size(24, 24), // Slightly smaller
+                  size: const Size(20, 20),
                 ),
               ),
             ),
 
-          // 4. Content
+          // 4. Main Content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top Bar
+                  // ── TOP BAR ──────────────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Date Info in Glassmorphic Container
+                      // Compact date glass card
                       GlassContainer(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: 12,
+                          vertical: 6,
                         ),
-                        borderRadius: 16,
+                        borderRadius: 14,
                         opacity: 0.15,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,12 +268,11 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
                             Text(
                               dayName,
                               style: GoogleFonts.tajawal(
-                                fontSize: 18,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            const SizedBox(height: 2),
                             ValueListenableBuilder(
                               valueListenable: Hive.box(
                                 'settings',
@@ -282,48 +285,22 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
                                         )
                                         as int;
                                 final adjustedHijri = HijriCalendar.now();
+                                HijriCalendar displayHijri = adjustedHijri;
                                 if (offset != 0) {
-                                  // HijriCalendar has hDay, hMonth, hYear.
-                                  // We should regenerate it with normalized dates if possible.
-                                  // Simplified: just add/subtract from day.
-                                  // Note: hijri package doesn't have a direct 'addDays'.
-                                  // We can use DateTime conversion.
                                   final dt = adjustedHijri.hijriToGregorian(
                                     adjustedHijri.hYear,
                                     adjustedHijri.hMonth,
                                     adjustedHijri.hDay,
                                   );
-                                  final adjustedDt = dt.add(
-                                    Duration(days: offset),
-                                  );
-                                  final newHijri = HijriCalendar.fromDate(
-                                    adjustedDt,
-                                  );
-                                  return FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '$gregorianDate | ${newHijri.hDay} ${newHijri.longMonthName} ${newHijri.hYear}',
-                                      style: GoogleFonts.tajawal(
-                                        fontSize: 12,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.6,
-                                        ),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                                  displayHijri = HijriCalendar.fromDate(
+                                    dt.add(Duration(days: offset)),
                                   );
                                 }
-                                return FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    '$gregorianDate | ${adjustedHijri.hDay} ${adjustedHijri.longMonthName} ${adjustedHijri.hYear}',
-                                    style: GoogleFonts.tajawal(
-                                      fontSize: 12,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.6,
-                                      ),
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                return Text(
+                                  '$gregorianDate | ${displayHijri.hDay} ${displayHijri.longMonthName} ${displayHijri.hYear}',
+                                  style: GoogleFonts.tajawal(
+                                    fontSize: 10,
+                                    color: Colors.white.withValues(alpha: 0.6),
                                   ),
                                 );
                               },
@@ -331,292 +308,263 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
                           ],
                         ),
                       ),
-                      // Menu and Language Buttons
+                      // Action Buttons (Language + Menu)
                       Row(
                         children: [
-                          // Language Button
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                final currentLocale = ref.read(localeProvider);
-                                final newLocale =
+                          _actionButton(
+                            onTap: () {
+                              final currentLocale = ref.read(localeProvider);
+                              ref
+                                  .read(localeProvider.notifier)
+                                  .setLocale(
                                     currentLocale.languageCode == 'ar'
-                                    ? const Locale('en')
-                                    : const Locale('ar');
-                                ref
-                                    .read(localeProvider.notifier)
-                                    .setLocale(newLocale);
-                              },
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.language,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
+                                        ? const Locale('en')
+                                        : const Locale('ar'),
+                                  );
+                            },
+                            icon: Icons.language,
                           ),
                           const SizedBox(width: 8),
-                          // Menu Button
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () => GlobalScaffoldService.openDrawer(),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.menu_rounded,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
+                          _actionButton(
+                            onTap: () => GlobalScaffoldService.openDrawer(),
+                            icon: Icons.menu_rounded,
                           ),
                         ],
                       ),
                     ],
                   ),
-                  const Spacer(),
-                  // Prayer Countdown
-                  Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          _nextPrayerName.isEmpty
-                              ? '...'
-                              : '${l10n.nextPrayer} $_nextPrayerName',
-                          style: GoogleFonts.tajawal(
-                            fontSize: 16,
-                            color: Colors.white70,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        // Timer with Subtl Glow - Slimmer Font
-                        Stack(
-                          alignment: Alignment.center,
+
+                  const SizedBox(height: 12),
+
+                  // ── MAIN ROW: Countdown + Progress Ring ──────────────
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Left: Next prayer label + countdown + location
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _timeUntilNext.isEmpty
-                                  ? '00:00:00'
-                                  : _timeUntilNext,
-                              style: GoogleFonts.montserrat(
-                                fontSize: 52,
-                                fontWeight: FontWeight.w100, // Slimmer
-                                color: Colors.white.withValues(alpha: 0.05),
-                                letterSpacing: 4,
+                              _nextPrayerName.isEmpty
+                                  ? '...'
+                                  : '${l10n.nextPrayer} $_nextPrayerName',
+                              style: GoogleFonts.tajawal(
+                                fontSize: 13,
+                                color: Colors.white70,
+                                letterSpacing: 0.5,
                               ),
                             ),
+                            const SizedBox(height: 2),
                             Text(
                               _timeUntilNext.isEmpty
                                   ? '00:00:00'
                                   : _timeUntilNext,
                               style: GoogleFonts.montserrat(
-                                fontSize: 48,
-                                fontWeight: FontWeight.w200, // Slimmer
+                                fontSize: 30,
+                                fontWeight: FontWeight.w300,
                                 color: Colors.white,
-                                letterSpacing: 4,
+                                letterSpacing: 2,
                                 shadows: [
                                   Shadow(
                                     color: Colors.white.withValues(alpha: 0.3),
-                                    blurRadius: 30,
+                                    blurRadius: 14,
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        // Location Badge (Interactive)
-                        InkWell(
-                          onTap: () => _showQuickLocationPicker(context, ref),
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black38,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.white10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                locationState.isLoading
-                                    ? SizedBox(
-                                        width: 14,
-                                        height: 14,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.amber,
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.location_on,
-                                        size: 14,
-                                        color: Colors.amber, // Gold
-                                      ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  currentCityDisplay,
-                                  style: GoogleFonts.tajawal(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  size: 14,
-                                  color: Colors.white70,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        // All Prayer Times Row
-                        prayerState.timings.when(
-                          data: (data) {
-                            if (data == null) {
-                              return const SizedBox.shrink();
-                            }
-                            final timings = data.timings;
-                            final prayerList = [
-                              {'name': l10n.fajr, 'time': timings['Fajr']},
-                              {'name': l10n.dhuhr, 'time': timings['Dhuhr']},
-                              {'name': l10n.asr, 'time': timings['Asr']},
-                              {
-                                'name': l10n.maghrib,
-                                'time': timings['Maghrib'],
-                              },
-                              {'name': l10n.isha, 'time': timings['Isha']},
-                            ];
-
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                physics: const BouncingScrollPhysics(),
+                            const SizedBox(height: 6),
+                            // Compact Location Badge
+                            InkWell(
+                              onTap: () =>
+                                  _showQuickLocationPicker(context, ref),
+                              borderRadius: BorderRadius.circular(14),
+                              child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black26,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: Colors.white10),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: prayerList.map((p) {
-                                    final isNext = p['name'] == _nextPrayerName;
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 3,
-                                      ),
-                                      child: GlassContainer(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 12,
-                                        ),
-                                        borderRadius: 20,
-                                        opacity: isNext ? 0.25 : 0.1,
-                                        borderColor: isNext
-                                            ? Colors.white.withValues(
-                                                alpha: 0.4,
-                                              )
-                                            : Colors.white.withValues(
-                                                alpha: 0.1,
-                                              ),
-                                        borderWidth: isNext ? 2 : 1,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              p['name']!,
-                                              style: GoogleFonts.tajawal(
-                                                fontSize: 12,
-                                                color: isNext
-                                                    ? Colors.white
-                                                    : Colors.white.withValues(
-                                                        alpha: 0.6,
-                                                      ),
-                                                fontWeight: isNext
-                                                    ? FontWeight.w900
-                                                    : FontWeight.w600,
-                                              ),
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    locationState.isLoading
+                                        ? const SizedBox(
+                                            width: 12,
+                                            height: 12,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 1.5,
+                                              color: Colors.amber,
                                             ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              p['time']?.split(' ')[0] ??
-                                                  '--:--',
-                                              style: GoogleFonts.montserrat(
-                                                fontSize: 14,
-                                                color: Colors.white,
-                                                fontWeight: isNext
-                                                    ? FontWeight.bold
-                                                    : FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                          )
+                                        : const Icon(
+                                            Icons.location_on,
+                                            size: 12,
+                                            color: Colors.amber,
+                                          ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      currentCityDisplay,
+                                      style: GoogleFonts.tajawal(
+                                        fontSize: 11,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            );
-                          },
-                          loading: () => Shimmer.fromColors(
-                            baseColor: Colors.white.withValues(alpha: 0.1),
-                            highlightColor: Colors.white.withValues(alpha: 0.2),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                5,
-                                (i) => Container(
-                                  width: 60,
-                                  height: 50,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 12,
+                                      color: Colors.white70,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ),
-                          error: (_, _) => const SizedBox.shrink(),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+
+                      const SizedBox(width: 16),
+
+                      // Right: Day Progress Ring (P1 element)
+                      SizedBox(
+                        width: 76,
+                        height: 76,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Outer glow ring
+                            CircularProgressIndicator(
+                              value: _dayProgress,
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.1,
+                              ),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white.withValues(alpha: 0.75),
+                              ),
+                              strokeWidth: 5,
+                              strokeCap: StrokeCap.round,
+                            ),
+                            // Center Icon
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withValues(alpha: 0.08),
+                              ),
+                              child: Icon(
+                                showStars
+                                    ? Icons.nightlight_round
+                                    : (hour >= 17
+                                          ? Icons.wb_twilight_rounded
+                                          : Icons.wb_sunny_rounded),
+                                color: Colors.white.withValues(alpha: 0.85),
+                                size: 24,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
+
+                  const SizedBox(height: 12),
+
+                  // ── PRAYER PILLS ROW (P3 element – flat, equal-width) ──
+                  prayerState.timings.when(
+                    data: (data) {
+                      if (data == null) return const SizedBox.shrink();
+                      final timings = data.timings;
+                      final prayerList = [
+                        {'name': l10n.fajr, 'time': timings['Fajr']},
+                        {'name': l10n.dhuhr, 'time': timings['Dhuhr']},
+                        {'name': l10n.asr, 'time': timings['Asr']},
+                        {'name': l10n.maghrib, 'time': timings['Maghrib']},
+                        {'name': l10n.isha, 'time': timings['Isha']},
+                      ];
+                      return Row(
+                        children: prayerList.map((p) {
+                          final isNext = p['name'] == _nextPrayerName;
+                          return Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isNext
+                                    ? Colors.white.withValues(alpha: 0.22)
+                                    : Colors.white.withValues(alpha: 0.07),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isNext
+                                      ? Colors.white.withValues(alpha: 0.5)
+                                      : Colors.white.withValues(alpha: 0.1),
+                                  width: isNext ? 1.5 : 1,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    p['name']!,
+                                    style: GoogleFonts.tajawal(
+                                      fontSize: 9,
+                                      color: isNext
+                                          ? Colors.white
+                                          : Colors.white60,
+                                      fontWeight: isNext
+                                          ? FontWeight.bold
+                                          : FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    p['time']?.split(' ')[0] ?? '--:--',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 11,
+                                      color: Colors.white,
+                                      fontWeight: isNext
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                    loading: () => Shimmer.fromColors(
+                      baseColor: Colors.white.withValues(alpha: 0.1),
+                      highlightColor: Colors.white.withValues(alpha: 0.2),
+                      child: Row(
+                        children: List.generate(
+                          5,
+                          (i) => Expanded(
+                            child: Container(
+                              height: 44,
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    error: (_, _) => const SizedBox.shrink(),
+                  ),
                 ],
               ),
             ),
@@ -626,172 +574,287 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
     );
   }
 
+  Widget _actionButton({required VoidCallback onTap, required IconData icon}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
+        ),
+      ),
+    );
+  }
+
   void _showQuickLocationPicker(BuildContext context, WidgetRef ref) {
     // final locationState = ref.read(locationProvider); // Removed
     final l10n = AppLocalizations.of(context)!;
+    final prayerState = ref.read(prayerNotifierProvider);
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => GlassContainer(
-        padding: const EdgeInsets.all(24),
-        borderRadius: 32,
-        blur: 40,
-        opacity: 0.15,
+      useRootNavigator: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F172A),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 30,
+              offset: const Offset(0, -8),
+            ),
+          ],
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Drag Handle
+            const SizedBox(height: 12),
             Container(
-              width: 40,
+              width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 24),
-            const SizedBox(height: 16),
-            // Use GPS Option
-            // Use GPS Option - Removed as it's now enforced
-            /*
-            ListTile(
-              onTap: () {
-                ref.read(locationProvider.notifier).toggleGPS(true);
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.my_location_rounded,
-                  color: Colors.blue,
-                ),
-              ),
-              title: Text(
-                l10n.useAutoLocation,
-                style: GoogleFonts.tajawal(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              trailing: Switch(
-                value: locationState.useGPS,
-                onChanged: (val) {
-                  ref.read(locationProvider.notifier).toggleGPS(val);
-                  Navigator.pop(context);
-                },
-                activeTrackColor: AppTheme.primaryColor,
+            const SizedBox(height: 20),
+
+            // ── HEADER ───────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.amber.withValues(alpha: 0.3),
+                          Colors.orange.withValues(alpha: 0.15),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.location_on_rounded,
+                      color: Colors.amber,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${prayerState.city}, ${prayerState.country}',
+                        style: GoogleFonts.tajawal(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        l10n.prayerTimes,
+                        style: GoogleFonts.tajawal(
+                          color: Colors.white38,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.push('/prayer-times');
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor.withValues(
+                        alpha: 0.15,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.moreSettings,
+                      style: GoogleFonts.tajawal(
+                        color: AppTheme.primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            */
-            // Manual Hijri Adjustment Option
+
+            const SizedBox(height: 20),
+            Divider(
+              color: Colors.white.withValues(alpha: 0.06),
+              height: 1,
+              indent: 20,
+              endIndent: 20,
+            ),
+            const SizedBox(height: 8),
+
+            // ── HIJRI ADJUSTMENT ─────────────────────────────────────
             ValueListenableBuilder(
               valueListenable: Hive.box('settings').listenable(),
               builder: (context, box, widget) {
                 final offset =
                     box.get('hijri_adjustment_days', defaultValue: 0) as int;
-                return ListTile(
+                return _settingsItem(
+                  context: context,
                   onTap: () => _showHijriAdjustmentDialog(context, ref, l10n),
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.calendar_month_rounded,
-                      color: Colors.green,
-                    ),
-                  ),
-                  title: Text(
-                    l10n.hijriAdjustment,
-                    style: GoogleFonts.tajawal(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    l10n.hijriAdjustmentSubtitle +
-                        (offset != 0
-                            ? ' (${offset > 0 ? '+' : ''}$offset ${l10n.adjustDays(offset)})'
-                            : ''),
-                    style: GoogleFonts.tajawal(
-                      color: Colors.white60,
-                      fontSize: 12,
-                    ),
-                  ),
-                  trailing: const Icon(
-                    Icons.edit_calendar_rounded,
-                    color: Colors.white24,
-                  ),
+                  icon: Icons.calendar_month_rounded,
+                  iconColor: const Color(0xFF4CAF50),
+                  iconBg: const Color(0xFF4CAF50).withValues(alpha: 0.12),
+                  title: l10n.hijriAdjustment,
+                  subtitle: offset != 0
+                      ? '${offset > 0 ? '+' : ''}$offset ${l10n.adjustDays(offset)}'
+                      : l10n.hijriAdjustmentSubtitle,
+                  badge: offset != 0 ? '${offset > 0 ? '+' : ''}$offset' : null,
+                  badgeColor: offset != 0 ? const Color(0xFF4CAF50) : null,
                 );
               },
             ),
-            const SizedBox(height: 16),
-            // Manual Prayer Adjustment Option
+
+            Divider(
+              color: Colors.white.withValues(alpha: 0.05),
+              height: 1,
+              indent: 68,
+              endIndent: 20,
+            ),
+
+            // ── PRAYER TIME ADJUSTMENT ───────────────────────────────
             ValueListenableBuilder(
               valueListenable: Hive.box('settings').listenable(),
               builder: (context, box, widget) {
                 final adjustment =
                     box.get('prayer_adjustment_minutes', defaultValue: 0)
                         as int;
-                return ListTile(
+                return _settingsItem(
+                  context: context,
                   onTap: () => _showPrayerAdjustmentDialog(context, ref, l10n),
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.av_timer_rounded,
-                      color: Colors.amber,
-                    ),
-                  ),
-                  title: Text(
-                    l10n.prayerAdjustment,
-                    style: GoogleFonts.tajawal(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    l10n.prayerAdjustmentSubtitle +
-                        (adjustment != 0
-                            ? ' (${adjustment > 0 ? '+' : ''}$adjustment ${l10n.minutes(adjustment)})'
-                            : ''),
-                    style: GoogleFonts.tajawal(
-                      color: Colors.white60,
-                      fontSize: 12,
-                    ),
-                  ),
-                  trailing: const Icon(
-                    Icons.edit_note_rounded,
-                    color: Colors.white24,
-                  ),
+                  icon: Icons.av_timer_rounded,
+                  iconColor: Colors.amber,
+                  iconBg: Colors.amber.withValues(alpha: 0.12),
+                  title: l10n.prayerAdjustment,
+                  subtitle: adjustment != 0
+                      ? '${adjustment > 0 ? '+' : ''}$adjustment ${l10n.minutes(adjustment)}'
+                      : l10n.prayerAdjustmentSubtitle,
+                  badge: adjustment != 0
+                      ? '${adjustment > 0 ? '+' : ''}$adjustment'
+                      : null,
+                  badgeColor: adjustment != 0 ? Colors.amber : null,
                 );
               },
             ),
+
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.push('/prayer-times');
-                },
-                child: Text(
-                  l10n.moreSettings,
-                  style: GoogleFonts.tajawal(color: AppTheme.primaryColor),
-                ),
+
+            // ── SAFE AREA BOTTOM ─────────────────────────────────────
+            SafeArea(child: const SizedBox.shrink()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _settingsItem({
+    required BuildContext context,
+    required VoidCallback onTap,
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBg,
+    required String title,
+    required String subtitle,
+    String? badge,
+    Color? badgeColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.tajawal(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.tajawal(
+                      color: Colors.white38,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
+            if (badge != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: badgeColor!.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: badgeColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  badge,
+                  style: GoogleFonts.montserrat(
+                    color: badgeColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            else
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.white.withValues(alpha: 0.2),
+                size: 20,
+              ),
           ],
         ),
       ),

@@ -7,10 +7,12 @@ class Reciter {
   final int? id;
   final String? name;
   final String? letter;
+  @JsonKey(name: 'qf_id')
+  final int? qfId;
   @JsonKey(name: 'moshaf')
   final List<Moshaf>? moshaf;
 
-  Reciter({this.id, this.name, this.letter, this.moshaf});
+  Reciter({this.id, this.name, this.letter, this.qfId, this.moshaf});
 
   factory Reciter.fromJson(Map<String, dynamic> json) =>
       _$ReciterFromJson(json);

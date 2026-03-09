@@ -50,7 +50,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
                 size: 30,
               ),
               label: Text(
-                'تشغيل الكل',
+                l10n.playlistPlayAll,
                 style: GoogleFonts.cairo(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -112,11 +112,12 @@ class PlaylistDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     Playlist playlist,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     if (playlist.items.isEmpty) {
       return SliverFillRemaining(
         child: Center(
           child: Text(
-            'لا توجد سور في هذه القائمة',
+            l10n.noSurahsInPlaylist,
             style: GoogleFonts.cairo(color: Colors.white38),
           ),
         ),
@@ -230,11 +231,11 @@ class PlaylistDetailScreen extends ConsumerWidget {
   }
 
   void _sharePlaylist(WidgetRef ref, Playlist playlist) {
+    final l10n = AppLocalizations.of(ref.context)!;
     final data = ref
         .read(favoritesProvider.notifier)
         .exportPlaylist(playlist.id);
-    final shareText =
-        'قائمة تشغيل: ${playlist.name}\nاستمع إليها عبر تطبيق المكتبة الإسلامية:\nislamiclibrary://playlist?data=$data';
+    final shareText = l10n.playlistShareText(playlist.name, data);
     SharePlus.instance.share(ShareParams(text: shareText));
   }
 }

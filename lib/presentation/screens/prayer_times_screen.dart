@@ -245,10 +245,49 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                 ),
               ),
               error: (e, _) => SliverToBoxAdapter(
-                child: Center(
-                  child: Text(
-                    e.toString(),
-                    style: GoogleFonts.cairo(color: Colors.redAccent),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 40,
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.wifi_off_rounded,
+                        color: Colors.white24,
+                        size: 48,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        Localizations.localeOf(context).languageCode == 'ar'
+                            ? 'عذراً، تعذر تحميل أوقات الصلاة. يرجى التأكد من الاتصال بالإنترنت أو إعدادات الموقع.'
+                            : 'Sorry, could not load prayer times. Please check your internet connection or location settings.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.cairo(
+                          color: Colors.white54,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () => ref
+                            .read(prayerNotifierProvider.notifier)
+                            .refresh(forceRefresh: true),
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: Text(
+                          Localizations.localeOf(context).languageCode == 'ar'
+                              ? 'إعادة المحاولة'
+                              : 'Retry',
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor.withValues(
+                            alpha: 0.2,
+                          ),
+                          foregroundColor: AppTheme.primaryColor,
+                          elevation: 0,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -272,71 +311,253 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
   }
 
   Widget _buildHeader(PrayerState state, AppLocalizations l10n) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hasCountdown = _nextPrayerName.isNotEmpty && _remaining.inSeconds > 0;
+    final h = hasCountdown ? twoDigits(_remaining.inHours) : '--';
+    final m = hasCountdown
+        ? twoDigits(_remaining.inMinutes.remainder(60))
+        : '--';
+    final s = hasCountdown
+        ? twoDigits(_remaining.inSeconds.remainder(60))
+        : '--';
+
     return Container(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF1A1A2E),
+            const Color(0xFF16213E),
+            AppTheme.primaryColor.withValues(alpha: 0.25),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: AppTheme.primaryColor.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 20,
+            color: AppTheme.primaryColor.withValues(alpha: 0.1),
+            blurRadius: 30,
+            spreadRadius: -5,
             offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
         children: [
+          // Location row
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                state.city,
-                style: GoogleFonts.cairo(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 5,
                 ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(
-                Icons.location_on_rounded,
-                color: AppTheme.primaryColor,
-                size: 18,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.location_on_rounded,
+                      color: AppTheme.primaryColor,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${state.city}, ${state.country}',
+                      style: GoogleFonts.tajawal(
+                        fontSize: 13,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 24),
+
+          // Animated pulse ring + prayer name
+          AnimatedBuilder(
+            animation: _pulseController,
+            builder: (context, child) {
+              final pulse = _pulseController.value;
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Outer glow ring
+                  Container(
+                    width: 110 + pulse * 12,
+                    height: 110 + pulse * 12,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppTheme.primaryColor.withValues(
+                          alpha: 0.15 - pulse * 0.12,
+                        ),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  // Middle ring
+                  Container(
+                    width: 90 + pulse * 6,
+                    height: 90 + pulse * 6,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppTheme.primaryColor.withValues(
+                          alpha: 0.25 - pulse * 0.15,
+                        ),
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                  // Inner circle with icon
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.primaryColor.withValues(alpha: 0.3),
+                          AppTheme.primaryColor.withValues(alpha: 0.1),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(
+                        color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Icon(
+                      _getPrayerIcon(_nextPrayerName),
+                      color: AppTheme.primaryColor,
+                      size: 32,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Next prayer label
           Text(
-            _getLocalizedPrayerName(_nextPrayerName, l10n),
+            _nextPrayerName.isEmpty
+                ? '...'
+                : _getLocalizedPrayerName(_nextPrayerName, l10n),
             style: GoogleFonts.cairo(
-              fontSize: 32,
+              fontSize: 28,
               fontWeight: FontWeight.w900,
               color: AppTheme.primaryColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _formatDuration(_remaining),
-            style: GoogleFonts.montserrat(
-              fontSize: 56,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
               letterSpacing: 1,
             ),
           ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 8),
+
+          // Countdown
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _timeSegment(h),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  ':',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w200,
+                    color: AppTheme.primaryColor.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+              _timeSegment(m),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  ':',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 40,
+                    fontWeight: FontWeight.w200,
+                    color: AppTheme.primaryColor.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+              _timeSegment(s),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
           Text(
             'الوقت المتبقي للأذان',
             style: GoogleFonts.cairo(
-              color: Colors.white.withValues(alpha: 0.4),
-              fontSize: 14,
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 12,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _timeSegment(String value) {
+    return Container(
+      width: 68,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Text(
+        value,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.montserrat(
+          fontSize: 36,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          letterSpacing: 2,
+        ),
+      ),
+    );
+  }
+
+  IconData _getPrayerIcon(String key) {
+    switch (key) {
+      case 'Fajr':
+        return Icons.wb_twilight_rounded;
+      case 'Sunrise':
+        return Icons.wb_sunny_outlined;
+      case 'Dhuhr':
+        return Icons.wb_sunny_rounded;
+      case 'Asr':
+        return Icons.cloud_queue_rounded;
+      case 'Maghrib':
+        return Icons.nights_stay_outlined;
+      case 'Isha':
+        return Icons.nightlight_round;
+      default:
+        return Icons.access_time_filled_rounded;
+    }
   }
 
   Widget _buildPrayerItem(
@@ -348,121 +569,161 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
   ) {
     final isNext = _nextPrayerName == key;
 
+    // Color per prayer
+    final Color accentColor = _prayerAccentColor(key);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: isNext
-            ? AppTheme.primaryColor.withValues(alpha: 0.1)
-            : AppTheme.surfaceColor.withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(24),
-        border: isNext
-            ? Border.all(
-                color: AppTheme.primaryColor.withValues(alpha: 0.8),
-                width: 2,
-              )
-            : Border.all(color: Colors.white.withValues(alpha: 0.05)),
+            ? accentColor.withValues(alpha: 0.08)
+            : Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isNext
+              ? accentColor.withValues(alpha: 0.45)
+              : Colors.white.withValues(alpha: 0.05),
+          width: isNext ? 1.5 : 1,
+        ),
         boxShadow: isNext
             ? [
                 BoxShadow(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.15),
-                  blurRadius: 15,
-                  spreadRadius: -2,
+                  color: accentColor.withValues(alpha: 0.12),
+                  blurRadius: 16,
+                  spreadRadius: -4,
                 ),
               ]
             : null,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isNext
-                      ? AppTheme.primaryColor.withValues(alpha: 0.1)
-                      : Colors.white.withValues(alpha: 0.05),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: isNext ? AppTheme.primaryColor : Colors.white38,
-                  size: 22,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            // Colored left accent indicator
+            Container(
+              width: 4,
+              height: 42,
+              decoration: BoxDecoration(
+                color: isNext
+                    ? accentColor
+                    : Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(4),
               ),
-              const SizedBox(width: 16),
-              Text(
+            ),
+            const SizedBox(width: 14),
+
+            // Icon
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: isNext
+                    ? accentColor.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: isNext ? accentColor : Colors.white30,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+
+            // Name
+            Expanded(
+              child: Text(
                 name,
                 style: GoogleFonts.cairo(
-                  fontSize: 18,
-                  fontWeight: isNext ? FontWeight.w900 : FontWeight.bold,
-                  color: isNext ? AppTheme.primaryColor : Colors.white70,
+                  fontSize: 17,
+                  fontWeight: isNext ? FontWeight.w900 : FontWeight.w600,
+                  color: isNext ? Colors.white : Colors.white60,
                 ),
               ),
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                time,
-                style: GoogleFonts.montserrat(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+            ),
+
+            // Time
+            Text(
+              time,
+              style: GoogleFonts.montserrat(
+                fontSize: 20,
+                fontWeight: isNext ? FontWeight.bold : FontWeight.w400,
+                color: isNext ? Colors.white : Colors.white54,
+                letterSpacing: 1,
               ),
-              const SizedBox(width: 12),
-              ValueListenableBuilder(
-                valueListenable: Hive.box('settings').listenable(
-                  keys: ['athan_global_enabled', 'athan_enabled_$key'],
-                ),
-                builder: (context, box, widget) {
-                  final globalEnabled =
-                      box.get('athan_global_enabled', defaultValue: true)
-                          as bool;
-                  final isEnabled =
-                      box.get('athan_enabled_$key', defaultValue: true) as bool;
+            ),
+            const SizedBox(width: 12),
 
-                  if (key == 'Sunrise') return const SizedBox.shrink();
+            // Notification toggle
+            ValueListenableBuilder(
+              valueListenable: Hive.box('settings').listenable(
+                keys: ['athan_global_enabled', 'athan_enabled_$key'],
+              ),
+              builder: (context, box, widget) {
+                final globalEnabled =
+                    box.get('athan_global_enabled', defaultValue: true) as bool;
+                final isEnabled =
+                    box.get('athan_enabled_$key', defaultValue: true) as bool;
 
-                  return GestureDetector(
-                    onTap: () {
-                      ref
-                          .read(prayerNotifierProvider.notifier)
-                          .togglePrayerAthan(key, !isEnabled);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: (isEnabled && globalEnabled)
-                            ? AppTheme.primaryColor.withValues(alpha: 0.15)
-                            : Colors.black26,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: (isEnabled && globalEnabled)
-                              ? AppTheme.primaryColor.withValues(alpha: 0.3)
-                              : Colors.white10,
-                        ),
-                      ),
-                      child: Icon(
-                        (isEnabled && globalEnabled)
-                            ? Icons.notifications_active_rounded
-                            : Icons.notifications_off_rounded,
-                        color: (isEnabled && globalEnabled)
-                            ? AppTheme.primaryColor
-                            : Colors.white24,
-                        size: 16,
+                if (key == 'Sunrise') return const SizedBox.shrink();
+
+                final active = isEnabled && globalEnabled;
+                return GestureDetector(
+                  onTap: () {
+                    ref
+                        .read(prayerNotifierProvider.notifier)
+                        .togglePrayerAthan(key, !isEnabled);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: active
+                          ? accentColor.withValues(alpha: 0.18)
+                          : Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: active
+                            ? accentColor.withValues(alpha: 0.4)
+                            : Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
+                    child: Icon(
+                      active
+                          ? Icons.notifications_active_rounded
+                          : Icons.notifications_off_rounded,
+                      color: active
+                          ? accentColor
+                          : Colors.white.withValues(alpha: 0.2),
+                      size: 16,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Color _prayerAccentColor(String key) {
+    switch (key) {
+      case 'Fajr':
+        return const Color(0xFF7C83E4); // Soft indigo
+      case 'Sunrise':
+        return const Color(0xFFFFB347); // Warm orange
+      case 'Dhuhr':
+        return const Color(0xFF4FC3F7); // Sky blue
+      case 'Asr':
+        return const Color(0xFF81C784); // Soft green
+      case 'Maghrib':
+        return const Color(0xFFFF8A65); // Deep orange
+      case 'Isha':
+        return const Color(0xFF9575CD); // Deep purple
+      default:
+        return AppTheme.primaryColor;
+    }
   }
 
   Widget _buildLocationSettings(PrayerState state, AppLocalizations l10n) {
@@ -475,7 +736,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
             const Icon(Icons.settings_rounded, color: Colors.white38, size: 20),
             const SizedBox(width: 8),
             Text(
-              'الإعدادات',
+              l10n.settings,
               style: GoogleFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -512,9 +773,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isArabic
-                                  ? 'تنبيهات الآذان قد لا تعمل'
-                                  : 'Adhan alerts might not work',
+                              l10n.adhanAlertsMayNotWork,
                               style: GoogleFonts.cairo(
                                 color: Colors.amber,
                                 fontWeight: FontWeight.bold,
@@ -522,9 +781,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                               ),
                             ),
                             Text(
-                              isArabic
-                                  ? 'الرجاء تفعيل إذن "التنبيهات الدقيقة" من الإعدادات.'
-                                  : 'Please enable "Exact Alarms" in system settings.',
+                              l10n.enableExactAlarmsFromSettings,
                               style: GoogleFonts.cairo(
                                 color: Colors.amber.withValues(alpha: 0.8),
                                 fontSize: 11,
@@ -537,7 +794,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                         onPressed: () =>
                             NotificationService().requestExactAlarmPermission(),
                         child: Text(
-                          isArabic ? 'تفعيل' : 'Enable',
+                          l10n.enable,
                           style: GoogleFonts.cairo(
                             color: Colors.amber,
                             fontWeight: FontWeight.bold,
@@ -595,7 +852,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                   ),
                 ),
                 title: Text(
-                  isArabic ? 'تنبيهات الآذان' : 'Adhan Notifications',
+                  l10n.athanNotifications,
                   style: GoogleFonts.cairo(
                     color: Colors.white,
                     fontSize: 15,
@@ -658,7 +915,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                   ),
                 ),
                 title: Text(
-                  isArabic ? 'تذكير ما قبل الصلاة' : 'Pre-Prayer Reminders',
+                  l10n.prePrayerReminders,
                   style: GoogleFonts.cairo(
                     color: Colors.white,
                     fontSize: 15,
@@ -666,9 +923,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                   ),
                 ),
                 subtitle: Text(
-                  isArabic
-                      ? 'تنبيه للاستعداد والأذكار قبل الصلاة بـ $reminderMin دقيقة'
-                      : 'Reminder to prepare and read Azkar $reminderMin mins before',
+                  l10n.prePrayerReminderSubtitle(reminderMin),
                   style: GoogleFonts.cairo(color: Colors.white38, fontSize: 11),
                 ),
                 trailing: Switch(
@@ -719,7 +974,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    isArabic ? 'وقت التذكير' : 'Remind before',
+                    l10n.remindBefore,
                     style: GoogleFonts.cairo(
                       color: Colors.white70,
                       fontSize: 13,
@@ -746,7 +1001,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          '${min}د',
+                          '$minد',
                           style: GoogleFonts.cairo(
                             color: selected == min
                                 ? Colors.white
@@ -828,7 +1083,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                       ),
                     ),
                     title: Text(
-                      isArabic ? 'سماع صوت الآذان' : 'Preview Adhan Sound',
+                      l10n.previewAdhanSound,
                       style: GoogleFonts.cairo(
                         color: Colors.white,
                         fontSize: 15,
@@ -836,13 +1091,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                       ),
                     ),
                     subtitle: Text(
-                      isArabic
-                          ? (isAthanPlaying
-                                ? 'جاري التشغيل...'
-                                : 'اضغط للاستماع')
-                          : (isAthanPlaying
-                                ? 'Now playing...'
-                                : 'Tap to listen'),
+                      isAthanPlaying ? l10n.nowPlaying : l10n.tapToListen,
                       style: GoogleFonts.cairo(
                         color: isAthanPlaying
                             ? AppTheme.primaryColor
@@ -901,7 +1150,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
               */
               // Calculation Method Option
               _buildSettingRow(
-                isArabic ? 'طريقة الحساب' : 'Calculation Method',
+                l10n.calculationMethodTitle,
                 _getSelectedMethodName(state.calculationMethodId, isArabic),
                 Icons.calculate_rounded,
                 () => _showCalculationMethodDialog(state, isArabic, l10n),
@@ -994,6 +1243,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
   void _showCountryPicker() {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: AppTheme.backgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -1035,6 +1285,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
   void _showHabousCityPicker() {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: AppTheme.backgroundColor,
       shape: const RoundedRectangleBorder(
@@ -1097,7 +1348,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surfaceColor,
         title: Text(
-          'إدخال يدوي',
+          l10n.manualLocationInput,
           style: GoogleFonts.cairo(color: Colors.white),
         ),
         content: Column(
@@ -1105,11 +1356,11 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
           children: [
             TextField(
               controller: cityController,
-              decoration: const InputDecoration(hintText: 'المدينة'),
+              decoration: InputDecoration(hintText: l10n.cityLabel),
             ),
             TextField(
               controller: countryController,
-              decoration: const InputDecoration(hintText: 'الدولة'),
+              decoration: InputDecoration(hintText: l10n.countryLabel),
             ),
           ],
         ),
@@ -1353,17 +1604,13 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
     );
   }
 
-  String _formatDuration(Duration d) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    return "${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}";
-  }
-
   String _getSelectedMethodName(int id, bool isArabic) {
     try {
       final method = PrayerMethod.methods.firstWhere((m) => m.id == id);
       return isArabic ? method.nameAr : method.nameEn;
     } catch (_) {
-      return isArabic ? 'رابطة العالم الإسلامي' : 'Muslim World League';
+      final l10n = AppLocalizations.of(context)!;
+      return l10n.muslimWorldLeague;
     }
   }
 
@@ -1374,6 +1621,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
   ) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: AppTheme.backgroundColor,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -1396,7 +1644,7 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
             ),
             const SizedBox(height: 24),
             Text(
-              isArabic ? 'طريقة الحساب' : 'Calculation Method',
+              l10n.calculationMethodTitle,
               style: GoogleFonts.cairo(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

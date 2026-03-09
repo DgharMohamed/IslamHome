@@ -44,6 +44,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   ) {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: AppTheme.backgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -160,9 +161,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
           _buildSettingTile(
+            icon: Icons.health_and_safety_rounded,
+            title: l10n.notificationDiagnosticsTitle,
+            subtitle: l10n.notificationDiagnosticsSubtitle,
+            onTap: () => context.push('/notification-diagnostics'),
+          ),
+          _buildSettingTile(
             icon: Icons.notification_important_rounded,
-            title: 'Test Notification',
-            subtitle: 'Tap to verify alerts are working',
+            title: l10n.testNotification,
+            subtitle: l10n.testNotificationSubtitle,
             onTap: () async {
               await NotificationService().showTestNotification();
             },
@@ -222,7 +229,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               style: GoogleFonts.montserrat(
                 color: Colors.white24,
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.normal,
               ),
             ),
           ),

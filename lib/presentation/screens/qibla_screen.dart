@@ -123,7 +123,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Location Permission Required',
+                l10n.locationPermissionRequired,
                 style: GoogleFonts.cairo(color: Colors.white, fontSize: 18),
               ),
               const SizedBox(height: 16),
@@ -367,7 +367,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
             '${lat >= 0 ? 'N' : 'S'}  ${lat.abs().toStringAsFixed(2)}°  ${lng >= 0 ? 'E' : 'W'}  ${lng.abs().toStringAsFixed(2)}°',
             style: GoogleFonts.montserrat(
               color: Colors.black,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.bold,
               fontSize: 18,
               letterSpacing: 1.2,
             ),
