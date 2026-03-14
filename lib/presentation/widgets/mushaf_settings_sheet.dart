@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 
 class MushafSettingsSheet extends ConsumerWidget {
@@ -11,11 +12,13 @@ class MushafSettingsSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final currentTheme = ref.watch(mushafThemeProvider);
+    final mushafSettings = ref.watch(mushafSettingsProvider);
     final isEnglish = Localizations.localeOf(
       context,
     ).languageCode.toLowerCase().startsWith('en');
     final titleText = l10n.mushafSettings;
     final sectionThemeText = l10n.themeLabel;
+    final fontSizeLabel = isEnglish ? 'Font Size' : 'حجم الخط';
 
     return Container(
       decoration: BoxDecoration(
@@ -125,6 +128,53 @@ class MushafSettingsSheet extends ConsumerWidget {
                 color: currentTheme.textColor.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
+            ),
+            const SizedBox(height: 32),
+            _sectionTitle(fontSizeLabel, currentTheme, isEnglish),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.text_fields_rounded,
+                  size: 16,
+                  color: currentTheme.textColor.withValues(alpha: 0.6),
+                ),
+                Expanded(
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: currentTheme.secondaryColor,
+                      inactiveTrackColor: currentTheme.secondaryColor.withValues(
+                        alpha: 0.15,
+                      ),
+                      thumbColor: currentTheme.secondaryColor,
+                      overlayColor: currentTheme.secondaryColor.withValues(
+                        alpha: 0.1,
+                      ),
+                      valueIndicatorColor: currentTheme.secondaryColor,
+                      valueIndicatorTextStyle: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    child: Slider(
+                      value: mushafSettings.fontSizeScale,
+                      min: 1.0,
+                      max: 2.0,
+                      divisions: 10,
+                      label: '${mushafSettings.fontSizeScale.toStringAsFixed(1)}x',
+                      onChanged: (value) {
+                        ref
+                            .read(mushafSettingsProvider.notifier)
+                            .setFontSizeScale(value);
+                      },
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.text_fields_rounded,
+                  size: 28,
+                  color: currentTheme.secondaryColor,
+                ),
+              ],
             ),
             const SizedBox(height: 32),
           ],

@@ -6,6 +6,7 @@ import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/presentation/providers/audio_ui_provider.dart';
 import 'package:islam_home/presentation/providers/mushaf_riwaya_provider.dart';
+import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -15,6 +16,7 @@ class QuranEnglishView extends ConsumerStatefulWidget {
   final void Function(int surah, int ayah) onPlayAyah;
   final void Function(int surah, int ayah) onShowTafsir;
   final double bottomInset;
+  final int initialPage;
 
   const QuranEnglishView({
     super.key,
@@ -22,6 +24,7 @@ class QuranEnglishView extends ConsumerStatefulWidget {
     required this.onPlayAyah,
     required this.onShowTafsir,
     this.bottomInset = 140,
+    this.initialPage = 1,
   });
 
   @override
@@ -211,6 +214,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
     final theme = ref.watch(mushafThemeProvider);
     final selectedRiwaya = ref.watch(selectedRiwayaProvider);
     final playingAyah = ref.watch(playingAyahProvider).value;
+    final mushafSettings = ref.watch(mushafSettingsProvider);
 
     return NotificationListener<UserScrollNotification>(
       onNotification: (notification) {
@@ -225,6 +229,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
       child: ScrollablePositionedList.builder(
         itemScrollController: _itemScrollController,
         itemPositionsListener: _itemPositionsListener,
+        initialScrollIndex: widget.initialPage - 1,
         physics: const BouncingScrollPhysics(),
         itemCount: quran.totalPagesCount + 1,
         itemBuilder: (context, index) {
@@ -283,6 +288,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
                               playingAyah: playingAyah,
                               currentSelection: selection,
                               l10n: l10n,
+                              fontSizeScale: mushafSettings.fontSizeScale,
                             ),
                           ),
                         ],
@@ -380,6 +386,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
     required String? playingAyah,
     required String? currentSelection,
     required AppLocalizations l10n,
+    required double fontSizeScale,
   }) {
     final ayahKey = '$surah:$ayah';
     final isHighlighted = playingAyah == ayahKey || currentSelection == ayahKey;
@@ -450,8 +457,8 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
               child: Text(
                 quran.getVerse(surah, ayah, verseEndSymbol: false),
                 style: TextStyle(
-                  color: theme.textColor.withValues(alpha: 0.97),
-                  fontSize: 26,
+                  color: theme.textColor.withValues(alpha:0.97),
+                  fontSize: 26 * fontSizeScale,
                   height: 1.8,
                   fontFamily: selectedRiwaya.fontFamily,
                   fontFamilyFallback: const ['UthmanicHafs', 'Amiri'],
@@ -469,7 +476,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
                   text.isNotEmpty ? text : l10n.noTranslationAvailable,
                   style: TextStyle(
                     color: theme.textColor.withValues(alpha: 0.94),
-                    fontSize: 14,
+                    fontSize: 14 * fontSizeScale,
                     height: 1.5,
                   ),
                   textAlign: TextAlign.left,

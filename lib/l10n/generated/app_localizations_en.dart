@@ -1961,4 +1961,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get manualLocationInput => 'Manual Input';
+
+  @override
+  String khatmaRemediationNeeded(int amount, String unit) {
+    return 'You are behind by $amount $unit. Let\'s get you back on track!';
+  }
+
+  @override
+  String get khatmaRemediationUpdatePlan => 'Update Plan';
+
+  @override
+  String get khatmaRemediationSheetTitle => 'Adjust Your Khatma';
+
+  @override
+  String khatmaRemediationSheetSubtitle(int units, String unitType) {
+    return 'You are behind by $units $unitType. How do you want to catch up?';
+  }
+
+  @override
+  String get khatmaRemediationCatchUp => 'Catch-Up Immediately';
+
+  @override
+  String get khatmaRemediationCatchUpDesc =>
+      'Read extra portion today and tomorrow.';
+
+  @override
+  String get khatmaRemediationDistribute => 'Distribute Load';
+
+  @override
+  String get khatmaRemediationDistributeDesc =>
+      'Spread missed progress across remaining days.';
+
+  @override
+  String get khatmaRemediationExtend => 'Extend Deadline';
+
+  @override
+  String get khatmaRemediationExtendDesc =>
+      'Keep current daily goal and push completion date.';
+
+  @override
+  String khatmaRemediationCurrentGoal(String amount) {
+    return 'Current: $amount / day';
+  }
+
+  @override
+  String khatmaRemediationNewGoal(String amount) {
+    return 'New: $amount / day';
+  }
+
+  @override
+  String khatmaRemediationCurrentDate(String date) {
+    return 'Current end date: $date';
+  }
+
+  @override
+  String khatmaRemediationNewDate(String date) {
+    return 'New end date: $date';
+  }
+
+  @override
+  String get khatmaDailyReminderTitle => 'Daily Khatma Reminder';
+
+  @override
+  String get khatmaDailyReminderBody =>
+      'Don\'t forget to read your daily portion to stay on track.';
+
+  @override
+  String get khatmaRemediationAction => 'Review Options';
 }

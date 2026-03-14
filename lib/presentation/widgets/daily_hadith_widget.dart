@@ -20,9 +20,10 @@ class DailyHadithWidget extends ConsumerWidget {
     return dailyHadith.when(
       data: (hadith) {
         if (hadith == null) return const SizedBox.shrink();
-        final content = isArabic
+        final rawContent = isArabic
             ? (hadith.arab ?? hadith.english ?? '')
             : (hadith.english ?? hadith.arab ?? '');
+        final content = rawContent.replaceAll(RegExp(r'<br\s*?/?>'), '\n').trim();
 
         return GlassContainer(
           borderRadius: 24,

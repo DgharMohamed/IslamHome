@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
+import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 import 'package:islam_home/data/models/quran_page_model.dart';
 
 class QuranPageWidget extends ConsumerWidget {
@@ -12,9 +13,10 @@ class QuranPageWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pageAsync = ref.watch(quranPageProvider(pageNumber));
     final activeVerseKey = ref.watch(activeVerseKeyProvider);
+    final mushafSettings = ref.watch(mushafSettingsProvider);
 
     return pageAsync.when(
-      data: (page) => _buildPage(context, ref, page, activeVerseKey),
+      data: (page) => _buildPage(context, ref, page, activeVerseKey, mushafSettings.fontSizeScale),
       loading: () => const Center(
         child: CircularProgressIndicator(
           color: Color(0xFFC9A227),
@@ -42,6 +44,7 @@ class QuranPageWidget extends ConsumerWidget {
     WidgetRef ref,
     QuranPage page,
     String? activeVerseKey,
+    double fontSizeScale,
   ) {
     return Container(
       color: const Color(0xFF121212),
@@ -56,7 +59,7 @@ class QuranPageWidget extends ConsumerWidget {
               ),
               child: Column(
                 children: page.lines
-                    .map((line) => _buildLine(ref, line, activeVerseKey))
+                    .map((line) => _buildLine(ref, line, activeVerseKey, fontSizeScale))
                     .toList(),
               ),
             ),
@@ -120,7 +123,7 @@ class QuranPageWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildLine(WidgetRef ref, QuranLine line, String? activeVerseKey) {
+  Widget _buildLine(WidgetRef ref, QuranLine line, String? activeVerseKey, double fontSizeScale) {
     return Expanded(
       child: Directionality(
         textDirection: TextDirection.rtl,
@@ -139,7 +142,7 @@ class QuranPageWidget extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: line.words
-                        .map((word) => _buildWord(ref, word, activeVerseKey))
+                        .map((word) => _buildWord(ref, word, activeVerseKey, fontSizeScale))
                         .toList(),
                   ),
                 ),
@@ -151,12 +154,12 @@ class QuranPageWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildWord(WidgetRef ref, QuranWord word, String? activeVerseKey) {
+  Widget _buildWord(WidgetRef ref, QuranWord word, String? activeVerseKey, double fontSizeScale) {
     final bool isEnd = word.charTypeName == 'end';
     final bool isActive = activeVerseKey == word.verseKey;
 
     if (isEnd) {
-      return _buildAyahNumber(word.textUthmani, isActive);
+      return _buildAyahNumber(word.textUthmani, isActive, fontSizeScale);
     }
 
     return GestureDetector(
@@ -174,7 +177,7 @@ class QuranPageWidget extends ConsumerWidget {
           word.textUthmani,
           style: TextStyle(
             color: isActive ? const Color(0xFFC9A227) : const Color(0xFFE8E3D6),
-            fontSize: 24,
+            fontSize: 24 * fontSizeScale,
             fontFamily: 'UthmanicHafs',
             height: 1.0,
           ),
@@ -183,7 +186,7 @@ class QuranPageWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildAyahNumber(String marker, bool isActive) {
+  Widget _buildAyahNumber(String marker, bool isActive, double fontSizeScale) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(2),
@@ -198,9 +201,9 @@ class QuranPageWidget extends ConsumerWidget {
       ),
       child: Text(
         marker,
-        style: const TextStyle(
-          color: Color(0xFFC9A227),
-          fontSize: 14,
+        style: TextStyle(
+          color: const Color(0xFFC9A227),
+          fontSize: 14 * fontSizeScale,
           fontFamily: 'UthmanicHafs',
         ),
       ),

@@ -5,12 +5,14 @@ import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 class SurahHeaderWidget extends StatelessWidget {
   final Map<String, dynamic> element;
   final MushafTheme theme;
+  final double fontSizeScale;
   final VoidCallback? onTapSurahName;
 
   const SurahHeaderWidget({
     super.key,
     required this.element,
     required this.theme,
+    required this.fontSizeScale,
     this.onTapSurahName,
   });
 
@@ -44,7 +46,7 @@ class SurahHeaderWidget extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: theme.textColor.withValues(alpha: 0.7),
-                    fontSize: 10,
+                    fontSize: 10 * fontSizeScale,
                     fontFamily: 'Amiri',
                   ),
                 ),
@@ -57,7 +59,7 @@ class SurahHeaderWidget extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                        fontSize: 18 * fontSizeScale,
                         color: theme.textColor,
                       ),
                     ),
@@ -68,7 +70,7 @@ class SurahHeaderWidget extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: theme.textColor.withValues(alpha: 0.7),
-                    fontSize: 10,
+                    fontSize: 10 * fontSizeScale,
                     fontFamily: 'Amiri',
                   ),
                 ),
@@ -83,7 +85,8 @@ class SurahHeaderWidget extends StatelessWidget {
 
 class BismillahWidget extends StatelessWidget {
   final MushafTheme theme;
-  const BismillahWidget({super.key, required this.theme});
+  final double fontSizeScale;
+  const BismillahWidget({super.key, required this.theme, required this.fontSizeScale});
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +97,7 @@ class BismillahWidget extends StatelessWidget {
           quran.basmala,
           style: TextStyle(
             fontFamily: 'Amiri',
-            fontSize: 22,
+            fontSize: 22 * fontSizeScale,
             color: theme.textColor,
           ),
         ),

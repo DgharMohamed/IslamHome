@@ -183,10 +183,11 @@ class AudioPlayerService {
   Future<void> setPlaylist({
     required List<AudioSource> sources,
     int initialIndex = 0,
+    bool autoPlay = true,
   }) async {
     try {
       debugPrint(
-        '🎵 Service: setPlaylist called with ${sources.length} sources, initialIndex=$initialIndex',
+        '🎵 Service: setPlaylist called with ${sources.length} sources, initialIndex=$initialIndex, autoPlay=$autoPlay',
       );
       if (sources.isEmpty) {
         debugPrint('🎵 Service: Empty sources list');
@@ -216,14 +217,18 @@ class AudioPlayerService {
       // Wait longer for the player to be ready and for the notification to register
       await Future.delayed(const Duration(milliseconds: 300));
 
-      debugPrint('🎵 Service: Now playing...');
-      await _handler.play();
+      if (autoPlay) {
+        debugPrint('🎵 Service: Now playing...');
+        await _handler.play();
 
-      // Wait after play to ensure notification is shown
-      await Future.delayed(const Duration(milliseconds: 200));
-      debugPrint(
-        '🎵 Service: Play command sent, notification should now be visible',
-      );
+        // Wait after play to ensure notification is shown
+        await Future.delayed(const Duration(milliseconds: 200));
+        debugPrint(
+          '🎵 Service: Play command sent, notification should now be visible',
+        );
+      } else {
+        debugPrint('🎵 Service: autoPlay is false, staying paused.');
+      }
     } catch (e, st) {
       debugPrint('🎵 Service: Playlist Error: $e');
       if (_isInterruptionOrAbortError(e)) {

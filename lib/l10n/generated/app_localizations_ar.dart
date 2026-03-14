@@ -1948,4 +1948,71 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get manualLocationInput => 'إدخال يدوي';
+
+  @override
+  String khatmaRemediationNeeded(int amount, String unit) {
+    return 'أنت متأخر بمقدار $amount $unit. دعنا نساعدك للعودة للمسار الصحيح!';
+  }
+
+  @override
+  String get khatmaRemediationUpdatePlan => 'تعديل الخطة';
+
+  @override
+  String get khatmaRemediationSheetTitle => 'تعديل خطة الختمة';
+
+  @override
+  String khatmaRemediationSheetSubtitle(int units, String unitType) {
+    return 'لقد تأخرت بمقدار $units $unitType. كيف تفضل التعويض؟';
+  }
+
+  @override
+  String get khatmaRemediationCatchUp => 'تعويض سريع';
+
+  @override
+  String get khatmaRemediationCatchUpDesc =>
+      'قراءة ورد إضافي اليوم وغداً للعودة للجدول فوراً.';
+
+  @override
+  String get khatmaRemediationDistribute => 'توزيع الجهد';
+
+  @override
+  String get khatmaRemediationDistributeDesc =>
+      'توزيع الورد الفائت على الأيام المتبقية.';
+
+  @override
+  String get khatmaRemediationExtend => 'تمديد المدة';
+
+  @override
+  String get khatmaRemediationExtendDesc =>
+      'استمرار الورد الحالي وتأخير موعد الختم.';
+
+  @override
+  String khatmaRemediationCurrentGoal(String amount) {
+    return 'الحالي: $amount / يوم';
+  }
+
+  @override
+  String khatmaRemediationNewGoal(String amount) {
+    return 'الجديد: $amount / يوم';
+  }
+
+  @override
+  String khatmaRemediationCurrentDate(String date) {
+    return 'تاريخ الختم الحالي: $date';
+  }
+
+  @override
+  String khatmaRemediationNewDate(String date) {
+    return 'تاريخ الختم الجديد: $date';
+  }
+
+  @override
+  String get khatmaDailyReminderTitle => 'تذكير الختمة اليومي';
+
+  @override
+  String get khatmaDailyReminderBody =>
+      'لا تنسَ قراءة وردك اليومي لتبقى على جدول ختمتك.';
+
+  @override
+  String get khatmaRemediationAction => 'استعراض الخيارات';
 }

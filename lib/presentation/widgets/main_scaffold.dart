@@ -14,6 +14,7 @@ import 'package:islam_home/presentation/providers/khatma_listening_sync_provider
 import 'package:islam_home/core/utils/responsive_utils.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:islam_home/presentation/providers/api_providers.dart';
 
 class MainScaffold extends ConsumerStatefulWidget {
   final Widget child;
@@ -46,8 +47,11 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
     final isWide = ResponsiveUtils.isWide(context);
     final selectedIndex = _getSelectedIndex(location);
+    final playingAyah = ref.watch(playingAyahProvider).value;
     final showMiniPlayer =
-        !location.contains('/quran-text') && !location.contains('/quran');
+        !location.contains('/quran-text') &&
+        !location.contains('/quran') &&
+        playingAyah == null;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final mobileBottomOverlayHeight = kBottomNavigationBarHeight + bottomInset;
 

@@ -344,35 +344,40 @@ class PrayerNotifier extends Notifier<PrayerState> {
       'Isha': box.get('athan_enabled_Isha', defaultValue: true),
     };
 
-    await NotificationService().scheduleDailyPrayers(
-      timings: times.timings,
-      enabledPrayers: Map<String, bool>.from(enabledPrayers),
-    );
+    // Prepare multi-day timings for the next 10 days
+    final Map<DateTime, Map<String, String>> multiDayTimings = {};
+    final lat = box.get('prayer_lat', defaultValue: 34.0209);
+    final lng = box.get('prayer_lng', defaultValue: -6.8416);
+    
+    // We schedule for the next 10 days to ensure the user is covered even if they don't open the app daily
+    for (int i = 0; i < 10; i++) {
+      final date = DateTime.now().add(Duration(days: i));
+      final result = _offlineService.calculatePrayerTimes(
+        latitude: (lat as num).toDouble(),
+        longitude: (lng as num).toDouble(),
+        date: date,
+      );
+      if (result.timings != null) {
+        multiDayTimings[date] = result.timings!;
+      }
+    }
 
-    // Schedule pre-prayer reminders if enabled
     final isPreReminderEnabled = box.get(
       'athan_pre_reminders_enabled',
       defaultValue: false,
     );
-    if (isPreReminderEnabled) {
-      final reminderMinutes =
-          box.get('athan_reminder_minutes', defaultValue: 15) as int;
-      await NotificationService().scheduleDailyPrePrayerReminders(
-        timings: times.timings,
-        enabledPrayers: Map<String, bool>.from(enabledPrayers),
-        reminderMinutes: reminderMinutes,
-      );
-      debugPrint(
-        '🔔 PrayerNotifier: Pre-prayer reminders scheduled ($reminderMinutes min)',
-      );
-    } else {
-      // Cancel reminder notifications if disabled
-      for (int id in [200, 201, 202, 203, 204]) {
-        await NotificationService().cancelNotification(id);
-      }
-    }
+    final reminderMinutes =
+        box.get('athan_reminder_minutes', defaultValue: 15) as int;
 
-    debugPrint('🔔 PrayerNotifier: Adhan schedules updated');
+    // Schedule all 10 days with unique IDs
+    await NotificationService().scheduleMultipleDays(
+      multiDayTimings: multiDayTimings,
+      enabledPrayers: Map<String, bool>.from(enabledPrayers),
+      preRemindersEnabled: isPreReminderEnabled,
+      reminderMinutes: reminderMinutes,
+    );
+
+    debugPrint('🔔 PrayerNotifier: Multi-day Adhan schedules updated (10 days)');
   }
 
   Future<void> updateCalculationMethod(int methodId) async {

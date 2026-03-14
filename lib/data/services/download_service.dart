@@ -150,14 +150,16 @@ class DownloadService {
             double progress = received / total;
             _notifyProgress(request.id, progress, DownloadStatus.downloading);
 
-            // Throttle notification updates? For now, let's update every 5%
-            if ((progress * 100).toInt() % 5 == 0) {
+            // Throttle notification updates. Update every 5%, but skip exactly 100%
+            // as showDownloadCompleteNotification will handle the final state.
+            final progressInt = (progress * 100).toInt();
+            if (progressInt % 5 == 0 && progressInt < 100) {
               try {
                 _notificationService.showProgressNotification(
                   id: request.notificationId,
                   title: 'جاري تحميل ${request.title}',
-                  body: '${(progress * 100).toStringAsFixed(0)}%',
-                  progress: (progress * 100).toInt(),
+                  body: '$progressInt%',
+                  progress: progressInt,
                   maxProgress: 100,
                 );
               } catch (e) {
@@ -171,6 +173,10 @@ class DownloadService {
       // Notify complete
       _notifyProgress(request.id, 1.0, DownloadStatus.completed);
       await _addToHistory(request);
+      
+      // Small delay to ensure the OS has handled any pending progress updates
+      await Future.delayed(const Duration(milliseconds: 200));
+      
       try {
         await _notificationService.showDownloadCompleteNotification(
           id: request.notificationId,

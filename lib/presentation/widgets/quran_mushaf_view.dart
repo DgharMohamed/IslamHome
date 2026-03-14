@@ -9,6 +9,7 @@ import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/presentation/providers/mushaf_riwaya_provider.dart';
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 import 'package:islam_home/presentation/providers/audio_ui_provider.dart';
+import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 import 'package:islam_home/presentation/widgets/quran_mushaf_view_headers.dart';
 
 class _VirtualMushafPage {
@@ -26,6 +27,7 @@ class QuranMushafView extends ConsumerStatefulWidget {
   final Function(int, int, int, Offset) onShowAyahOptions;
   final void Function(int surah, int ayah) onShowSurahInfo;
   final double bottomInset;
+  final int initialPage;
 
   const QuranMushafView({
     super.key,
@@ -33,6 +35,7 @@ class QuranMushafView extends ConsumerStatefulWidget {
     required this.onShowAyahOptions,
     required this.onShowSurahInfo,
     this.bottomInset = 140,
+    this.initialPage = 1,
   });
 
   @override
@@ -74,6 +77,15 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
       (previous, next) => _onPlayingAyahChanged(next.value),
     );
     _itemPositionsListener.itemPositions.addListener(_onVisibleItemsChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _ensureVirtualPagesBuilt(); // Need this for correct index calculation
+      final playingAyah = ref.read(playingAyahProvider).value;
+      if (playingAyah != null) {
+        _onPlayingAyahChanged(playingAyah);
+      }
+    });
   }
 
   @override
@@ -363,6 +375,11 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     selectedAyahNotifier.value = null;
   }
 
+  int _getInitialScrollIndex() {
+    _ensureVirtualPagesBuilt();
+    return _mushafToVirtualIndex[widget.initialPage] ?? 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     _ensureVirtualPagesBuilt();
@@ -370,6 +387,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     final mushafTheme = ref.watch(mushafThemeProvider);
     final playingAyah = ref.watch(playingAyahProvider).value;
     final selectedRiwaya = ref.watch(selectedRiwayaProvider);
+    final mushafSettings = ref.watch(mushafSettingsProvider);
 
     return NotificationListener<UserScrollNotification>(
       onNotification: (notification) {
@@ -385,6 +403,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
       child: ScrollablePositionedList.builder(
         itemScrollController: _itemScrollController,
         itemPositionsListener: _itemPositionsListener,
+        initialScrollIndex: _getInitialScrollIndex(),
         physics: const BouncingScrollPhysics(),
         itemCount: _virtualPages.length + 1,
         itemBuilder: (context, index) {
@@ -428,6 +447,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                             selectedRiwaya,
                             mushafTheme,
                             quranPageNumber,
+                            mushafSettings.fontSizeScale,
                           );
 
                           return RichText(
@@ -452,9 +472,10 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                                 quranPageNumber,
                                 virtualPage.segments,
                                 mushafTheme.highlightColor,
-                                playingAyah,
+                                 playingAyah,
                                 selection,
                                 mushafTheme,
+                                mushafSettings.fontSizeScale,
                               ),
                             ),
                           );
@@ -537,6 +558,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     String? playingAyah,
     String? currentSelection,
     MushafTheme theme,
+    double fontSizeScale,
   ) {
     final spans = <InlineSpan>[];
 
@@ -553,13 +575,14 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                 key: _getSurahHeaderKey(surah),
                 element: element,
                 theme: theme,
+                fontSizeScale: fontSizeScale,
                 onTapSurahName: () => widget.onShowSurahInfo(surah, 1),
               ),
             ),
           );
 
           if (surah != 1 && surah != 9) {
-            spans.add(WidgetSpan(child: BismillahWidget(theme: theme)));
+            spans.add(WidgetSpan(child: BismillahWidget(theme: theme, fontSizeScale: fontSizeScale)));
           }
           if (surah == 9) {
             spans.add(const WidgetSpan(child: SizedBox(height: 20)));
@@ -624,7 +647,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                   '\u06DD${_toArabicNum(ayah)}',
                   style: TextStyle(
                     fontFamily: 'Amiri',
-                    fontSize: 22,
+                    fontSize: 22 * fontSizeScale,
                     color: isHighlighted
                         ? Colors.amber.shade800
                         : theme.secondaryColor,
@@ -649,6 +672,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     MushafRiwaya riwaya,
     MushafTheme theme,
     int pageNumber,
+    double fontSizeScale,
   ) {
     final isWarsh = riwaya.key == MushafRiwaya.warsh.key;
     final fallback = isWarsh
@@ -657,7 +681,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
 
     return TextStyle(
       color: theme.textColor,
-      fontSize: _getFontSizeForPage(pageNumber),
+      fontSize: _getFontSizeForPage(pageNumber) * fontSizeScale,
       fontFamily: riwaya.fontFamily,
       fontFamilyFallback: fallback,
       height: isWarsh ? 1.9 : 1.95,

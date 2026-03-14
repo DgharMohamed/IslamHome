@@ -966,5 +966,67 @@
   "theme": "المظهر",
   "riwaya": "الرواية"
   ,
-  "manualLocationInput": "إدخال يدوي"
+  "manualLocationInput": "إدخال يدوي",
+  "khatmaRemediationNeeded": "أنت متأخر عن جدولك!",
+  "khatmaRemediationUpdatePlan": "تعديل الخطة",
+  "khatmaRemediationSheetTitle": "تعديل خطة الختمة",
+  "khatmaRemediationSheetSubtitle": "لقد تأخرت بمقدار {units} {unitType}. كيف تفضل التعويض؟",
+  "@khatmaRemediationSheetSubtitle": {
+    "placeholders": {
+      "units": {
+        "type": "int"
+      },
+      "unitType": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationCatchUp": "تعويض سريع",
+  "khatmaRemediationCatchUpDesc": "قراءة ورد إضافي اليوم وغداً للعودة للجدول فوراً.",
+  "khatmaRemediationDistribute": "توزيع الجهد",
+  "khatmaRemediationDistributeDesc": "توزيع الورد الفائت على الأيام المتبقية.",
+  "khatmaRemediationExtend": "تمديد المدة",
+  "khatmaRemediationExtendDesc": "استمرار الورد الحالي وتأخير موعد الختم.",
+  "khatmaRemediationCurrentGoal": "الحالي: {amount} / يوم",
+  "@khatmaRemediationCurrentGoal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationNewGoal": "الجديد: {amount} / يوم",
+  "@khatmaRemediationNewGoal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationCurrentDate": "تاريخ الختم الحالي: {date}",
+  "@khatmaRemediationCurrentDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationNewDate": "تاريخ الختم الجديد: {date}",
+  "@khatmaRemediationNewDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDailyReminderTitle": "تذكير الختمة اليومي",
+  "khatmaDailyReminderBody": "لا تنسَ قراءة وردك اليومي لتبقى على جدول ختمتك.",
+  "khatmaRemediationNeeded": "أنت متأخر بمقدار {amount} {unit}. دعنا نساعدك للعودة للمسار الصحيح!",
+  "@khatmaRemediationNeeded": {
+    "placeholders": {
+      "amount": { "type": "int" },
+      "unit": { "type": "String" }
+    }
+  },
+  "khatmaRemediationAction": "استعراض الخيارات"
 }

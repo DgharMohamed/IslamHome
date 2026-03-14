@@ -908,5 +908,67 @@
   "theme": "Theme",
   "riwaya": "Riwaya"
   ,
-  "manualLocationInput": "Manual Input"
+  "manualLocationInput": "Manual Input",
+  "khatmaRemediationNeeded": "You are behind schedule!",
+  "khatmaRemediationUpdatePlan": "Update Plan",
+  "khatmaRemediationSheetTitle": "Adjust Your Khatma",
+  "khatmaRemediationSheetSubtitle": "You are behind by {units} {unitType}. How do you want to catch up?",
+  "@khatmaRemediationSheetSubtitle": {
+    "placeholders": {
+      "units": {
+        "type": "int"
+      },
+      "unitType": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationCatchUp": "Catch-Up Immediately",
+  "khatmaRemediationCatchUpDesc": "Read extra portion today and tomorrow.",
+  "khatmaRemediationDistribute": "Distribute Load",
+  "khatmaRemediationDistributeDesc": "Spread missed progress across remaining days.",
+  "khatmaRemediationExtend": "Extend Deadline",
+  "khatmaRemediationExtendDesc": "Keep current daily goal and push completion date.",
+  "khatmaRemediationCurrentGoal": "Current: {amount} / day",
+  "@khatmaRemediationCurrentGoal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationNewGoal": "New: {amount} / day",
+  "@khatmaRemediationNewGoal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationCurrentDate": "Current end date: {date}",
+  "@khatmaRemediationCurrentDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemediationNewDate": "New end date: {date}",
+  "@khatmaRemediationNewDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDailyReminderTitle": "Daily Khatma Reminder",
+  "khatmaDailyReminderBody": "Don't forget to read your daily portion to stay on track.",
+  "khatmaRemediationNeeded": "You are behind by {amount} {unit}. Let's get you back on track!",
+  "@khatmaRemediationNeeded": {
+    "placeholders": {
+      "amount": { "type": "int" },
+      "unit": { "type": "String" }
+    }
+  },
+  "khatmaRemediationAction": "Review Options"
 }

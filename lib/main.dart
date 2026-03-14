@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -50,6 +51,8 @@ import 'package:islam_home/data/models/khatma_v2_models.dart';
 import 'package:islam_home/data/models/quran_page_model.dart';
 import 'package:islam_home/data/database/adhkar_database.dart';
 import 'package:islam_home/data/services/notification_service.dart';
+import 'package:islam_home/data/services/background_worker.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:islam_home/data/services/adhkar_import_service.dart';
 import 'package:islam_home/presentation/screens/adhkar_list_screen.dart';
 import 'package:islam_home/presentation/screens/adhkar_details_screen.dart';
@@ -139,9 +142,16 @@ void main() async {
     debugPrint('🎵 Main: Essential services initialized');
 
     runApp(const ProviderScope(child: IslamicLibraryApp()));
-    NotificationService().init().then(
-      (_) => debugPrint('🔔 Main: Notifications ready'),
-    );
+
+    // Initialize notifications and then register the background Adhan job
+    NotificationService().init().then((_) {
+      debugPrint('🔔 Main: Notifications ready');
+      // workmanager is Android-only — skip on desktop/web/iOS
+      if (!kIsWeb && Platform.isAndroid) {
+        Workmanager().initialize(callbackDispatcher)
+            .then((_) => registerAdhanBackgroundTask());
+      }
+    });
     // PlaybackSessionService.initialize().catchError(
     //   (e) => debugPrint('📦 PlaybackSession error: $e'),
     // );

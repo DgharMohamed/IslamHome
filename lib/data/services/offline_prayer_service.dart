@@ -22,7 +22,8 @@ class OfflinePrayerService {
         .shafi; // Default for most, including Morocco (Maliki is similar in timings usually)
 
     final dateToCalculate = date ?? DateTime.now();
-    final prayerTimes = PrayerTimes.today(myCoordinates, params);
+    final components = DateComponents.from(dateToCalculate);
+    final prayerTimes = PrayerTimes(myCoordinates, components, params);
 
     // Map adhan types to string format used in the existing model
     final DateFormat formatter = DateFormat('HH:mm');

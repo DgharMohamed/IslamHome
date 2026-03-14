@@ -7,6 +7,7 @@ import 'package:islam_home/presentation/providers/khatma_v2_provider.dart';
 import 'package:islam_home/presentation/widgets/khatma_heatmap.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
 import 'package:islam_home/presentation/widgets/khatma_v2_setup_sheet.dart';
+import 'package:islam_home/presentation/widgets/khatma_remediation_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 
@@ -32,6 +33,11 @@ class KhatmaDashboardCard extends ConsumerWidget {
     final remaining = activeTrack.remainingUnits;
     final progressPercent = (activeTrack.overallProgress * 100).toInt();
     final unitLabel = _unitSingularLabel(context, activeTrack.unit);
+
+    final remediationPlan = activeTrack.targetDate != null 
+        ? KhatmaV2Notifier.buildRemediationPlan(activeTrack, RemediationStrategy.catchUp, now: DateTime.now())
+        : null;
+    final isBehind = remediationPlan != null && remediationPlan.backlogUnits > 0;
 
     return GlassContainer(
       child: Padding(
@@ -103,6 +109,7 @@ class KhatmaDashboardCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
+            if (isBehind) _buildRemediationAlert(context, l10n, ref, activeTrack, remediationPlan),
             Row(
               children: [
                 _buildMetricChip(
@@ -201,55 +208,124 @@ class KhatmaDashboardCard extends ConsumerWidget {
   Widget _buildEmptyState(BuildContext context) {
     return GlassContainer(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         child: Column(
           children: [
-            Icon(
-              Icons.auto_stories_outlined,
-              size: 48,
-              color: AppTheme.textSecondary.withValues(alpha: 0.5),
+            // Glowing icon container
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Ambient glow
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        AppTheme.primaryColor.withValues(alpha: 0.25),
+                        AppTheme.primaryColor.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+                // Icon container
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppTheme.primaryColor.withValues(alpha: 0.22),
+                        AppTheme.primaryColor.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.35),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_rounded,
+                    size: 22,
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 10),
+
             Text(
               AppLocalizations.of(context)!.khatmaV2NoActive,
               style: GoogleFonts.cairo(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               AppLocalizations.of(context)!.khatmaV2StartJourneyDesc,
               textAlign: TextAlign.center,
               style: GoogleFonts.tajawal(
                 color: AppTheme.textSecondary,
-                fontSize: 14,
+                fontSize: 12,
+                height: 1.4,
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  useRootNavigator: true,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const KhatmaV2SetupSheet(),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
-                foregroundColor: AppTheme.primaryColor,
-                side: const BorderSide(color: AppTheme.primaryColor, width: 1),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+
+            const SizedBox(height: 14),
+
+            // Feature chips row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildFeatureChip(Icons.chrome_reader_mode_outlined, 'قراءة'),
+                const SizedBox(width: 6),
+                _buildFeatureChip(Icons.headphones_outlined, 'استماع'),
+                const SizedBox(width: 6),
+                _buildFeatureChip(Icons.psychology_outlined, 'حفظ'),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+
+            // CTA button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => const KhatmaV2SetupSheet(),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  minimumSize: const Size.fromHeight(40),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
                 ),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.khatmaV2SetupNew,
-                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(
+                  AppLocalizations.of(context)!.khatmaV2SetupNew,
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           ],
@@ -257,6 +333,96 @@ class KhatmaDashboardCard extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _buildRemediationAlert(
+    BuildContext context, 
+    AppLocalizations l10n, 
+    WidgetRef ref, 
+    KhatmaTrack track, 
+    RemediationPlan plan
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.redAccent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.khatmaRemediationNeeded(plan.backlogUnits, _unitSingularLabel(context, track.unit)),
+                  style: GoogleFonts.tajawal(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      useRootNavigator: true,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => KhatmaRemediationSheet(
+                        track: track,
+                        plan: plan,
+                      ),
+                    );
+                  },
+                  child: Text(
+                    l10n.khatmaRemediationAction,
+                    style: GoogleFonts.cairo(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: AppTheme.primaryColor),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.tajawal(
+              fontSize: 11,
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildMetricChip({required String label, required String value}) {
     return Expanded(

@@ -3630,6 +3630,108 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إدخال يدوي'**
   String get manualLocationInput;
+
+  /// No description provided for @khatmaRemediationNeeded.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت متأخر بمقدار {amount} {unit}. دعنا نساعدك للعودة للمسار الصحيح!'**
+  String khatmaRemediationNeeded(int amount, String unit);
+
+  /// No description provided for @khatmaRemediationUpdatePlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الخطة'**
+  String get khatmaRemediationUpdatePlan;
+
+  /// No description provided for @khatmaRemediationSheetTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل خطة الختمة'**
+  String get khatmaRemediationSheetTitle;
+
+  /// No description provided for @khatmaRemediationSheetSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لقد تأخرت بمقدار {units} {unitType}. كيف تفضل التعويض؟'**
+  String khatmaRemediationSheetSubtitle(int units, String unitType);
+
+  /// No description provided for @khatmaRemediationCatchUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعويض سريع'**
+  String get khatmaRemediationCatchUp;
+
+  /// No description provided for @khatmaRemediationCatchUpDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة ورد إضافي اليوم وغداً للعودة للجدول فوراً.'**
+  String get khatmaRemediationCatchUpDesc;
+
+  /// No description provided for @khatmaRemediationDistribute.
+  ///
+  /// In ar, this message translates to:
+  /// **'توزيع الجهد'**
+  String get khatmaRemediationDistribute;
+
+  /// No description provided for @khatmaRemediationDistributeDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'توزيع الورد الفائت على الأيام المتبقية.'**
+  String get khatmaRemediationDistributeDesc;
+
+  /// No description provided for @khatmaRemediationExtend.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمديد المدة'**
+  String get khatmaRemediationExtend;
+
+  /// No description provided for @khatmaRemediationExtendDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمرار الورد الحالي وتأخير موعد الختم.'**
+  String get khatmaRemediationExtendDesc;
+
+  /// No description provided for @khatmaRemediationCurrentGoal.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحالي: {amount} / يوم'**
+  String khatmaRemediationCurrentGoal(String amount);
+
+  /// No description provided for @khatmaRemediationNewGoal.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجديد: {amount} / يوم'**
+  String khatmaRemediationNewGoal(String amount);
+
+  /// No description provided for @khatmaRemediationCurrentDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الختم الحالي: {date}'**
+  String khatmaRemediationCurrentDate(String date);
+
+  /// No description provided for @khatmaRemediationNewDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الختم الجديد: {date}'**
+  String khatmaRemediationNewDate(String date);
+
+  /// No description provided for @khatmaDailyReminderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير الختمة اليومي'**
+  String get khatmaDailyReminderTitle;
+
+  /// No description provided for @khatmaDailyReminderBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنسَ قراءة وردك اليومي لتبقى على جدول ختمتك.'**
+  String get khatmaDailyReminderBody;
+
+  /// No description provided for @khatmaRemediationAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعراض الخيارات'**
+  String get khatmaRemediationAction;
 }
 
 class _AppLocalizationsDelegate

@@ -271,7 +271,6 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
     }
   }
 
-  @visibleForTesting
   static int calculateDailyGoalForTrack(
     KhatmaTrack track, {
     DateTime? now,
@@ -286,7 +285,6 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
     return (remainingUnits / remainingDays).ceil();
   }
 
-  @visibleForTesting
   static RemediationPlan buildRemediationPlan(
     KhatmaTrack track,
     RemediationStrategy strategy, {

@@ -47,6 +47,7 @@ class NotificationService {
   };
   static const int _dailyVerseNotificationId = 710;
   static const int _dailyDhikrNotificationId = 711;
+  static const int _khatmaReminderNotificationId = 712;
 
   // ──────────────────────────────────────────────────────────────────────────
   // Initialization
@@ -79,14 +80,19 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin
           >();
 
+      final soundPath = await _getAdhanSoundPath();
+      
       // Adhan channel (with custom sound)
       await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'adhan_channel_v3',
+        AndroidNotificationChannel(
+          'adhan_channel_v4',
           'أوقات الصلاة',
           description: 'إشعارات الأذان عند دخول وقت الصلاة',
           importance: Importance.max,
           playSound: true,
+          sound: soundPath != null
+              ? UriAndroidNotificationSound('file://$soundPath')
+              : null,
           enableVibration: true,
           showBadge: true,
         ),
@@ -282,130 +288,147 @@ class NotificationService {
   // Schedule daily prayers
   // ──────────────────────────────────────────────────────────────────────────
 
-  /// Schedules one exact alarm for each enabled prayer today (or tomorrow if
-  /// the prayer time has already passed).
-  Future<void> scheduleDailyPrayers({
-    required Map<String, String> timings,
+  /// Schedules multiple days of prayers to ensure accuracy as times shift.
+  Future<void> scheduleMultipleDays({
+    required Map<DateTime, Map<String, String>> multiDayTimings,
     required Map<String, bool> enabledPrayers,
+    required bool preRemindersEnabled,
+    int reminderMinutes = 15,
   }) async {
     if (!_initialized) await init();
 
     final soundPath = await _getAdhanSoundPath();
 
-    for (final entry in _prayerIds.entries) {
-      final prayerName = entry.key;
-      final notifId = entry.value;
-
-      // Cancel existing alarm for this prayer
-      await _plugin.cancel(notifId);
-
-      final isEnabled = enabledPrayers[prayerName] ?? true;
-      if (!isEnabled) {
-        debugPrint('🔕 $prayerName adhan disabled, skipped');
-        continue;
+    // 1. Cancel existing future notifications (to avoid overlaps)
+    // We use a safe range to clear IDs (100-350) which covers ~10 days
+    for (int dayOffset = 0; dayOffset <= 12; dayOffset++) {
+      for (final baseId in _prayerIds.values) {
+        await _plugin.cancel(_calculateId(baseId, dayOffset));
       }
+      for (final baseId in _reminderIds.values) {
+        await _plugin.cancel(_calculateId(baseId, dayOffset));
+      }
+    }
 
-      final timeStr = timings[prayerName];
-      if (timeStr == null) continue;
+    // 2. Schedule for each day provided
+    int dayIndex = 0;
+    for (final dateEntry in multiDayTimings.entries) {
+      final date = dateEntry.key;
+      final timings = dateEntry.value;
 
-      final scheduledTime = _nextOccurrence(timeStr);
-      if (scheduledTime == null) continue;
+      for (final entry in _prayerIds.entries) {
+        final prayerName = entry.key;
+        final baseId = entry.value;
 
-      final androidDetails = AndroidNotificationDetails(
-        'adhan_channel_v3',
-        'أوقات الصلاة',
-        channelDescription: 'إشعارات الأذان',
-        importance: Importance.max,
-        priority: Priority.max,
-        ticker: 'حان وقت ${_prayerNamesAr[prayerName] ?? prayerName}',
-        fullScreenIntent: true,
-        sound: soundPath != null
-            ? UriAndroidNotificationSound('file://$soundPath')
-            : null,
-      );
+        if (!(enabledPrayers[prayerName] ?? true)) continue;
 
-      final details = NotificationDetails(android: androidDetails);
+        final timeStr = timings[prayerName];
+        if (timeStr == null) continue;
 
-      try {
+        final scheduledTime = _getSpecificTime(date, timeStr);
+        if (scheduledTime == null) continue;
+
+        // Skip if in the past
+        if (scheduledTime.isBefore(tz.TZDateTime.now(tz.local))) continue;
+
+        final notifId = _calculateId(baseId, dayIndex);
+
+        final androidDetails = AndroidNotificationDetails(
+          'adhan_channel_v4',
+          'أوقات الصلاة',
+          channelDescription: 'إشعارات الأذان',
+          importance: Importance.max,
+          priority: Priority.max,
+          ticker: 'حان وقت ${_prayerNamesAr[prayerName] ?? prayerName}',
+          fullScreenIntent: true,
+          sound: soundPath != null
+              ? UriAndroidNotificationSound('file://$soundPath')
+              : null,
+        );
+
         await _plugin.zonedSchedule(
           notifId,
           'حان وقت ${_prayerNamesAr[prayerName] ?? prayerName}',
           'اللهم صلِّ على محمد',
           scheduledTime,
-          details,
+          NotificationDetails(android: androidDetails),
           androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.time,
           uiLocalNotificationDateInterpretation:
               UILocalNotificationDateInterpretation.absoluteTime,
         );
-        debugPrint(
-          '🔔 Scheduled $prayerName adhan at ${scheduledTime.toLocal()}',
-        );
-      } catch (e) {
-        debugPrint('🔔 Failed to schedule $prayerName: $e');
+
+        // Schedule reminder if enabled
+        if (preRemindersEnabled) {
+          final reminderBaseId = _reminderIds[prayerName];
+          if (reminderBaseId != null) {
+            final reminderTime = scheduledTime.subtract(
+              Duration(minutes: reminderMinutes),
+            );
+
+            if (reminderTime.isAfter(tz.TZDateTime.now(tz.local))) {
+              final reminderId = _calculateId(reminderBaseId, dayIndex);
+              const reminderAndroid = AndroidNotificationDetails(
+                'prayer_reminder_channel',
+                'تذكير قبل الصلاة',
+                importance: Importance.high,
+                priority: Priority.high,
+              );
+
+              await _plugin.zonedSchedule(
+                reminderId,
+                '${_prayerNamesAr[prayerName] ?? prayerName} بعد $reminderMinutes دقيقة',
+                'استعد لصلاة ${_prayerNamesAr[prayerName] ?? prayerName}',
+                reminderTime,
+                const NotificationDetails(android: reminderAndroid),
+                androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+                uiLocalNotificationDateInterpretation:
+                    UILocalNotificationDateInterpretation.absoluteTime,
+              );
+            }
+          }
+        }
       }
+      dayIndex++;
     }
+
+    debugPrint('🔔 Scheduled prayers for $dayIndex days');
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Pre-prayer reminders
-  // ──────────────────────────────────────────────────────────────────────────
+  /// Calculates a unique ID based on a base ID and a day offset.
+  int _calculateId(int baseId, int dayOffset) {
+    // baseId is 100-104 or 200-204
+    // We add dayOffset * 20 to keep them separate (plenty of room)
+    return baseId + (dayOffset * 20);
+  }
 
+  /// Deprecated in favor of [scheduleMultipleDays]
+  @Deprecated('Use scheduleMultipleDays instead')
+  Future<void> scheduleDailyPrayers({
+    required Map<String, String> timings,
+    required Map<String, bool> enabledPrayers,
+  }) async {
+    final now = DateTime.now();
+    await scheduleMultipleDays(
+      multiDayTimings: {now: timings},
+      enabledPrayers: enabledPrayers,
+      preRemindersEnabled: false,
+    );
+  }
+
+  /// Deprecated in favor of [scheduleMultipleDays]
+  @Deprecated('Use scheduleMultipleDays instead')
   Future<void> scheduleDailyPrePrayerReminders({
     required Map<String, String> timings,
     required Map<String, bool> enabledPrayers,
     int reminderMinutes = 15,
   }) async {
-    if (!_initialized) await init();
-
-    for (final entry in _reminderIds.entries) {
-      final prayerName = entry.key;
-      final notifId = entry.value;
-
-      await _plugin.cancel(notifId);
-
-      final isEnabled = enabledPrayers[prayerName] ?? true;
-      if (!isEnabled) continue;
-
-      final timeStr = timings[prayerName];
-      if (timeStr == null) continue;
-
-      final prayerTime = _nextOccurrence(timeStr);
-      if (prayerTime == null) continue;
-
-      final reminderTime = prayerTime.subtract(
-        Duration(minutes: reminderMinutes),
-      );
-
-      // Don't schedule if reminder time is in the past
-      if (reminderTime.isBefore(tz.TZDateTime.now(tz.local))) continue;
-
-      const androidDetails = AndroidNotificationDetails(
-        'prayer_reminder_channel',
-        'تذكير قبل الصلاة',
-        importance: Importance.high,
-        priority: Priority.high,
-      );
-
-      try {
-        await _plugin.zonedSchedule(
-          notifId,
-          '${_prayerNamesAr[prayerName] ?? prayerName} بعد $reminderMinutes دقيقة',
-          'استعد لصلاة ${_prayerNamesAr[prayerName] ?? prayerName}',
-          reminderTime,
-          const NotificationDetails(android: androidDetails),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          matchDateTimeComponents: DateTimeComponents.time,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-        );
-        debugPrint(
-          '🔔 Scheduled $prayerName pre-reminder at ${reminderTime.toLocal()}',
-        );
-      } catch (e) {
-        debugPrint('🔔 Failed to schedule $prayerName reminder: $e');
-      }
-    }
+    final now = DateTime.now();
+    await scheduleMultipleDays(
+      multiDayTimings: {now: timings},
+      enabledPrayers: enabledPrayers,
+      preRemindersEnabled: true,
+      reminderMinutes: reminderMinutes,
+    );
   }
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -417,7 +440,7 @@ class NotificationService {
     try {
       final soundPath = await _getAdhanSoundPath();
       final androidDetails = AndroidNotificationDetails(
-        'adhan_channel_v3',
+        'adhan_channel_v4',
         'أوقات الصلاة',
         channelDescription: 'إشعارات الأذان',
         importance: Importance.max,
@@ -468,23 +491,25 @@ class NotificationService {
 
     try {
       final safeBody = body.trim().isEmpty ? subtitle ?? '' : body.trim();
-      final trimmed = safeBody.length > 220
-          ? '${safeBody.substring(0, 220)}...'
-          : safeBody;
 
-      const androidDetails = AndroidNotificationDetails(
+      final androidDetails = AndroidNotificationDetails(
         'daily_content_channel',
         'المحتوى اليومي',
         channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
         importance: Importance.high,
         priority: Priority.high,
+        styleInformation: BigTextStyleInformation(
+          safeBody,
+          contentTitle: title,
+          summaryText: 'محتوى اليوم',
+        ),
       );
 
       await _plugin.show(
         _dailyVerseNotificationId,
         title,
-        trimmed,
-        const NotificationDetails(android: androidDetails),
+        safeBody,
+        NotificationDetails(android: androidDetails),
       );
       return true;
     } catch (e) {
@@ -503,26 +528,64 @@ class NotificationService {
     if (!hasPermission) return false;
 
     try {
-      final base = body.trim().isEmpty ? (subtitle ?? '') : body.trim();
-      final trimmed = base.length > 220 ? '${base.substring(0, 220)}...' : base;
+      final safeBody = body.trim().isEmpty ? (subtitle ?? '') : body.trim();
 
-      const androidDetails = AndroidNotificationDetails(
+      final androidDetails = AndroidNotificationDetails(
         'daily_content_channel',
         'المحتوى اليومي',
         channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
         importance: Importance.high,
         priority: Priority.high,
+        styleInformation: BigTextStyleInformation(
+          safeBody,
+          contentTitle: title,
+          summaryText: 'ذكر اليوم',
+        ),
       );
 
       await _plugin.show(
         _dailyDhikrNotificationId,
         title,
-        trimmed,
-        const NotificationDetails(android: androidDetails),
+        safeBody,
+        NotificationDetails(android: androidDetails),
       );
       return true;
     } catch (e) {
       debugPrint('🔔 showDailyDhikrNotification error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> showKhatmaReminderNotification({
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) await init();
+    final hasPermission = await holdsNotificationPermission();
+    if (!hasPermission) return false;
+
+    try {
+      final androidDetails = AndroidNotificationDetails(
+        'daily_content_channel',
+        'المحتوى اليومي',
+        channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
+        importance: Importance.high,
+        priority: Priority.high,
+        styleInformation: BigTextStyleInformation(
+          body,
+          contentTitle: title,
+        ),
+      );
+
+      await _plugin.show(
+        _khatmaReminderNotificationId,
+        title,
+        body,
+        NotificationDetails(android: androidDetails),
+      );
+      return true;
+    } catch (e) {
+      debugPrint('🔔 showKhatmaReminderNotification error: $e');
       return false;
     }
   }
@@ -570,8 +633,11 @@ class NotificationService {
         'download_channel',
         'التحميلات',
         channelDescription: 'إشعارات تقدم التحميل',
-        importance: Importance.defaultImportance,
-        priority: Priority.defaultPriority,
+        importance: Importance.high,
+        priority: Priority.high,
+        showProgress: false, // Explicitly disable progress bar
+        playSound: true,
+        enableVibration: true,
       );
       await _plugin.show(
         id,
@@ -602,10 +668,8 @@ class NotificationService {
   // Helpers
   // ──────────────────────────────────────────────────────────────────────────
 
-  /// Parses a "HH:MM" string and returns the next occurrence as a
-  /// [tz.TZDateTime] (today if the time is still in the future, otherwise
-  /// tomorrow).
-  tz.TZDateTime? _nextOccurrence(String timeStr) {
+  /// Parses a "HH:MM" string and returns the specific [tz.TZDateTime] for a [baseDate].
+  tz.TZDateTime? _getSpecificTime(DateTime baseDate, String timeStr) {
     try {
       // Strip timezone suffix if present (e.g. "05:12 (WET)")
       final clean = timeStr.split(' ').first.trim();
@@ -616,23 +680,16 @@ class NotificationService {
       final minute = int.tryParse(parts[1]);
       if (hour == null || minute == null) return null;
 
-      final now = tz.TZDateTime.now(tz.local);
-      var scheduled = tz.TZDateTime(
+      return tz.TZDateTime(
         tz.local,
-        now.year,
-        now.month,
-        now.day,
+        baseDate.year,
+        baseDate.month,
+        baseDate.day,
         hour,
         minute,
       );
-
-      if (scheduled.isBefore(now)) {
-        scheduled = scheduled.add(const Duration(days: 1));
-      }
-
-      return scheduled;
     } catch (e) {
-      debugPrint('🔔 _nextOccurrence parse error for "$timeStr": $e');
+      debugPrint('🔔 _getSpecificTime error for "$timeStr": $e');
       return null;
     }
   }

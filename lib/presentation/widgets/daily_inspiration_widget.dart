@@ -102,9 +102,10 @@ class _HadithCard extends ConsumerWidget {
         if (hadith == null) return const SizedBox.shrink();
         final locale = ref.watch(localeProvider);
         final isArabic = locale.languageCode == 'ar';
-        final content = isArabic
+        final rawContent = isArabic
             ? (hadith.arab ?? hadith.english ?? '')
             : (hadith.english ?? hadith.arab ?? '');
+        final content = rawContent.replaceAll(RegExp(r'<br\s*?/?>'), '\n').trim();
         final subtitle = '${hadith.book ?? ''} - ${hadith.number ?? ''}';
 
         return _BaseCard(

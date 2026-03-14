@@ -174,6 +174,7 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                   await ref
                       .read(moodEngineProvider.notifier)
                       .recordActionTap(rec.route);
+                  if (!context.mounted) return;
                   context.push(rec.route);
                 },
                 style: ElevatedButton.styleFrom(
@@ -203,7 +204,8 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                     Navigator.pop(context);
                     await ref
                         .read(moodEngineProvider.notifier)
-                        .recordActionTap(alternative!.recommendation.route);
+                        .recordActionTap(alternative.recommendation.route);
+                    if (!context.mounted) return;
                     context.push(alternative.recommendation.route);
                   },
                   style: OutlinedButton.styleFrom(
@@ -213,7 +215,7 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    _buildAlternativeLabel(context, alternative!),
+                    _buildAlternativeLabel(context, alternative),
                     style: GoogleFonts.cairo(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,

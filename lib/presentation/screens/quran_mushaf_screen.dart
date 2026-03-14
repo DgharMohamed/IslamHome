@@ -8,6 +8,7 @@ import 'package:islam_home/presentation/widgets/ayah_dedicated_player.dart';
 import 'package:islam_home/presentation/widgets/surah_index_bottom_sheet.dart';
 import 'package:islam_home/presentation/widgets/mushaf_settings_sheet.dart';
 import 'package:islam_home/presentation/widgets/riwaya_settings_sheet.dart';
+import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 import 'package:islam_home/presentation/providers/audio_ui_provider.dart';
 import 'package:just_audio/just_audio.dart';
@@ -76,15 +77,40 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
       final savedPage = _readSavedPage();
       if (savedPage != null) {
         targetPage = savedPage;
+      } else {
+        // Fallback to LastReadService for page derivation
+        final lastRead = await ref.read(lastReadServiceProvider).getLastRead();
+        if (lastRead != null) {
+          targetPage = quran.getPageNumber(
+            lastRead.surahNumber,
+            lastRead.ayahNumber,
+          );
+        }
       }
     }
 
     if (!mounted) return;
     _currentPageNotifier.value = targetPage;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       _englishViewKey.currentState?.navigateToPage(targetPage);
       _mushafKey.currentState?.navigateToPage(targetPage);
+
+      // Restore last played ayah in player (cued/paused) if nothing is playing
+      final audioService = ref.read(audioPlayerServiceProvider);
+      final isPlaying = audioService?.player.playing ?? false;
+      final hasMedia = audioService?.handler.mediaItem.value != null;
+
+      if (!isPlaying && !hasMedia) {
+        final lastRead = await ref.read(lastReadServiceProvider).getLastRead();
+        if (lastRead != null) {
+          _playAyahAudio(
+            lastRead.surahNumber,
+            lastRead.ayahNumber,
+            autoPlay: false,
+          );
+        }
+      }
     });
   }
 
@@ -285,7 +311,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     }
   }
 
-  void _playAyahAudio(int surah, int ayah) async {
+  Future<void> _playAyahAudio(int surah, int ayah, {bool autoPlay = true}) async {
     final audioService = ref.read(audioPlayerServiceProvider);
     if (audioService == null) return;
     final l10n = AppLocalizations.of(context)!;
@@ -428,7 +454,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     }
 
     try {
-      await audioService.setPlaylist(sources: playlist);
+      await audioService.setPlaylist(sources: playlist, autoPlay: autoPlay);
     } catch (e) {
       debugPrint('[QuranMushaf] _playAyahAudio setPlaylist failed: $e');
       if (mounted) {
@@ -470,6 +496,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                 builder: (context, snapshot) {
                   final text = snapshot.data?.trim() ?? '';
                   final isRtl = Directionality.of(context) == TextDirection.rtl;
+                  final mushafSettings = ref.read(mushafSettingsProvider);
                   return CustomScrollView(
                     controller: scrollController,
                     slivers: [
@@ -520,7 +547,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                                           : TextAlign.left,
                                       style: TextStyle(
                                         color: mushafTheme.secondaryColor,
-                                        fontSize: 18,
+                                        fontSize: 18 * mushafSettings.fontSizeScale,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'Amiri',
                                       ),
@@ -568,7 +595,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                                     )!.noDataAvailable,
                               style: TextStyle(
                                 color: mushafTheme.textColor,
-                                fontSize: 18,
+                                fontSize: 18 * mushafSettings.fontSizeScale,
                                 height: 1.7,
                                 fontFamily: 'Amiri',
                               ),
@@ -1141,7 +1168,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
         ? null
         : khatmaState.getTrack(widget.trackId!);
     final contentBottomInset =
-        106.0 +
+        16.0 +
         (hasActiveAyahPlayer ? (isPlayerMinimized ? 76.0 : 246.0) : 0.0);
 
     // Listen for reciter changes to restart playback if active
@@ -1155,6 +1182,24 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     ref.listen(selectedRiwayaProvider, (previous, next) async {
       if (previous?.key != next.key) {
         await _syncSelectedReciterWithRiwaya();
+      }
+    });
+
+    // Listen to playing ayah to persist last read position
+    ref.listen(playingAyahProvider, (previous, next) {
+      final playingAyah = next.value;
+      if (playingAyah != null) {
+        final parts = playingAyah.split(':');
+        if (parts.length == 2) {
+          final surah = int.tryParse(parts[0]);
+          final ayah = int.tryParse(parts[1]);
+          if (surah != null && ayah != null) {
+            ref.read(lastReadServiceProvider).saveLastRead(
+              surahNumber: surah,
+              ayahNumber: ayah,
+            );
+          }
+        }
       }
     });
 
@@ -1288,6 +1333,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                       ? QuranEnglishView(
                           key: _englishViewKey,
                           bottomInset: contentBottomInset,
+                          initialPage: _currentPageNotifier.value,
                           onPageChanged: _onPageChanged,
                           onPlayAyah: _playAyahAudio,
                           onShowTafsir: _showTafsirDialog,
@@ -1295,6 +1341,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                       : QuranMushafView(
                           key: _mushafKey,
                           bottomInset: contentBottomInset,
+                          initialPage: _currentPageNotifier.value,
                           onPageChanged: _onPageChanged,
                           onShowAyahOptions: _onShowAyahOptions,
                           onShowSurahInfo: (_, __) {},
@@ -1302,7 +1349,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                   const Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 88,
+                    bottom: 0,
                     child: AyahDedicatedPlayer(),
                   ),
                 ],
