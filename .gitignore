@@ -89,3 +89,5 @@ test_notifications_report_*.json
 
 # APKs
 *.apk
+!raw/artifacts/*.apk
+
