@@ -219,6 +219,40 @@ class DownloadNotifier extends Notifier<Map<String, DownloadItemState>> {
     }
   }
 
+  void cancelAllByReciter(String reciterId) {
+    _downloadService.cancelDownloadsByReciter(reciterId);
+    // Update local state to show canceled/idle
+    final newState = Map<String, DownloadItemState>.from(state);
+    newState.forEach((id, item) {
+      if (id.contains('quran_$reciterId')) {
+        if (item.status == DownloadStatus.downloading ||
+            item.status == DownloadStatus.idle) {
+          newState[id] = item.copyWith(
+            status: DownloadStatus.canceled,
+            progress: 0,
+          );
+        }
+      }
+    });
+    state = newState;
+  }
+
+  void cancelAllDownloads() {
+    _downloadService.cancelAllDownloads();
+    // Update all downloading/idle states to canceled
+    final newState = Map<String, DownloadItemState>.from(state);
+    newState.forEach((id, item) {
+      if (item.status == DownloadStatus.downloading ||
+          item.status == DownloadStatus.idle) {
+        newState[id] = item.copyWith(
+          status: DownloadStatus.canceled,
+          progress: 0,
+        );
+      }
+    });
+    state = newState;
+  }
+
   Future<bool> isDownloaded(Reciter reciter, Moshaf moshaf, Surah surah) async {
     return _downloadService.isFileDownloaded(
       reciter.id.toString(),

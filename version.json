@@ -1,8 +1,8 @@
 {
-  "version": "1.0.1",
-  "build_number": "2",
+  "version": "1.0.2",
+  "build_number": "3",
   "apk": "https://raw.githubusercontent.com/DgharMohamed/IslamHome/main/raw/artifacts/app-release.apk",
-  "notes_en": "Added Smart Remediation and Daily Reminders.",
-  "notes_ar": "إضافة محرك المعالجة الذكية والتذكير اليومي للختمة القرانية.",
+  "notes_en": "Improved audio download stability and added download cancellation features.",
+  "notes_ar": "تحسين استقرار تحميل الصوت وإضافة ميزة إلغاء التحميل.",
   "force_update": false
 }

@@ -18,6 +18,7 @@ import 'package:islam_home/data/models/surah_model.dart';
 import 'package:islam_home/data/models/playlist_model.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 import 'package:islam_home/core/utils/quran_utils.dart';
+import 'package:islam_home/data/services/download_service.dart';
 
 class ReciterScreen extends ConsumerStatefulWidget {
   final Reciter reciter;
@@ -637,6 +638,13 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
   Widget _buildReciterActions(dynamic moshaf, List<dynamic>? surahs) {
     if (moshaf == null || surahs == null) return const SizedBox.shrink();
     final l10n = AppLocalizations.of(context)!;
+    final downloadState = ref.watch(downloadProvider);
+
+    // Check if any surah for *this* reciter is downloading or queued
+    final hasActiveDownloads = downloadState.values.any((item) =>
+        item.id.contains('quran_${widget.reciter.id}_') &&
+        (item.status == DownloadStatus.downloading ||
+            item.status == DownloadStatus.idle));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -653,9 +661,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                     .cast<Surah>()
                     .toList();
 
-                ref
-                    .read(downloadProvider.notifier)
-                    .downloadAll(
+                ref.read(downloadProvider.notifier).downloadAll(
                       reciter: widget.reciter,
                       moshaf: moshaf,
                       surahs: surahsToDownload,
@@ -677,6 +683,27 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
               ),
             ),
           ),
+          if (hasActiveDownloads) ...[
+            const SizedBox(width: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.close_rounded, color: Colors.redAccent),
+                onPressed: () {
+                  ref
+                      .read(downloadProvider.notifier)
+                      .cancelAllByReciter(widget.reciter.id.toString());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تم إلغاء جميع التحميلات')),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -60,23 +60,28 @@ class _DownloadButtonState extends ConsumerState<DownloadButton> {
       switch (itemState.status) {
         case DownloadStatus.idle: // Queued?
         case DownloadStatus.downloading:
-          return SizedBox(
-            width: 24,
-            height: 24,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: itemState.progress > 0 ? itemState.progress : null,
-                  strokeWidth: 2,
-                  color: widget.color ?? Theme.of(context).primaryColor,
-                ),
-                Icon(
-                  Icons.close,
-                  size: 14,
-                  color: widget.color ?? Theme.of(context).primaryColor,
-                ),
-              ],
+          return GestureDetector(
+            onTap: () {
+              ref.read(downloadProvider.notifier).cancelDownload(_id);
+            },
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: itemState.progress > 0 ? itemState.progress : null,
+                    strokeWidth: 2,
+                    color: widget.color ?? Theme.of(context).primaryColor,
+                  ),
+                  Icon(
+                    Icons.close,
+                    size: 14,
+                    color: widget.color ?? Theme.of(context).primaryColor,
+                  ),
+                ],
+              ),
             ),
           );
         case DownloadStatus.completed:

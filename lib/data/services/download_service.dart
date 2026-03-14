@@ -13,8 +13,8 @@ class DownloadService {
   final Dio _dio = Dio();
   final NotificationService _notificationService = NotificationService();
 
-  // Active downloads: URL -> CancelToken
-  final Map<String, CancelToken> _activeDownloads = {};
+  // Active downloads: URL -> (CancelToken, Request)
+  final Map<String, _ActiveDownload> _activeDownloads = {};
 
   // Download Queue
   final List<DownloadRequest> _queue = [];
@@ -113,7 +113,7 @@ class DownloadService {
   Future<void> _startDownload(DownloadRequest request) async {
     _currentDownloads++;
     final cancelToken = CancelToken();
-    _activeDownloads[request.url] = cancelToken;
+    _activeDownloads[request.url] = _ActiveDownload(cancelToken, request);
 
     try {
       final filePath = await getFilePath(
@@ -170,28 +170,54 @@ class DownloadService {
         },
       );
 
-      // Notify complete
-      _notifyProgress(request.id, 1.0, DownloadStatus.completed);
-      await _addToHistory(request);
-      
-      // Small delay to ensure the OS has handled any pending progress updates
-      await Future.delayed(const Duration(milliseconds: 200));
-      
-      try {
-        await _notificationService.showDownloadCompleteNotification(
-          id: request.notificationId,
-          title: 'تم التحميل',
-          body: 'تم تحميل ${request.title} بنجاح',
-        );
-      } catch (e) {
-        debugPrint('Notification error on complete: $e');
+      // Verify file exists and has size after Dio succeeds
+      if (await file.exists() && await file.length() > 0) {
+        debugPrint('✅ Download successful for ${request.id}: $filePath');
+        
+        // Notify complete (UI first)
+        _notifyProgress(request.id, 1.0, DownloadStatus.completed);
+
+        // Nested try-catch for non-critical post-download steps
+        try {
+          await _addToHistory(request);
+          
+          await Future.delayed(const Duration(milliseconds: 200));
+          
+          await _notificationService.showDownloadCompleteNotification(
+            id: request.notificationId,
+            title: 'تم التحميل',
+            body: 'تم تحميل ${request.title} بنجاح',
+          );
+        } catch (postError) {
+          debugPrint('⚠️ Post-download non-critical error for ${request.id}: $postError');
+          // We don't mark as failed because the file is actually there
+        }
+      } else {
+        throw Exception('File was not created or is empty after download');
       }
     } catch (e) {
       if (e is DioException && CancelToken.isCancel(e)) {
-        debugPrint('Download canceled: ${request.url}');
+        debugPrint('🚫 Download canceled: ${request.url}');
         _notifyProgress(request.id, 0.0, DownloadStatus.canceled);
       } else {
-        debugPrint('Download error: $e');
+        debugPrint('❌ Download error for ${request.id}: $e');
+        
+        // Final sanity check: if file exists despite error, consider it a success
+        try {
+          final filePath = await getFilePath(
+            request.reciterId,
+            request.moshafType,
+            request.surahNumber,
+            type: request.type,
+          );
+          final file = File(filePath);
+          if (await file.exists() && await file.length() > 1024 * 5) { // Min 5KB for safety
+             debugPrint('💡 File found despite error, treating as success');
+             _notifyProgress(request.id, 1.0, DownloadStatus.completed);
+             return;
+          }
+        } catch (_) {}
+
         _notifyProgress(request.id, 0.0, DownloadStatus.failed);
         try {
           await _notificationService.showDownloadCompleteNotification(
@@ -200,7 +226,7 @@ class DownloadService {
             body: 'حدث خطأ أثناء تحميل ${request.title}',
           );
         } catch (ne) {
-          debugPrint('Notification error on throw: $ne');
+          debugPrint('🔔 Notification error on download failure: $ne');
         }
       }
     } finally {
@@ -212,12 +238,48 @@ class DownloadService {
 
   void cancelDownload(String url) {
     if (_activeDownloads.containsKey(url)) {
-      _activeDownloads[url]?.cancel();
+      _activeDownloads[url]?.token.cancel();
       _activeDownloads.remove(url);
     } else {
       // Remove from queue if not started yet
-      _queue.removeWhere((req) => req.url == url);
+      final index = _queue.indexWhere((req) => req.url == url);
+      if (index != -1) {
+        final request = _queue.removeAt(index);
+        _notifyProgress(request.id, 0.0, DownloadStatus.canceled);
+      }
     }
+  }
+
+  void cancelAllDownloads() {
+    // Cancel active
+    for (var active in _activeDownloads.values) {
+      active.token.cancel();
+    }
+    _activeDownloads.clear();
+
+    // Clear queue
+    _queue.clear();
+    
+    // Reset current downloads count to be safe, though finally blocks should handle it
+    _currentDownloads = 0;
+  }
+
+  void cancelDownloadsByReciter(String reciterId) {
+    // 1. Cancel active ones matching reciterId
+    final urlsToCancel = <String>[];
+    _activeDownloads.forEach((url, active) {
+      if (active.request.reciterId == reciterId) {
+        urlsToCancel.add(url);
+      }
+    });
+
+    for (var url in urlsToCancel) {
+      _activeDownloads[url]?.token.cancel();
+      _activeDownloads.remove(url);
+    }
+
+    // 2. Remove from queue matching reciterId
+    _queue.removeWhere((req) => req.reciterId == reciterId);
   }
 
   Future<void> deleteDownload(
@@ -261,6 +323,10 @@ class DownloadService {
   }
 
   Future<void> _addToHistory(DownloadRequest request) async {
+    // Ensure history is loaded first or we might overwrite it
+    if (_downloadedHistory.isEmpty) {
+      await _loadHistory();
+    }
     // Avoid duplicates
     _downloadedHistory.removeWhere((item) => item.id == request.id);
     _downloadedHistory.add(request);
@@ -340,3 +406,10 @@ class DownloadRequest {
 }
 
 enum DownloadStatus { idle, downloading, completed, failed, canceled }
+
+class _ActiveDownload {
+  final CancelToken token;
+  final DownloadRequest request;
+
+  _ActiveDownload(this.token, this.request);
+}
