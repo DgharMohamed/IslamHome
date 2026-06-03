@@ -80,8 +80,8 @@ class MosqueSilhouettePainter extends CustomPainter {
     path.lineTo(size.width, size.height);
 
     // Silhouette structure
-    double w = size.width;
-    double h = size.height;
+    final double w = size.width;
+    final double h = size.height;
 
     // Small domes on left
     path.lineTo(w * 0.1, h);

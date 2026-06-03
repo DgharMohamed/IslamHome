@@ -25,7 +25,7 @@ Future<void> syncDailyContentHomeWidget(WidgetRef ref) async {
   var type = 'verse';
 
   if (contentType == 0) {
-    final verse = ref.read(rotatingDailyVerseProvider);
+    final verse = await ref.read(rotatingDailyVerseProvider.future);
     title = isArabic ? 'آية اليوم' : 'Verse of the Day';
     content = isArabic ? verse.text : verse.translation;
     subtitle = verse.surah;
@@ -51,7 +51,7 @@ Future<void> syncDailyContentHomeWidget(WidgetRef ref) async {
   }
 
   if (content.trim().isEmpty) {
-    final verse = ref.read(rotatingDailyVerseProvider);
+    final verse = await ref.read(rotatingDailyVerseProvider.future);
     title = isArabic ? 'آية اليوم' : 'Verse of the Day';
     content = isArabic ? verse.text : verse.translation;
     subtitle = verse.surah;

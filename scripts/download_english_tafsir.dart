@@ -33,7 +33,7 @@ void main() async {
         await file.parent.create(recursive: true);
 
         // Write the file
-        await file.writeAsString(JsonEncoder.withIndent('  ').convert(data));
+        await file.writeAsString(const JsonEncoder.withIndent('  ').convert(data));
 
         print('✅ تم تحميل $name بنجاح!\n');
       } else {
@@ -44,7 +44,7 @@ void main() async {
     }
 
     // Wait a bit between requests to be respectful to the API
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   print('✨ اكتمل التحميل!');

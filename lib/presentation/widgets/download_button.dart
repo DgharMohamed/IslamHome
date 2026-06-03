@@ -93,7 +93,7 @@ class _DownloadButtonState extends ConsumerState<DownloadButton> {
           );
         case DownloadStatus.failed:
           return IconButton(
-            icon: Icon(Icons.error_outline, color: Colors.red),
+            icon: const Icon(Icons.error_outline, color: Colors.red),
             onPressed: () => _startDownload(),
           );
         case DownloadStatus.canceled:
@@ -104,7 +104,7 @@ class _DownloadButtonState extends ConsumerState<DownloadButton> {
 
     // 2. Initial Loading Check
     if (_isLoadingCheck) {
-      return SizedBox(
+      return const SizedBox(
         width: 16,
         height: 16,
         child: CircularProgressIndicator(strokeWidth: 2),

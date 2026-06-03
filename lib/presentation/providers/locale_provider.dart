@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:islam_home/data/services/notification_service.dart';
 
 final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
   LocaleNotifier.new,
@@ -25,6 +26,10 @@ class LocaleNotifier extends Notifier<Locale> {
   Future<void> setLocale(Locale locale) async {
     final box = await Hive.openBox('settings');
     await box.put('language', locale.languageCode);
+    
+    // Update NotificationService locale as well
+    NotificationService().updateLocale(locale.languageCode);
+    
     state = locale;
   }
 }

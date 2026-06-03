@@ -98,6 +98,48 @@ abstract class AppLocalizations {
     Locale('en'),
   ];
 
+  /// No description provided for @albumGeneral.
+  ///
+  /// In ar, this message translates to:
+  /// **'عام'**
+  String get albumGeneral;
+
+  /// No description provided for @mushafThemeCream.
+  ///
+  /// In ar, this message translates to:
+  /// **'كريمي'**
+  String get mushafThemeCream;
+
+  /// No description provided for @mushafThemeGreen.
+  ///
+  /// In ar, this message translates to:
+  /// **'أخضر'**
+  String get mushafThemeGreen;
+
+  /// No description provided for @mushafThemeBlue.
+  ///
+  /// In ar, this message translates to:
+  /// **'أزرق'**
+  String get mushafThemeBlue;
+
+  /// No description provided for @mushafThemeSepia.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورق قديم'**
+  String get mushafThemeSepia;
+
+  /// No description provided for @mushafThemeDark.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليلي'**
+  String get mushafThemeDark;
+
+  /// No description provided for @mushafThemeBlack.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسود'**
+  String get mushafThemeBlack;
+
   /// No description provided for @appTitle.
   ///
   /// In ar, this message translates to:
@@ -365,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @english.
   ///
   /// In ar, this message translates to:
-  /// **'الإنجليزية'**
+  /// **'English'**
   String get english;
 
   /// No description provided for @globalSearch.
@@ -379,6 +421,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'بحث عن سورة...'**
   String get searchSurah;
+
+  /// No description provided for @searchForCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث عن تصنيف...'**
+  String get searchForCategory;
+
+  /// No description provided for @searchHadithBooksHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث في كتب الحديث...'**
+  String get searchHadithBooksHint;
+
+  /// No description provided for @searchInHadithHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث في الأحاديث...'**
+  String get searchInHadithHint;
+
+  /// No description provided for @searchSiraHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث في السيرة...'**
+  String get searchSiraHint;
 
   /// No description provided for @downloadAll.
   ///
@@ -493,6 +559,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count} حديث'**
   String hadithCount(int count);
+
+  /// No description provided for @adhkarCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, =1{ذكر واحد} =2{ذكران} few{{count} أذكار} many{{count} ذكراً} other{{count} ذكر}}'**
+  String adhkarCount(int count);
 
   /// No description provided for @page.
   ///
@@ -764,6 +836,12 @@ abstract class AppLocalizations {
   /// **'{count} آية'**
   String ayahsCount(int count);
 
+  /// No description provided for @surahsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} سور'**
+  String surahsCount(int count);
+
   /// No description provided for @pageN.
   ///
   /// In ar, this message translates to:
@@ -781,6 +859,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اختر الترجمة'**
   String get selectTranslation;
+
+  /// No description provided for @noSurahsAvailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد سور متاحة لهذا التفسير'**
+  String get noSurahsAvailable;
+
+  /// No description provided for @errorLoadingTafsir.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ في تحميل التفسير'**
+  String get errorLoadingTafsir;
 
   /// No description provided for @selectTafsir.
   ///
@@ -810,7 +900,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'الآية {number}'**
-  String verseN(Object number);
+  String verseN(int number);
 
   /// No description provided for @noTafsirAvailable.
   ///
@@ -1050,7 +1140,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'سيتم تفعيل {feature} قريباً'**
-  String comingSoon(Object feature);
+  String comingSoon(String feature);
 
   /// No description provided for @startingDownload.
   ///
@@ -1080,7 +1170,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'{count} صوتيات'**
-  String audioCount(Object count);
+  String audioCount(int count);
 
   /// No description provided for @nowPlayingLabel.
   ///
@@ -1092,7 +1182,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'الوقت المتبقي: {time}'**
-  String timeRemaining(Object time);
+  String timeRemaining(String time);
 
   /// No description provided for @stopTimer.
   ///
@@ -1110,7 +1200,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تم ضبط المؤقت لـ {time}'**
-  String timerSetFor(Object time);
+  String timerSetFor(String time);
 
   /// No description provided for @surahIdNotFound.
   ///
@@ -1128,13 +1218,13 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'استمع إلى {title} بصوت القارئ {reciter} عبر تطبيق المكتبة الإسلامية.\n\n{link}'**
-  String shareRecitationText(Object link, Object reciter, Object title);
+  String shareRecitationText(String title, String reciter, String link);
 
   /// No description provided for @minutes.
   ///
   /// In ar, this message translates to:
   /// **'{count} دقيقة'**
-  String minutes(Object count);
+  String minutes(int count);
 
   /// No description provided for @timerOption.
   ///
@@ -1302,7 +1392,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'{count} سورة محملة'**
-  String downloadedSurahCount(Object count);
+  String downloadedSurahCount(int count);
 
   /// No description provided for @audioFile.
   ///
@@ -1794,7 +1884,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'الجزء {juz} - {surah}'**
-  String juzAndSurah(Object juz, Object surah);
+  String juzAndSurah(int juz, String surah);
 
   /// No description provided for @smartSuggestionsForNewPlan.
   ///
@@ -1830,7 +1920,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'بقي لك {count} صفحات لليوم'**
-  String pagesRemainingToday(Object count);
+  String pagesRemainingToday(int count);
 
   /// No description provided for @khatmaHistory.
   ///
@@ -2004,7 +2094,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تعديل {minutes} دقيقة'**
-  String adjustMinutes(Object minutes);
+  String adjustMinutes(int minutes);
 
   /// No description provided for @manualOffset.
   ///
@@ -2016,7 +2106,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'{count} ساعة'**
-  String hours(Object count);
+  String hours(int count);
 
   /// No description provided for @hour.
   ///
@@ -2096,11 +2186,11 @@ abstract class AppLocalizations {
   /// **'منح الإذن'**
   String get grantPermission;
 
-  /// No description provided for @error.
+  /// General error message with error placeholder
   ///
   /// In ar, this message translates to:
-  /// **'حدث خطأ: {message}'**
-  String error(String message);
+  /// **'خطأ: {error}'**
+  String error(String error);
 
   /// No description provided for @noSensors.
   ///
@@ -2291,7 +2381,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تعديل {days} يوم'**
-  String adjustDays(Object days);
+  String adjustDays(int days);
 
   /// No description provided for @fontSettings.
   ///
@@ -2359,23 +2449,17 @@ abstract class AppLocalizations {
   /// **'إنشاء'**
   String get create;
 
-  /// No description provided for @surahsCount.
-  ///
-  /// In ar, this message translates to:
-  /// **'{count} سور'**
-  String surahsCount(int count);
-
   /// No description provided for @noPlaylistsMessage.
   ///
   /// In ar, this message translates to:
   /// **'لا توجد قوائم تشغيل. أنشئ واحدة من قسم المفضلات.'**
   String get noPlaylistsMessage;
 
-  /// No description provided for @addedToPlaylist.
+  /// Message shown when an item is added to a playlist
   ///
   /// In ar, this message translates to:
   /// **'تمت الإضافة إلى {playlistName}'**
-  String addedToPlaylist(Object playlistName);
+  String addedToPlaylist(String playlistName);
 
   /// No description provided for @duaKhatmQuran.
   ///
@@ -2418,6 +2502,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم الانتقال إلى {surah} - آية {ayah}'**
   String navigatedToAyah(String surah, int ayah);
+
+  /// Error message with message placeholder
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ: {message}'**
+  String errorMessage(String message);
 
   /// No description provided for @setTarget.
   ///
@@ -2520,6 +2610,144 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'طريقة الحساب'**
   String get calculationMethodTitle;
+
+  /// No description provided for @methodKarachi.
+  ///
+  /// In ar, this message translates to:
+  /// **'جامعة العلوم الإسلامية، كراتشي'**
+  String get methodKarachi;
+
+  /// No description provided for @methodIsna.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجمعية الإسلامية لأمريكا الشمالية (ISNA)'**
+  String get methodIsna;
+
+  /// No description provided for @methodMWL.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابطة العالم الإسلامي'**
+  String get methodMWL;
+
+  /// No description provided for @methodUmmAlQura.
+  ///
+  /// In ar, this message translates to:
+  /// **'جامعة أم القرى، مكة المكرمة'**
+  String get methodUmmAlQura;
+
+  /// No description provided for @methodEgyptian.
+  ///
+  /// In ar, this message translates to:
+  /// **'الهيئة العامة المصرية للمساحة'**
+  String get methodEgyptian;
+
+  /// No description provided for @methodGulf.
+  ///
+  /// In ar, this message translates to:
+  /// **'منطقة الخليج'**
+  String get methodGulf;
+
+  /// No description provided for @methodKuwait.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكويت'**
+  String get methodKuwait;
+
+  /// No description provided for @methodQatar.
+  ///
+  /// In ar, this message translates to:
+  /// **'قطر'**
+  String get methodQatar;
+
+  /// No description provided for @methodSingapore.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجلس الديني الإسلامي في سنغافورة'**
+  String get methodSingapore;
+
+  /// No description provided for @methodFrance.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتحاد المنظمات الإسلامية في فرنسا'**
+  String get methodFrance;
+
+  /// No description provided for @methodTurkey.
+  ///
+  /// In ar, this message translates to:
+  /// **'رئاسة الشؤون الدينية، تركيا'**
+  String get methodTurkey;
+
+  /// No description provided for @methodRussia.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإدارة الروحية لمسلمي روسيا'**
+  String get methodRussia;
+
+  /// No description provided for @methodMoonsighting.
+  ///
+  /// In ar, this message translates to:
+  /// **'لجنة مشاهدة القمر حول العالم'**
+  String get methodMoonsighting;
+
+  /// No description provided for @methodDubai.
+  ///
+  /// In ar, this message translates to:
+  /// **'دبي'**
+  String get methodDubai;
+
+  /// No description provided for @methodJakim.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدارة التنمية الإسلامية الماليزية (JAKIM)'**
+  String get methodJakim;
+
+  /// No description provided for @methodTunisia.
+  ///
+  /// In ar, this message translates to:
+  /// **'تونس'**
+  String get methodTunisia;
+
+  /// No description provided for @methodAlgeria.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجزائر'**
+  String get methodAlgeria;
+
+  /// No description provided for @methodIndonesia.
+  ///
+  /// In ar, this message translates to:
+  /// **'وزارة الشؤون الدينية بجمهورية إندونيسيا'**
+  String get methodIndonesia;
+
+  /// No description provided for @methodMorocco.
+  ///
+  /// In ar, this message translates to:
+  /// **'المغرب'**
+  String get methodMorocco;
+
+  /// No description provided for @methodPortugal.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجالية الإسلامية في لشبونة'**
+  String get methodPortugal;
+
+  /// No description provided for @methodJordan.
+  ///
+  /// In ar, this message translates to:
+  /// **'وزارة الأوقاف والشؤون والمقدسات الإسلامية، الأردن'**
+  String get methodJordan;
+
+  /// No description provided for @methodShia.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشيعة الاثنا عشرية، معهد ليفا، قم'**
+  String get methodShia;
+
+  /// No description provided for @methodTehran.
+  ///
+  /// In ar, this message translates to:
+  /// **'معهد الجيوفيزياء، جامعة طهران'**
+  String get methodTehran;
 
   /// No description provided for @sidebarMainQuran.
   ///
@@ -2795,7 +3023,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'ختمتي لـ {type}'**
-  String khatmaV2MyKhatma(Object type);
+  String khatmaV2MyKhatma(String type);
 
   /// No description provided for @khatmaV2NoActive.
   ///
@@ -2837,7 +3065,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تسجيل صفحة {page}'**
-  String khatmaV2RecordPage(Object page);
+  String khatmaV2RecordPage(int page);
 
   /// No description provided for @khatmaV2SelectTrack.
   ///
@@ -2849,13 +3077,13 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تم حفظ التقدم في {track}'**
-  String khatmaV2ProgressSaved(Object track);
+  String khatmaV2ProgressSaved(String track);
 
   /// No description provided for @khatmaV2TrackTypeSuffix.
   ///
   /// In ar, this message translates to:
   /// **'مسار {type}'**
-  String khatmaV2TrackTypeSuffix(Object type);
+  String khatmaV2TrackTypeSuffix(String type);
 
   /// No description provided for @khatmaV2UnitLabel.
   ///
@@ -2897,7 +3125,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تسجيل الجزء {juz}'**
-  String khatmaV2RecordJuz(Object juz);
+  String khatmaV2RecordJuz(int juz);
 
   /// No description provided for @khatmaV2UnitPageSingle.
   ///
@@ -2951,7 +3179,7 @@ abstract class AppLocalizations {
   ///
   /// In ar, this message translates to:
   /// **'تسجيل سورة {surah}'**
-  String khatmaV2RecordSurah(Object surah);
+  String khatmaV2RecordSurah(String surah);
 
   /// No description provided for @khatmaV2ValidationRangeOrder.
   ///
@@ -3205,6 +3433,54 @@ abstract class AppLocalizations {
   /// **'أدعية قرآنية'**
   String get adhkarCategoryQuranDua;
 
+  /// No description provided for @adhkarCategoryWakingUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الاستيقاظ'**
+  String get adhkarCategoryWakingUp;
+
+  /// No description provided for @adhkarCategoryWudu.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الوضوء'**
+  String get adhkarCategoryWudu;
+
+  /// No description provided for @adhkarCategoryAdhan.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الآذان'**
+  String get adhkarCategoryAdhan;
+
+  /// No description provided for @adhkarCategoryDistress.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكرب والهم'**
+  String get adhkarCategoryDistress;
+
+  /// No description provided for @adhkarCategoryIstighfar.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستغفار والتوبة'**
+  String get adhkarCategoryIstighfar;
+
+  /// No description provided for @adhkarCategoryRuqyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقية الشرعية'**
+  String get adhkarCategoryRuqyah;
+
+  /// No description provided for @adhkarCategoryHajj.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحج والعمرة'**
+  String get adhkarCategoryHajj;
+
+  /// No description provided for @adhkarCategoryIllness.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المريض'**
+  String get adhkarCategoryIllness;
+
   /// No description provided for @athanOnboardingPrompt.
   ///
   /// In ar, this message translates to:
@@ -3310,7 +3586,7 @@ abstract class AppLocalizations {
   /// No description provided for @languageArabicSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'العربية'**
+  /// **'Arabic'**
   String get languageArabicSubtitle;
 
   /// No description provided for @languageEnglishSubtitle.
@@ -3732,6 +4008,606 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'استعراض الخيارات'**
   String get khatmaRemediationAction;
+
+  /// No description provided for @logout.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get logout;
+
+  /// No description provided for @upgradeBannerTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ارتقِ بتجربتك للسحاب'**
+  String get upgradeBannerTitle;
+
+  /// No description provided for @upgradeBannerSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجل حساباً الآن لمزامنة أذكارك وختماتك عبر جميع أجهزتك وضمان عدم فقدانها.'**
+  String get upgradeBannerSubtitle;
+
+  /// No description provided for @createAccountNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب الآن'**
+  String get createAccountNow;
+
+  /// No description provided for @login.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get login;
+
+  /// No description provided for @register.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب'**
+  String get register;
+
+  /// No description provided for @email.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
+  String get password;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور'**
+  String get confirmPassword;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليس لديك حساب؟'**
+  String get dontHaveAccount;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'لديك حساب بالفعل؟'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @logoutConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get logoutConfirmTitle;
+
+  /// No description provided for @logoutConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من رغبتك في تسجيل الخروج؟'**
+  String get logoutConfirmBody;
+
+  /// No description provided for @guestStatus.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستخدم زائر'**
+  String get guestStatus;
+
+  /// No description provided for @anonymousUsage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصفح كزائر'**
+  String get anonymousUsage;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الملف الشخصي'**
+  String get editProfile;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الحساب'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد حذف الحساب'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف كافة بياناتك.'**
+  String get deleteAccountConfirmBody;
+
+  /// No description provided for @updateNameHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم الكامل'**
+  String get updateNameHint;
+
+  /// No description provided for @requiresRecentLogin.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتطلب هذا الإجراء تسجيل الدخول حديثاً. يرجى تسجيل الخروج ثم الدخول مرة أخرى والمحاولة.'**
+  String get requiresRecentLogin;
+
+  /// No description provided for @audioLibraryAlbum.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتبة الصوتيات'**
+  String get audioLibraryAlbum;
+
+  /// No description provided for @quranRecitation.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلاوة قرآنية'**
+  String get quranRecitation;
+
+  /// No description provided for @islamicPersonality.
+  ///
+  /// In ar, this message translates to:
+  /// **'شخصية إسلامية'**
+  String get islamicPersonality;
+
+  /// No description provided for @videoClip.
+  ///
+  /// In ar, this message translates to:
+  /// **'مقطع فيديو'**
+  String get videoClip;
+
+  /// No description provided for @sheikhBadrAlMeshari.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشيخ بدر المشاري'**
+  String get sheikhBadrAlMeshari;
+
+  /// No description provided for @muadhinIslamHome.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤذن إسلام هوم'**
+  String get muadhinIslamHome;
+
+  /// No description provided for @athan.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأذان'**
+  String get athan;
+
+  /// No description provided for @athanNotificationsAlbum.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيهات الأذان'**
+  String get athanNotificationsAlbum;
+
+  /// No description provided for @downloadedAudio.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملف صوتي محمل'**
+  String get downloadedAudio;
+
+  /// No description provided for @invalidUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط غير صالح'**
+  String get invalidUrl;
+
+  /// No description provided for @noAudioStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد روابط صوتية متاحة'**
+  String get noAudioStreams;
+
+  /// No description provided for @streamTimeout.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت مهلة التحميل، يرجى المحاولة مرة أخرى'**
+  String get streamTimeout;
+
+  /// No description provided for @unableToStartPlayback.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر بدء التشغيل'**
+  String get unableToStartPlayback;
+
+  /// No description provided for @seerahAlbum.
+  ///
+  /// In ar, this message translates to:
+  /// **'السيرة النبوية'**
+  String get seerahAlbum;
+
+  /// No description provided for @downloadsAlbum.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنزيلات'**
+  String get downloadsAlbum;
+
+  /// No description provided for @notificationChannelAdhan.
+  ///
+  /// In ar, this message translates to:
+  /// **'أوقات الصلاة'**
+  String get notificationChannelAdhan;
+
+  /// No description provided for @notificationChannelAdhanDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات الأذان عند دخول وقت الصلاة'**
+  String get notificationChannelAdhanDesc;
+
+  /// No description provided for @notificationChannelReminders.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير قبل الصلاة'**
+  String get notificationChannelReminders;
+
+  /// No description provided for @notificationChannelRemindersDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير قبل موعد الصلاة'**
+  String get notificationChannelRemindersDesc;
+
+  /// No description provided for @notificationChannelDaily.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحتوى اليومي'**
+  String get notificationChannelDaily;
+
+  /// No description provided for @notificationChannelDailyDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات آية اليوم والمحتوى الإيماني'**
+  String get notificationChannelDailyDesc;
+
+  /// No description provided for @athanTimeFor.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت صلاة {prayer}'**
+  String athanTimeFor(String prayer);
+
+  /// No description provided for @fajrName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفجر'**
+  String get fajrName;
+
+  /// No description provided for @dhuhrName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الظهر'**
+  String get dhuhrName;
+
+  /// No description provided for @asrName.
+  ///
+  /// In ar, this message translates to:
+  /// **'العصر'**
+  String get asrName;
+
+  /// No description provided for @maghribName.
+  ///
+  /// In ar, this message translates to:
+  /// **'المغرب'**
+  String get maghribName;
+
+  /// No description provided for @ishaName.
+  ///
+  /// In ar, this message translates to:
+  /// **'العشاء'**
+  String get ishaName;
+
+  /// No description provided for @allahBlessing.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهم صلِّ على محمد'**
+  String get allahBlessing;
+
+  /// No description provided for @reminderBefore.
+  ///
+  /// In ar, this message translates to:
+  /// **'{prayer} بعد {minutes} دقيقة'**
+  String reminderBefore(String prayer, int minutes);
+
+  /// No description provided for @prepareFor.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعد لصلاة {prayer}'**
+  String prepareFor(String prayer);
+
+  /// No description provided for @khatmaReminderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير الورد القرآني'**
+  String get khatmaReminderTitle;
+
+  /// No description provided for @khatmaReminderBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنس وردك من القرآن الكريم اليوم'**
+  String get khatmaReminderBody;
+
+  /// No description provided for @testAthanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجربة الأذان'**
+  String get testAthanTitle;
+
+  /// No description provided for @testAthanBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصوت يعمل بنجاح'**
+  String get testAthanBody;
+
+  /// No description provided for @testNotifTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعار تجريبي'**
+  String get testNotifTitle;
+
+  /// No description provided for @testNotifBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات تعمل بكفاءة على جهازك'**
+  String get testNotifBody;
+
+  /// No description provided for @notificationChannelDownloads.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحميلات'**
+  String get notificationChannelDownloads;
+
+  /// No description provided for @notificationChannelDownloadsDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات تقدم التحميل'**
+  String get notificationChannelDownloadsDesc;
+
+  /// No description provided for @notificationChannelDailyVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية اليوم'**
+  String get notificationChannelDailyVerse;
+
+  /// No description provided for @notificationChannelDailyDhikr.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذكر اليوم'**
+  String get notificationChannelDailyDhikr;
+
+  /// No description provided for @offlineBanner.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت غير متصل بالإنترنت — تعمل بالبيانات المحلية'**
+  String get offlineBanner;
+
+  /// No description provided for @or.
+  ///
+  /// In ar, this message translates to:
+  /// **'أو'**
+  String get or;
+
+  /// No description provided for @calibrateCompass.
+  ///
+  /// In ar, this message translates to:
+  /// **'قم بتحريك الهاتف بشكل رقم 8 لمعايرة البوصلة'**
+  String get calibrateCompass;
+
+  /// No description provided for @compassLowAccuracy.
+  ///
+  /// In ar, this message translates to:
+  /// **'دقة البوصلة منخفضة - قم بالمعايرة'**
+  String get compassLowAccuracy;
+
+  /// No description provided for @qiblaNotSupportedOnWindows.
+  ///
+  /// In ar, this message translates to:
+  /// **'بوصلة القبلة غير مدعومة على ويندوز حالياً'**
+  String get qiblaNotSupportedOnWindows;
+
+  /// No description provided for @qiblaWindowsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى استخدام تطبيق الهاتف للحصول على أفضل تجربة'**
+  String get qiblaWindowsHint;
+
+  /// No description provided for @distanceFromKabah.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعد عن الكعبة'**
+  String get distanceFromKabah;
+
+  /// No description provided for @qiblaDirectionLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتجاه القبلة'**
+  String get qiblaDirectionLabel;
+
+  /// No description provided for @timeUntilAdhan.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوقت المتبقي للأذان'**
+  String get timeUntilAdhan;
+
+  /// No description provided for @prayerTimesLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'عذراً، تعذر تحميل أوقات الصلاة. يرجى التأكد من الاتصال بالإنترنت أو إعدادات الموقع.'**
+  String get prayerTimesLoadError;
+
+  /// No description provided for @dataLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ في تحميل البيانات'**
+  String get dataLoadError;
+
+  /// No description provided for @allDownloadsCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إلغاء جميع التحميلات'**
+  String get allDownloadsCancelled;
+
+  /// No description provided for @qiblaSourceApi.
+  ///
+  /// In ar, this message translates to:
+  /// **'المصدر: AlAdhan API • الانحراف: {declination}°'**
+  String qiblaSourceApi(String declination);
+
+  /// No description provided for @qiblaSourceOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'المصدر: بدون اتصال • الانحراف: {declination}°'**
+  String qiblaSourceOffline(String declination);
+
+  /// No description provided for @notificationAdhanDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات الأذان عند دخول وقت الصلاة'**
+  String get notificationAdhanDesc;
+
+  /// No description provided for @notificationReminders.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير قبل الصلاة'**
+  String get notificationReminders;
+
+  /// No description provided for @notificationRemindersDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير قبل موعد الصلاة'**
+  String get notificationRemindersDesc;
+
+  /// No description provided for @notificationDailyContent.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحتوى اليومي'**
+  String get notificationDailyContent;
+
+  /// No description provided for @notificationDailyDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات آية اليوم والمحتوى الإيماني'**
+  String get notificationDailyDesc;
+
+  /// No description provided for @notificationAthanTimeFor.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت صلاة {prayer}'**
+  String notificationAthanTimeFor(String prayer);
+
+  /// No description provided for @notificationAllahBlessing.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهم صلِّ على محمد'**
+  String get notificationAllahBlessing;
+
+  /// No description provided for @notificationReminderBefore.
+  ///
+  /// In ar, this message translates to:
+  /// **'{prayer} بعد {minutes} دقيقة'**
+  String notificationReminderBefore(String prayer, String minutes);
+
+  /// No description provided for @notificationPrepareFor.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعد لصلاة {prayer}'**
+  String notificationPrepareFor(String prayer);
+
+  /// No description provided for @notificationKhatmaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير الورد القرآني'**
+  String get notificationKhatmaTitle;
+
+  /// No description provided for @notificationKhatmaBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنس وردك من القرآن الكريم اليوم'**
+  String get notificationKhatmaBody;
+
+  /// No description provided for @notificationTestAthanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجربة الأذان'**
+  String get notificationTestAthanTitle;
+
+  /// No description provided for @notificationTestAthanBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصوت يعمل بنجاح'**
+  String get notificationTestAthanBody;
+
+  /// No description provided for @notificationTestNotifTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعار تجريبي'**
+  String get notificationTestNotifTitle;
+
+  /// No description provided for @notificationTestNotifBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات تعمل بكفاءة على جهازك'**
+  String get notificationTestNotifBody;
+
+  /// No description provided for @notificationDownloadProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات تقدم التحميل'**
+  String get notificationDownloadProgress;
+
+  /// No description provided for @notificationDailyDhikr.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذكر اليوم'**
+  String get notificationDailyDhikr;
+
+  /// No description provided for @notificationDailyVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية اليوم'**
+  String get notificationDailyVerse;
+
+  /// No description provided for @notificationDownloads.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنزيلات'**
+  String get notificationDownloads;
+
+  /// No description provided for @themeCream.
+  ///
+  /// In ar, this message translates to:
+  /// **'كريمي'**
+  String get themeCream;
+
+  /// No description provided for @themeGreen.
+  ///
+  /// In ar, this message translates to:
+  /// **'أخضر'**
+  String get themeGreen;
+
+  /// No description provided for @themeBlue.
+  ///
+  /// In ar, this message translates to:
+  /// **'أزرق'**
+  String get themeBlue;
+
+  /// No description provided for @themeSepia.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورق قديم'**
+  String get themeSepia;
+
+  /// No description provided for @themeNight.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليلي'**
+  String get themeNight;
+
+  /// No description provided for @themeBlack.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسود'**
+  String get themeBlack;
 }
 
 class _AppLocalizationsDelegate

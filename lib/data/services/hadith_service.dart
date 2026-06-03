@@ -38,7 +38,7 @@ class HadithService {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'hadith_database.db');
+    final String path = join(await getDatabasesPath(), 'hadith_database.db');
     return await openDatabase(
       path,
       version: 1,

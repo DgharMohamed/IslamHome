@@ -5,8 +5,8 @@ import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:islam_home/presentation/providers/tafsir_provider.dart';
 import 'package:islam_home/data/models/tafsir_model.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:islam_home/presentation/providers/locale_provider.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/data/services/audio_player_service.dart';
@@ -15,6 +15,7 @@ import 'package:islam_home/presentation/widgets/tafsir_download_button.dart';
 import 'package:islam_home/presentation/widgets/aurora_background.dart';
 import 'package:islam_home/presentation/widgets/glass_container.dart';
 import 'package:islam_home/presentation/providers/favorites_provider.dart';
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
 
 class TafsirScreen extends ConsumerStatefulWidget {
   const TafsirScreen({super.key});
@@ -220,32 +221,10 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: Colors.white10),
-          ),
-          child: TextField(
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            style: GoogleFonts.cairo(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: l10n.searchSurah,
-              hintStyle: GoogleFonts.cairo(
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
-          ),
+        child: AppSearchField(
+          hintText: l10n.searchSurah,
+          controller: _searchController,
+          onChanged: _onSearchChanged,
         ),
       ),
     );
@@ -256,14 +235,15 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
     AsyncValue<List<TafsirItem>> availableTafasirAsync,
     AudioPlayerService? audioService,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return tafsirSurahsAsync.when(
       data: (surahs) {
         if (surahs.isEmpty) {
-          return const SliverFillRemaining(
+          return SliverFillRemaining(
             child: Center(
               child: Text(
-                'No surahs available for this tafsir',
-                style: TextStyle(color: Colors.white),
+                l10n.noSurahsAvailable,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           );
@@ -274,10 +254,13 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
           groupedSurahs.putIfAbsent(surah.surahId, () => []).add(surah);
         }
 
+        final currentLocale = ref.watch(localeProvider);
+        final isEnglish = currentLocale.languageCode == 'en';
+
         final filteredSurahIds = _searchQuery.isEmpty
             ? groupedSurahs.keys.toList()
             : groupedSurahs.keys.where((id) {
-                final surahName = QuranUtils.getSurahName(id);
+                final surahName = QuranUtils.getSurahName(id, isEnglish: isEnglish);
                 return QuranUtils.matchesSearch(surahName, _searchQuery);
               }).toList();
 
@@ -287,7 +270,7 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
             delegate: SliverChildBuilderDelegate((context, index) {
               final surahId = filteredSurahIds[index];
               final parts = groupedSurahs[surahId]!;
-              final surahName = 'سورة ${QuranUtils.getSurahName(surahId)}';
+              final surahName = '${l10n.surah} ${QuranUtils.getSurahName(surahId, isEnglish: isEnglish)}';
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),
@@ -501,7 +484,7 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
       error: (error, _) => SliverFillRemaining(
         child: Center(
           child: Text(
-            'Error loading tafsir',
+            l10n.errorLoadingTafsir,
             style: GoogleFonts.cairo(color: Colors.red),
           ),
         ),

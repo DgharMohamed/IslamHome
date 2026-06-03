@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,8 @@ import 'package:islam_home/core/utils/scaffold_utils.dart';
 import 'package:islam_home/presentation/widgets/qibla_painters.dart';
 import 'package:islam_home/presentation/providers/location_provider.dart';
 import 'package:islam_home/data/services/al_adhan_service.dart';
+import 'package:islam_home/core/utils/magnetic_declination.dart';
+import 'package:islam_home/core/utils/compass_filter.dart';
 
 class QiblaScreen extends ConsumerStatefulWidget {
   const QiblaScreen({super.key});
@@ -28,10 +31,20 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
   String? _lastCoordinates;
   bool _isRequesting = false;
 
+  // ── Accuracy fixes ──
+  final CompassFilter _compassFilter = CompassFilter(smoothingFactor: 0.2);
+  double _magneticDeclination = 0.0;
+  bool _showCalibrationHint = true;
+  double? _compassAccuracy;
+
   @override
   void initState() {
     super.initState();
     _checkPermissions();
+    // Auto-dismiss calibration hint after 8 seconds
+    Future.delayed(const Duration(seconds: 8), () {
+      if (mounted) setState(() => _showCalibrationHint = false);
+    });
   }
 
   Future<void> _checkPermissions() async {
@@ -55,16 +68,29 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
 
   Future<void> _fetchApiQibla(double lat, double lng) async {
     final coordKey = '$lat,$lng';
-    if (_lastCoordinates == coordKey) return; // Prevent redundant calls
+    if (_lastCoordinates == coordKey) return;
 
     setState(() {
       _isLoadingApi = true;
       _lastCoordinates = coordKey;
     });
 
-    final direction = await ref
-        .read(alAdhanServiceProvider)
-        .getQiblaDirection(lat, lng);
+    // Calculate magnetic declination for this location
+    try {
+      final geoField = GeomagneticField.calculate(
+        latitudeDeg: lat,
+        longitudeDeg: lng,
+      );
+      _magneticDeclination = geoField.declination;
+      debugPrint(
+          'QiblaScreen: Magnetic declination at ($lat, $lng) = ${_magneticDeclination.toStringAsFixed(2)}°');
+    } catch (e) {
+      debugPrint('QiblaScreen: Declination calculation failed: $e');
+      _magneticDeclination = 0.0;
+    }
+
+    final direction =
+        await ref.read(alAdhanServiceProvider).getQiblaDirection(lat, lng);
 
     if (mounted) {
       setState(() {
@@ -72,6 +98,11 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
         _isLoadingApi = false;
       });
     }
+  }
+
+  /// Converts magnetic heading to true heading using declination.
+  double _toTrueHeading(double magneticHeading) {
+    return normalizeAngle(magneticHeading + _magneticDeclination);
   }
 
   @override
@@ -144,12 +175,12 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [const Color(0xFF0D47A1), AppTheme.backgroundColor],
-            stops: const [0, 0.4],
+            colors: [Color(0xFF0D47A1), AppTheme.backgroundColor],
+            stops: [0, 0.4],
           ),
         ),
         child: SafeArea(
@@ -158,67 +189,127 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
               // 1. Custom Header
               _buildHeader(l10n),
 
+              // 2. Calibration Hint Banner
+              if (_showCalibrationHint) _buildCalibrationHint(l10n),
+
               Expanded(
-                child: StreamBuilder<CompassEvent>(
-                  stream: FlutterCompass.events,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(l10n.error(snapshot.error.toString())),
-                      );
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppTheme.primaryColor,
+                child: Platform.isWindows
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.compass_calibration,
+                                size: 80, color: Colors.white54),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.qiblaNotSupportedOnWindows,
+                              style: GoogleFonts.cairo(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.qiblaWindowsHint,
+                              style: GoogleFonts.cairo(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                      );
-                    }
+                      )
+                    : StreamBuilder<CompassEvent>(
+                        stream: FlutterCompass.events,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child:
+                                  Text(l10n.error(snapshot.error.toString())),
+                            );
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primaryColor,
+                              ),
+                            );
+                          }
 
-                    double? direction = snapshot.data?.heading;
-                    if (direction == null) {
-                      return Center(child: Text(l10n.noSensors));
-                    }
+                          final double? rawHeading = snapshot.data?.heading;
+                          if (rawHeading == null) {
+                            return Center(child: Text(l10n.noSensors));
+                          }
 
-                    // Calculate Qibla - Fallback to local adhan package if API fails
-                    double qiblaDirection;
-                    bool isUsingApi = false;
+                          // Track compass accuracy
+                          _compassAccuracy = snapshot.data?.accuracy;
 
-                    if (_apiQiblaDirection != null) {
-                      qiblaDirection = _apiQiblaDirection!;
-                      isUsingApi = true;
-                    } else {
-                      final qibla = Qibla(Coordinates(lat, lng));
-                      qiblaDirection = qibla.direction;
-                    }
+                          // ── FIX 1: Smooth the compass reading ──
+                          final smoothedMagnetic =
+                              _compassFilter.update(rawHeading);
 
-                    // Calculate Distance (Local is fine for this)
-                    double distanceInMeters = Geolocator.distanceBetween(
-                      lat,
-                      lng,
-                      21.4225, // Kaaba Lat
-                      39.8262, // Kaaba Long
-                    );
+                          // ── FIX 2: Convert magnetic heading → true heading ──
+                          final trueHeading =
+                              _toTrueHeading(smoothedMagnetic);
 
-                    return Column(
-                      children: [
-                        const Spacer(),
-                        // 3. Compass Section
-                        _buildCompass(direction, qiblaDirection),
-                        const Spacer(),
-                        // 4. Info Badges
-                        _buildInfoBadges(
-                          qiblaDirection,
-                          distanceInMeters,
-                          lat,
-                          lng,
-                          isUsingApi: isUsingApi,
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  },
-                ),
+                          // Calculate Qibla bearing (from True North)
+                          double qiblaDirection;
+                          bool isUsingApi = false;
+
+                          if (_apiQiblaDirection != null) {
+                            qiblaDirection = _apiQiblaDirection!;
+                            isUsingApi = true;
+                          } else {
+                            final qibla = Qibla(Coordinates(lat, lng));
+                            qiblaDirection = qibla.direction;
+                          }
+
+                          // Distance to Kaaba
+                          final double distanceInMeters =
+                              Geolocator.distanceBetween(
+                            lat,
+                            lng,
+                            21.4225,
+                            39.8262,
+                          );
+
+                          // Check if needle is pointing near Qibla (within 3°)
+                          final angleDiff =
+                              angularDifference(trueHeading, qiblaDirection)
+                                  .abs();
+                          final isAligned = angleDiff < 3.0;
+
+                          return Column(
+                            children: [
+                              const Spacer(),
+                              // 3. Accuracy indicator
+                              if (_showCalibrationHint) _buildCalibrationHint(l10n),
+                              if (_compassAccuracy != null &&
+                                  _compassAccuracy! < 0)
+                                _buildLowAccuracyWarning(l10n),
+                              // 4. Compass Section (now using true heading)
+                              _buildCompass(
+                                  trueHeading, qiblaDirection, isAligned),
+                              const Spacer(),
+                              // 5. Info Badges
+                              _buildInfoBadges(
+                                l10n,
+                                qiblaDirection,
+                                distanceInMeters,
+                                lat,
+                                lng,
+                                trueHeading: trueHeading,
+                                isUsingApi: isUsingApi,
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -254,7 +345,90 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
     );
   }
 
-  Widget _buildCompass(double direction, double qiblaDirection) {
+  /// Calibration hint banner shown at startup.
+  Widget _buildCalibrationHint(AppLocalizations l10n) {
+    return AnimatedOpacity(
+      opacity: _showCalibrationHint ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 500),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.amber.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.calibrateCompass,
+                    style: GoogleFonts.cairo(
+                      color: Colors.amber,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (Platform.isWindows) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.qiblaWindowsHint,
+                      style: GoogleFonts.cairo(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () => setState(() => _showCalibrationHint = false),
+              child: const Icon(Icons.close, color: Colors.amber, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Warning shown when compass accuracy is poor.
+  Widget _buildLowAccuracyWarning(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.red.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.warning_amber, color: Colors.redAccent, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              l10n.compassLowAccuracy,
+              style: GoogleFonts.cairo(
+                color: Colors.redAccent,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompass(
+      double trueHeading, double qiblaDirection, bool isAligned) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -267,9 +441,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
           ),
         ),
 
-        // Rotating Dial
+        // Rotating Dial - rotates opposite to true heading
         Transform.rotate(
-          angle: (direction * -1) * (math.pi / 180),
+          angle: (trueHeading * -1) * (math.pi / 180),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -281,13 +455,12 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
           ),
         ),
 
-        // Fixed Center components (Needle)
+        // Fixed Center components (Needle) - points to Qibla
         Transform.rotate(
-          angle: (qiblaDirection - direction) * (math.pi / 180),
+          angle: (qiblaDirection - trueHeading) * (math.pi / 180),
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // The Main Needle
               CustomPaint(
                 size: const Size(40, 260),
                 painter: CompassNeedlePainter(),
@@ -296,17 +469,36 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
           ),
         ),
 
+        // Alignment glow effect when pointing at Qibla
+        if (isAligned)
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.3),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withValues(alpha: 0.5),
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+          ),
+
         // Center Point
         Container(
           width: 20,
           height: 20,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isAligned ? Colors.green : Colors.white,
             shape: BoxShape.circle,
             border: Border.all(color: AppTheme.primaryColor, width: 4),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryColor.withValues(alpha: 0.5),
+                color: (isAligned ? Colors.green : AppTheme.primaryColor)
+                    .withValues(alpha: 0.5),
                 blurRadius: 10,
               ),
             ],
@@ -317,15 +509,17 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
   }
 
   Widget _buildInfoBadges(
+    AppLocalizations l10n,
     double qiblaDirection,
     double distance,
     double lat,
     double lng, {
+    double trueHeading = 0,
     bool isUsingApi = false,
   }) {
     return Column(
       children: [
-        // DataSource Badge (Small indicator)
+        // DataSource Badge + Declination info
         if (_isLoadingApi)
           const Padding(
             padding: EdgeInsets.only(bottom: 8.0),
@@ -343,8 +537,8 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
               isUsingApi
-                  ? 'Source: AlAdhan API'
-                  : 'Source: Offline Calculation',
+                  ? l10n.qiblaSourceApi(_magneticDeclination.toStringAsFixed(1))
+                  : l10n.qiblaSourceOffline(_magneticDeclination.toStringAsFixed(1)),
               style: GoogleFonts.cairo(fontSize: 10, color: Colors.white38),
             ),
           ),
@@ -380,17 +574,17 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
           children: [
             _buildInfoCard(
               '${(distance / 1000).toStringAsFixed(0)} KM',
-              'بعد عن الكعبة',
+              l10n.distanceFromKabah,
               const Icon(Icons.mosque, color: Colors.black, size: 20),
             ),
             const SizedBox(width: 12),
             _buildInfoCard(
-              qiblaDirection.toStringAsFixed(2),
-              'اتجاه القبلة',
+              '${qiblaDirection.toStringAsFixed(1)}°',
+              l10n.qiblaDirectionLabel,
               const Icon(Icons.architecture, color: Colors.black, size: 20),
             ),
             const SizedBox(width: 12),
-            _buildSmallRoundBadge('36\nMT'),
+            _buildSmallRoundBadge('${trueHeading.toStringAsFixed(0)}°'),
           ],
         ),
       ],

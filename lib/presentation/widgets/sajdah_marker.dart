@@ -42,7 +42,7 @@ class SajdahMarkerPainter extends CustomPainter {
 
     // Draw the Mihrab shape (ogee arch)
     // Base width is slightly narrower than full width
-    final baseWidthPercentage = 0.8;
+    const baseWidthPercentage = 0.8;
     final baseXStart = w * (1 - baseWidthPercentage) / 2;
     final baseXEnd = w * (1 + baseWidthPercentage) / 2;
 

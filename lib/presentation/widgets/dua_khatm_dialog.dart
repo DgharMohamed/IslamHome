@@ -258,7 +258,7 @@ class _DuaKhatmDialogState extends ConsumerState<DuaKhatmDialog>
                         ),
                         child: Column(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.auto_stories_rounded,
                               size: 40,
                               color: _gold,

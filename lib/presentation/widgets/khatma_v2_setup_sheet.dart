@@ -253,7 +253,7 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
               labelText: AppLocalizations.of(context)!.khatmaV2TitleLabel,
-              labelStyle: TextStyle(color: AppTheme.textSecondary),
+              labelStyle: const TextStyle(color: AppTheme.textSecondary),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: Colors.white.withValues(alpha: 0.1),
@@ -462,7 +462,7 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
     String subtitle,
     IconData icon,
   ) {
-    bool isSelected = _selectedType == type;
+    final bool isSelected = _selectedType == type;
     return InkWell(
       onTap: () => _onTypeSelected(type),
       child: Container(
@@ -567,7 +567,7 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
   }
 
   Widget _buildUnitOption(KhatmaUnit unit, String label) {
-    bool isSelected = _selectedUnit == unit;
+    final bool isSelected = _selectedUnit == unit;
     return InkWell(
       onTap: () {
         setState(() {
@@ -650,7 +650,7 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
       style: const TextStyle(color: Colors.white, fontSize: 13),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+        labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(12),
@@ -663,7 +663,8 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
       ),
       items: List.generate(max - min + 1, (i) {
         final surahNum = min + i;
-        final surahName = QuranUtils.getSurahName(surahNum, isEnglish: false);
+        final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+        final surahName = QuranUtils.getSurahName(surahNum, isEnglish: isEnglish);
         return DropdownMenuItem(
           value: surahNum,
           child: Text(
@@ -683,7 +684,7 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
     String subtitle,
     IconData icon,
   ) {
-    bool isSelected = _selectedMode == mode;
+    final bool isSelected = _selectedMode == mode;
     return InkWell(
       onTap: () => setState(() => _selectedMode = mode),
       child: Container(
@@ -759,7 +760,7 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+        labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
           borderRadius: BorderRadius.circular(12),

@@ -26,7 +26,7 @@ class PremiumIslamicFramePainter extends CustomPainter {
     );
 
     // Corner decorations (Abstract Islamic Geometric style)
-    final cornerSize = 24.0;
+    const cornerSize = 24.0;
     _drawCornerOrnament(canvas, paint, Offset.zero, cornerSize, 0);
     _drawCornerOrnament(canvas, paint, Offset(size.width, 0), cornerSize, 1);
     _drawCornerOrnament(canvas, paint, Offset(0, size.height), cornerSize, 2);

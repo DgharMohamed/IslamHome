@@ -7,6 +7,7 @@ import 'package:islam_home/data/services/offline_prayer_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:islam_home/presentation/providers/location_provider.dart';
 import 'package:islam_home/data/services/notification_service.dart';
+import 'package:islam_home/presentation/providers/locale_provider.dart';
 
 class PrayerState {
   final AsyncValue<DailyPrayerTimes?> timings;
@@ -77,6 +78,16 @@ class PrayerNotifier extends Notifier<PrayerState> {
           useGPS: next.useGPS,
         );
 
+        refresh();
+      }
+    });
+
+    // Listen to locale changes to reschedule notifications with the new language
+    ref.listen(localeProvider, (previous, next) {
+      if (previous != next) {
+        debugPrint(
+          '🌐 PrayerNotifier: Locale changed to ${next.languageCode}, rescheduling notifications...',
+        );
         refresh();
       }
     });
@@ -188,13 +199,13 @@ class PrayerNotifier extends Notifier<PrayerState> {
             box.get('prayer_adjustment_minutes', defaultValue: 0) as int;
 
         if (offsetMinutes != 0) {
-          Map<String, String> adjustedTimings = Map.from(times.timings);
+          final Map<String, String> adjustedTimings = Map.from(times.timings);
           adjustedTimings.forEach((key, value) {
             try {
               final parts = value.split(':');
               if (parts.length == 2) {
-                int h = int.parse(parts[0]);
-                int m = int.parse(parts[1]);
+                final int h = int.parse(parts[0]);
+                final int m = int.parse(parts[1]);
 
                 final dateTime = DateTime(
                   2000,
@@ -321,9 +332,8 @@ class PrayerNotifier extends Notifier<PrayerState> {
     final hasPermission = await NotificationService()
         .holdsExactAlarmPermission();
     if (!hasPermission) {
-      debugPrint('⚠️ Exact alarm permission missing, cannot schedule Adhan');
-      // We don't request here to avoid multiple popups, but logs will show why it failed
-      return;
+      debugPrint('Exact alarm permission missing; using inexact Adhan fallback');
+      // NotificationService will use an inexact fallback so alerts are still scheduled.
     }
 
     final hasNotificationPermission = await NotificationService()

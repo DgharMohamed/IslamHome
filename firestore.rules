@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User-specific data sync
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Global Islamic Content (Admin editable)
+    match /adhkar/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'islamhome1.0@gmail.com';
+    }
+    
+    match /seerah/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'islamhome1.0@gmail.com';
+    }
+    
+    match /tafsir/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'islamhome1.0@gmail.com';
+    }
+
+    // Default: Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

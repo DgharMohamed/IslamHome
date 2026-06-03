@@ -32,7 +32,7 @@ Future<void> main() async {
       final jsonString = await file.readAsString();
       final data = json.decode(jsonString);
 
-      var hadithsData = data;
+      final hadithsData = data;
       List<dynamic> localHadiths = [];
       if (hadithsData is List) {
         localHadiths = hadithsData;

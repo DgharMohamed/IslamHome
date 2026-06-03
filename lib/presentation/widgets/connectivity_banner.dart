@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/core/services/connectivity_service.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 /// A premium animated banner that shows when the device is offline.
 class ConnectivityBanner extends ConsumerStatefulWidget {
@@ -41,6 +42,7 @@ class _ConnectivityBannerState extends ConsumerState<ConnectivityBanner>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final connectivityAsync = ref.watch(connectivityStreamProvider);
     final isOnline = connectivityAsync.whenOrNull(data: (v) => v) ?? true;
 
@@ -89,15 +91,14 @@ class _ConnectivityBannerState extends ConsumerState<ConnectivityBanner>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'أنت غير متصل بالإنترنت — تعمل بالبيانات المحلية',
-                      style: TextStyle(
+                      l10n.offlineBanner,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
-                      textDirection: TextDirection.rtl,
                     ),
                   ),
                 ],

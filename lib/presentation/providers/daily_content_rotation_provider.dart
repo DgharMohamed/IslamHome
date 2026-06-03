@@ -7,6 +7,8 @@ import 'package:islam_home/presentation/providers/adhkar_providers.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/presentation/providers/daily_verse_provider.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
+import 'package:islam_home/data/services/firestore_sync_service.dart';
+import 'package:flutter/foundation.dart';
 
 final dailyContentRotationProvider =
     NotifierProvider<DailyContentRotationNotifier, int>(
@@ -23,18 +25,30 @@ class DailyContentRotationNotifier extends Notifier<int> {
 
   @override
   int build() {
-    final box = Hive.box(_settingsBoxName);
-    return (box.get(_rotationKey, defaultValue: 0) as int?) ?? 0;
+    try {
+      if (!Hive.isBoxOpen(_settingsBoxName)) return 0;
+      final box = Hive.box(_settingsBoxName);
+      return (box.get(_rotationKey, defaultValue: 0) as int?) ?? 0;
+    } catch (_) {
+      return 0;
+    }
   }
 
   Future<void> rotateOnHomeEnter() async {
     final next = state + 1;
     state = next;
 
-    final box = Hive.box(_settingsBoxName);
-    await box.put(_rotationKey, next);
-    await _notifyOnVerseChange(next, box);
-    await _notifyOnDhikrChange(next, box);
+    try {
+      if (!Hive.isBoxOpen(_settingsBoxName)) {
+        await Hive.openBox(_settingsBoxName);
+      }
+      final box = Hive.box(_settingsBoxName);
+      await box.put(_rotationKey, next);
+      await _notifyOnVerseChange(next, box);
+      await _notifyOnDhikrChange(next, box);
+    } catch (e) {
+      debugPrint('DailyContentRotation: Error in rotateOnHomeEnter: $e');
+    }
   }
 
   Future<void> _notifyOnVerseChange(int rotation, Box box) async {
@@ -135,8 +149,27 @@ const List<DailyVerse> _dailyVersesPool = <DailyVerse>[
   ),
 ];
 
-final rotatingDailyVerseProvider = Provider<DailyVerse>((ref) {
+final rotatingDailyVerseProvider = FutureProvider<DailyVerse>((ref) async {
   final rotation = ref.watch(dailyContentRotationProvider);
+  final syncService = ref.watch(firestoreSyncServiceProvider);
+  
+  try {
+    final cloudPool = await syncService.getDailyVerses();
+    
+    if (cloudPool.isNotEmpty) {
+      final index = rotation % cloudPool.length;
+      final data = cloudPool[index];
+      return DailyVerse(
+        text: data['text'] ?? '',
+        surah: data['surah'] ?? '',
+        translation: data['translation'] ?? '',
+      );
+    }
+  } catch (e) {
+    debugPrint('DailyContentRotation: Error fetching cloud verses: $e');
+  }
+
+  // Fallback to hardcoded pool
   final index = rotation % _dailyVersesPool.length;
   return _dailyVersesPool[index];
 });

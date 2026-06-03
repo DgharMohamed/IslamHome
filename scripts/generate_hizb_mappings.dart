@@ -24,7 +24,7 @@ Future<void> main() async {
         final ayahNum = ayah['numberInSurah'] as int;
 
         // Ensure proper division formatting in dart
-        double hizbQ = ayah['hizbQuarter'] is int
+        final double hizbQ = ayah['hizbQuarter'] is int
             ? (ayah['hizbQuarter'] as int).toDouble()
             : ayah['hizbQuarter'] as double;
         final actualHizb = (hizbQ / 4).ceil();

@@ -18,8 +18,8 @@ class PrayerTimesWidget extends ConsumerStatefulWidget {
 
 class _PrayerTimesWidgetState extends ConsumerState<PrayerTimesWidget> {
   Timer? _timer;
-  String _timeUntilNext = "";
-  String _nextPrayerName = "";
+  String _timeUntilNext = '';
+  String _nextPrayerName = '';
   @override
   void initState() {
     super.initState();
@@ -126,8 +126,8 @@ class _PrayerTimesWidgetState extends ConsumerState<PrayerTimesWidget> {
   }
 
   String _formatDuration(Duration d) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    return "${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}";
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    return '${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}';
   }
 
   @override

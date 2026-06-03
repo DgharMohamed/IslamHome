@@ -399,7 +399,7 @@ class ApiService {
         'https://quran.yousefheiba.com/api/azkar',
       );
       if (response.statusCode == 200) {
-        Map<String, dynamic> data = response.data;
+        final Map<String, dynamic> data = response.data;
         return data.map(
           (key, value) => MapEntry(
             key,
@@ -418,7 +418,7 @@ class ApiService {
     try {
       final response = await _dio.get('https://quran.yousefheiba.com/api/duas');
       if (response.statusCode == 200) {
-        Map<String, dynamic> data = response.data;
+        final Map<String, dynamic> data = response.data;
         return data.map(
           (key, value) => MapEntry(
             key,
@@ -476,9 +476,9 @@ class ApiService {
 
   Future<List<VideoModel>> _getEnglishVideos() async {
     final List<VideoModel> enVideos = [];
-    final String baseUrl =
+    const String baseUrl =
         'https://archive.org/download/lifeofthelastmessengerbymuftiismailmenk';
-    final String thumbUrl = '$baseUrl/__ia_thumb.jpg';
+    const String thumbUrl = '$baseUrl/__ia_thumb.jpg';
 
     for (int i = 1; i <= 29; i++) {
       final String fileName = i < 10 ? '0$i' : '$i';
@@ -589,8 +589,8 @@ class ApiService {
 
   Future<List<VideoModel>> _getHewenyVideos() async {
     final List<VideoModel> arVideos = [];
-    final String baseUrl = 'https://archive.org/download/saheeh_assera';
-    final String thumbUrl = '$baseUrl/__ia_thumb.jpg';
+    const String baseUrl = 'https://archive.org/download/saheeh_assera';
+    const String thumbUrl = '$baseUrl/__ia_thumb.jpg';
 
     for (int i = 1; i <= 14; i++) {
       final String fileName = i < 10 ? '0$i' : '$i';
@@ -611,8 +611,8 @@ class ApiService {
   }
 
   Future<List<VideoType>> getVideoTypes({String language = 'ar'}) async {
-    final biographyAr = VideoType(id: 99, name: "السيرة النبوية");
-    final biographyEn = VideoType(id: 100, name: "Prophetic Biography");
+    final biographyAr = VideoType(id: 99, name: 'السيرة النبوية');
+    final biographyEn = VideoType(id: 100, name: 'Prophetic Biography');
     final biographyType = language == 'en' ? biographyEn : biographyAr;
 
     try {

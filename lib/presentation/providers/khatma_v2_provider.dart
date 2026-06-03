@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:islam_home/data/models/khatma_v2_models.dart';
 import 'package:intl/intl.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
+import 'package:islam_home/data/services/auth_service.dart';
+import 'package:islam_home/data/services/firestore_sync_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class KhatmaV2State {
   final List<KhatmaTrack> tracks;
@@ -61,23 +66,77 @@ class RemediationPlan {
 class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
   late Box<KhatmaTrack> _box;
   late Box _settingsBox;
+  StreamSubscription? _cloudSubscription;
+  String? _listeningUid;
   static const String _activeListeningTrackKey = 'active_listening_track_id';
+  
+  FirestoreSyncService get _syncService => ref.read(firestoreSyncServiceProvider);
+  FirebaseAuth get _auth => FirebaseAuth.instance;
 
   @override
   KhatmaV2State build() {
     _box = Hive.box<KhatmaTrack>('khatma_tracks_box');
     _settingsBox = Hive.box('settings_box');
+
+    ref.onDispose(() => _cloudSubscription?.cancel());
+    ref.listen(authStateProvider, (previous, next) {
+      _listenToCloudChanges(next.asData?.value?.uid);
+    });
+    _listenToCloudChanges(_auth.currentUser?.uid);
+
     return _composeState();
+  }
+
+  void _listenToCloudChanges(String? uid) {
+    if (_listeningUid == uid) return;
+
+    _cloudSubscription?.cancel();
+    _cloudSubscription = null;
+    _listeningUid = uid;
+    if (uid == null) return;
+
+    _cloudSubscription = _syncService
+        .getUserCollectionStream('khatma', uid: uid)
+        .listen((snapshot) {
+      bool localUpdated = false;
+      
+      for (var doc in snapshot.docs) {
+        final cloudTrack = KhatmaTrack.fromJson(doc.data());
+        final localTrack = _box.get(cloudTrack.id);
+
+        if (localTrack == null || cloudTrack.lastUpdated.isAfter(localTrack.lastUpdated)) {
+          _box.put(cloudTrack.id, cloudTrack);
+          localUpdated = true;
+        }
+      }
+
+      if (localUpdated) {
+        _refreshState();
+      }
+    }, onError: (Object error) {
+      debugPrint('KhatmaV2Notifier: cloud listener error: $error');
+    });
   }
 
   Future<void> addTrack(KhatmaTrack track) async {
     validateTrack(track);
-    await _box.put(track.id, track);
-    if (track.type == KhatmaType.listening &&
-        track.unit == KhatmaUnit.surah &&
+    final trackWithTime = track.copyWith(lastUpdated: DateTime.now());
+    await _box.put(trackWithTime.id, trackWithTime);
+    
+    if (trackWithTime.type == KhatmaType.listening &&
+        trackWithTime.unit == KhatmaUnit.surah &&
         _settingsBox.get(_activeListeningTrackKey) == null) {
-      await _settingsBox.put(_activeListeningTrackKey, track.id);
+      await _settingsBox.put(_activeListeningTrackKey, trackWithTime.id);
     }
+
+    if (_auth.currentUser != null) {
+      await _syncService.saveUserData(
+        collection: 'khatma',
+        docId: trackWithTime.id,
+        data: trackWithTime.toJson(),
+      );
+    }
+
     _refreshState();
   }
 
@@ -103,9 +162,19 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
     final updatedTrack = track.copyWith(
       currentPage: newCurrent,
       progress: currentProgress,
+      lastUpdated: DateTime.now(),
     );
 
     await _box.put(trackId, updatedTrack);
+
+    if (_auth.currentUser != null) {
+      await _syncService.saveUserData(
+        collection: 'khatma',
+        docId: trackId,
+        data: updatedTrack.toJson(),
+      );
+    }
+
     _refreshState();
   }
 
@@ -114,6 +183,10 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
     if (_settingsBox.get(_activeListeningTrackKey) == trackId) {
       await _settingsBox.delete(_activeListeningTrackKey);
     }
+
+    // Note: In a full sync, we might want to mark as deleted in Firestore
+    // For now, we'll focus on positive sync (adds/updates)
+    
     _refreshState();
   }
 
@@ -199,11 +272,13 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
       case RemediationStrategy.distribute:
         updatedTrack = track.copyWith(
           remediationLog: [...track.remediationLog, logEntry],
+          lastUpdated: DateTime.now(),
         );
         break;
       case RemediationStrategy.catchUp:
         updatedTrack = track.copyWith(
           remediationLog: [...track.remediationLog, logEntry],
+          lastUpdated: DateTime.now(),
         );
         break;
       case RemediationStrategy.extend:
@@ -211,11 +286,21 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
         updatedTrack = track.copyWith(
           targetDate: newTargetDate,
           remediationLog: [...track.remediationLog, logEntry],
+          lastUpdated: DateTime.now(),
         );
         break;
     }
 
     await _box.put(trackId, updatedTrack);
+
+    if (_auth.currentUser != null) {
+      await _syncService.saveUserData(
+        collection: 'khatma',
+        docId: trackId,
+        data: updatedTrack.toJson(),
+      );
+    }
+
     _refreshState();
   }
 

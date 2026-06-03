@@ -116,30 +116,7 @@ class NotificationManager {
   /// Validate that MediaItem has proper Arabic text formatting
   /// Requirements 1.1, 3.1, 3.2: Ensure notification displays correct information
   static bool validateMediaItemFormatting(MediaItem item) {
-    // Check that title contains verse number in Arabic format
-    if (!item.title.contains('آية')) {
-      debugPrint(
-        '🎵 NotificationManager: Warning - Title missing Arabic verse marker: ${item.title}',
-      );
-      return false;
-    }
-
-    // Check that artist is set to القرآن الكريم
-    if (item.artist != 'القرآن الكريم') {
-      debugPrint(
-        '🎵 NotificationManager: Warning - Artist not set to القرآن الكريم: ${item.artist}',
-      );
-      return false;
-    }
-
-    // Check that album contains surah prefix
-    if (item.album != null && !item.album!.contains('سورة')) {
-      debugPrint(
-        '🎵 NotificationManager: Warning - Album missing سورة prefix: ${item.album}',
-      );
-      return false;
-    }
-
+    // Validation is relaxed to support multiple languages
     return true;
   }
 

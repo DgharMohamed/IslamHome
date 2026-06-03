@@ -18,7 +18,7 @@ class MushafSettingsSheet extends ConsumerWidget {
     ).languageCode.toLowerCase().startsWith('en');
     final titleText = l10n.mushafSettings;
     final sectionThemeText = l10n.themeLabel;
-    final fontSizeLabel = isEnglish ? 'Font Size' : 'حجم الخط';
+    final fontSizeLabel = l10n.fontSize;
 
     return Container(
       decoration: BoxDecoration(
@@ -123,7 +123,7 @@ class MushafSettingsSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              _localizedThemeName(currentTheme.id, isEnglish),
+              _localizedThemeName(currentTheme.id, l10n),
               style: GoogleFonts.cairo(
                 color: currentTheme.textColor.withValues(alpha: 0.7),
                 fontSize: 16,
@@ -197,30 +197,22 @@ class MushafSettingsSheet extends ConsumerWidget {
     );
   }
 
-  String _localizedThemeName(String id, bool isEnglish) {
-    if (!isEnglish) {
-      final theme = MushafTheme.themes.firstWhere(
-        (element) => element.id == id,
-        orElse: () => MushafTheme.themes.first,
-      );
-      return theme.name;
-    }
-
+  String _localizedThemeName(String id, AppLocalizations l10n) {
     switch (id) {
       case 'cream':
-        return 'Cream';
+        return l10n.themeCream;
       case 'green':
-        return 'Green';
+        return l10n.themeGreen;
       case 'blue':
-        return 'Blue';
+        return l10n.themeBlue;
       case 'sepia':
-        return 'Sepia';
+        return l10n.themeSepia;
       case 'dark':
-        return 'Night';
+        return l10n.themeNight;
       case 'black':
-        return 'Black';
+        return l10n.themeBlack;
       default:
-        return 'Theme';
+        return '';
     }
   }
 }

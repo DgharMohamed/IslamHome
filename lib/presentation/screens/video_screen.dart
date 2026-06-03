@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/presentation/widgets/aurora_background.dart';
@@ -22,6 +23,13 @@ class _VideoScreenState extends ConsumerState<VideoScreen> {
   int? activeTypeId; // Default to All
   String searchQuery = '';
   bool _isProcessing = false;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _playEpisode(
     VideoModel video,
@@ -91,7 +99,7 @@ class _VideoScreenState extends ConsumerState<VideoScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.playingInBackground),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -234,46 +242,11 @@ class _VideoScreenState extends ConsumerState<VideoScreen> {
                         child: Column(
                           children: [
                             // Glass Search Bar
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  color: Colors.white.withValues(alpha: 0.05),
-                                  child: TextField(
-                                    onChanged: (value) =>
-                                        setState(() => searchQuery = value),
-                                    style: GoogleFonts.cairo(
-                                      color: Colors.white,
-                                    ),
-                                    decoration: InputDecoration(
-                                      hintText: l10n.searchVideoHint,
-                                      hintStyle: GoogleFonts.cairo(
-                                        color: Colors.white38,
-                                        fontSize: 14,
-                                      ),
-                                      prefixIcon: const Icon(
-                                        Icons.search_rounded,
-                                        color: AppTheme.primaryColor,
-                                      ),
-                                      border: InputBorder.none,
-                                      contentPadding: const EdgeInsets.all(16),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            AppSearchField(
+                              hintText: l10n.searchVideoHint,
+                              controller: _searchController,
+                              onChanged: (value) =>
+                                  setState(() => searchQuery = value),
                             ),
                             const SizedBox(height: 20),
                             // Filter Pills
@@ -547,8 +520,8 @@ class _VideoScreenState extends ConsumerState<VideoScreen> {
                       final double progress = activeDownload?.progress ?? 0.0;
 
                       if (isDownloaded) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: Icon(
                             Icons.offline_pin_rounded,
                             color: AppTheme.primaryColor,

@@ -55,7 +55,7 @@ class SurahHeaderWidget extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     onTap: onTapSurahName,
                     child: Text(
-                      quran.getSurahNameArabic(element["surah"]),
+                      quran.getSurahNameArabic(element['surah']),
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontWeight: FontWeight.bold,

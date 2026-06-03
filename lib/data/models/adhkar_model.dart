@@ -26,6 +26,9 @@ class AdhkarModel extends HiveObject {
   @HiveField(7)
   final bool favorite;
 
+  @HiveField(8)
+  final String textArWithoutDiacritics;
+
   AdhkarModel({
     required this.id,
     required this.category,
@@ -35,6 +38,7 @@ class AdhkarModel extends HiveObject {
     required this.reference,
     required this.repeat,
     this.favorite = false,
+    this.textArWithoutDiacritics = '',
   });
 
   factory AdhkarModel.fromJson(Map<String, dynamic> json) {
@@ -57,7 +61,6 @@ class AdhkarModel extends HiveObject {
     final title = _pickFirstNonEmptyString([
       json['title'],
       json['name'],
-      json['description'],
       category,
     ]);
 
@@ -74,6 +77,7 @@ class AdhkarModel extends HiveObject {
       json['english'],
       json['translation'],
       json['transliteration'],
+      json['description'],
     ]);
 
     final reference = _pickFirstNonEmptyString([
@@ -91,6 +95,7 @@ class AdhkarModel extends HiveObject {
       reference: reference,
       repeat: repeat < 1 ? 1 : repeat,
       favorite: json['favorite'] == true,
+      textArWithoutDiacritics: json['text_without_diacritical']?.toString() ?? '',
     );
   }
 
@@ -104,6 +109,7 @@ class AdhkarModel extends HiveObject {
       'reference': reference,
       'repeat': repeat,
       'favorite': favorite,
+      'textArWithoutDiacritics': textArWithoutDiacritics,
     };
   }
 
@@ -116,6 +122,7 @@ class AdhkarModel extends HiveObject {
     String? reference,
     int? repeat,
     bool? favorite,
+    String? textArWithoutDiacritics,
   }) {
     return AdhkarModel(
       id: id ?? this.id,
@@ -126,6 +133,7 @@ class AdhkarModel extends HiveObject {
       reference: reference ?? this.reference,
       repeat: repeat ?? this.repeat,
       favorite: favorite ?? this.favorite,
+      textArWithoutDiacritics: textArWithoutDiacritics ?? this.textArWithoutDiacritics,
     );
   }
 
@@ -157,13 +165,14 @@ class AdhkarModelAdapter extends TypeAdapter<AdhkarModel> {
       reference: fields[5] as String,
       repeat: fields[6] as int,
       favorite: fields[7] as bool,
+      textArWithoutDiacritics: fields[8] as String? ?? '',
     );
   }
 
   @override
   void write(BinaryWriter writer, AdhkarModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -179,7 +188,9 @@ class AdhkarModelAdapter extends TypeAdapter<AdhkarModel> {
       ..writeByte(6)
       ..write(obj.repeat)
       ..writeByte(7)
-      ..write(obj.favorite);
+      ..write(obj.favorite)
+      ..writeByte(8)
+      ..write(obj.textArWithoutDiacritics);
   }
 
   @override

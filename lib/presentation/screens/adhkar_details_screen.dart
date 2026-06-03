@@ -115,10 +115,7 @@ class _DetailsBody extends ConsumerWidget {
     final arText = item.textAr.trim();
     final enText = item.textEn.trim();
     final rawTitle = item.title.trim();
-    final primaryText = isEnglish
-        ? (enText.isNotEmpty ? enText : arText)
-        : (arText.isNotEmpty ? arText : enText);
-    final isArabicText = !isEnglish || enText.isEmpty;
+    final showEnglish = isEnglish && enText.isNotEmpty;
     final title = _displayTitle(rawTitle, categoryValue);
     final displayReference = _displayReference(item.reference);
 
@@ -128,7 +125,7 @@ class _DetailsBody extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppTheme.surfaceColor.withValues(alpha: 0.72),
               borderRadius: BorderRadius.circular(18),
@@ -137,38 +134,69 @@ class _DetailsBody extends ConsumerWidget {
               ),
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontFamily: 'Cairo',
+                  style: TextStyle(
+                    fontFamily: isEnglish ? 'Montserrat' : 'Cairo',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppTheme.primaryColor.withValues(alpha: 0.9),
                   ),
                 ),
-                const SizedBox(height: 14),
-                Text(
-                  primaryText,
-                  textAlign: isArabicText ? TextAlign.right : TextAlign.left,
-                  style: TextStyle(
-                    fontFamily: isArabicText ? 'Cairo' : 'Montserrat',
-                    fontSize: isArabicText ? 26 : 18,
-                    height: isArabicText ? 1.7 : 1.55,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                const SizedBox(height: 20),
+                if (showEnglish) ...[
+                  // English Translation Primary
+                  Text(
+                    enText,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 20,
+                      height: 1.55,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  // Arabic Original Secondary
+                  Text(
+                    arText,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontFamily: 'Cairo',
+                      fontSize: 24,
+                      height: 1.8,
+                      color: Colors.white.withValues(alpha: 0.65),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ] else ...[
+                  // Arabic Primary
+                  Text(
+                    arText.isNotEmpty ? arText : enText,
+                    textAlign: arText.isNotEmpty ? TextAlign.right : TextAlign.left,
+                    style: TextStyle(
+                      fontFamily: arText.isNotEmpty ? 'Cairo' : 'Montserrat',
+                      fontSize: 28,
+                      height: 1.8,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
                 if (displayReference != null) ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 24),
+                  Divider(color: Colors.white.withValues(alpha: 0.1)),
+                  const SizedBox(height: 16),
                   Text(
                     '${l10n.referenceLabel}: $displayReference',
                     style: TextStyle(
                       fontFamily: isEnglish ? 'Montserrat' : 'Cairo',
                       fontSize: 13,
-                      color: AppTheme.primaryColor.withValues(alpha: 0.95),
-                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primaryColor.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],

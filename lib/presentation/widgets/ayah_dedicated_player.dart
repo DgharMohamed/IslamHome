@@ -136,7 +136,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  "مؤقت النوم",
+                  'مؤقت النوم',
                   style: GoogleFonts.amiri(
                     color: theme.secondaryColor,
                     fontSize: 20,
@@ -146,7 +146,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                 const SizedBox(height: 10),
                 ListTile(
                   title: Text(
-                    "15 دقيقة",
+                    '15 دقيقة',
                     style: TextStyle(color: theme.textColor),
                   ),
                   onTap: () {
@@ -156,7 +156,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                 ),
                 ListTile(
                   title: Text(
-                    "30 دقيقة",
+                    '30 دقيقة',
                     style: TextStyle(color: theme.textColor),
                   ),
                   onTap: () {
@@ -166,7 +166,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                 ),
                 ListTile(
                   title: Text(
-                    "60 دقيقة",
+                    '60 دقيقة',
                     style: TextStyle(color: theme.textColor),
                   ),
                   onTap: () {
@@ -176,7 +176,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                 ),
                 ListTile(
                   title: const Text(
-                    "إيقاف المؤقت",
+                    'إيقاف المؤقت',
                     style: TextStyle(color: Colors.redAccent),
                   ),
                   onTap: () {
@@ -385,10 +385,10 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                                 stream: audioService.loopModeStream,
                                 builder: (context, loopSnap) {
                                   final mode = loopSnap.data ?? LoopMode.off;
-                                  IconData icon = mode == LoopMode.one
+                                  final IconData icon = mode == LoopMode.one
                                       ? Icons.repeat_one_rounded
                                       : Icons.repeat_rounded;
-                                  Color color = mode != LoopMode.off
+                                  final Color color = mode != LoopMode.off
                                       ? mushafTheme.secondaryColor
                                       : mushafTheme.textColor.withValues(
                                           alpha: 0.3,
@@ -459,7 +459,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                                       );
                                     },
                                     child: Text(
-                                      "${speed}x",
+                                      '${speed}x',
                                       style: TextStyle(
                                         color: mushafTheme.textColor,
                                         fontSize: 13,
@@ -595,7 +595,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          "انقر للتوسيع والتحكم",
+                                          'انقر للتوسيع والتحكم',
                                           style: TextStyle(
                                             color: mushafTheme.textColor
                                                 .withValues(alpha: 0.5),
@@ -651,7 +651,7 @@ class AyahDedicatedPlayer extends ConsumerWidget {
   String _formatDuration(Duration d) {
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "$m:$s";
+    return '$m:$s';
   }
 }
 

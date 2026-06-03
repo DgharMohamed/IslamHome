@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:audio_service/audio_service.dart';
@@ -26,14 +25,14 @@ class MiniPlayerWidget extends ConsumerWidget {
     return StreamBuilder<MediaItem?>(
       stream: audioService.mediaItemStream,
       builder: (context, metadataSnapshot) {
-        return StreamBuilder<PlayerState>(
-          stream: audioService.player.playerStateStream,
+        return StreamBuilder<PlaybackState>(
+          stream: audioService.handler.playbackState,
           builder: (context, snapshot) {
             final playerState = snapshot.data;
             final processingState = playerState?.processingState;
             final playing = playerState?.playing;
 
-            if (processingState == ProcessingState.idle ||
+            if (processingState == AudioProcessingState.idle ||
                 processingState == null) {
               return const SizedBox.shrink();
             }
@@ -158,6 +157,14 @@ class MiniPlayerWidget extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                  // Close Button
+                                  _ControlButton(
+                                    onPressed: () {
+                                      audioService.stop();
+                                    },
+                                    icon: Icons.close_rounded,
+                                    isPrimary: false,
                                   ),
                                   const SizedBox(width: 8),
                                   // Play/Pause Button

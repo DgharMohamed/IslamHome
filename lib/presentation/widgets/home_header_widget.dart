@@ -26,8 +26,8 @@ class HomeHeaderWidget extends ConsumerStatefulWidget {
 class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
     with SingleTickerProviderStateMixin {
   Timer? _timer;
-  String _timeUntilNext = "";
-  String _nextPrayerName = "";
+  String _timeUntilNext = '';
+  String _nextPrayerName = '';
   double _dayProgress = 0.0;
   late AnimationController _animationController;
   final List<Star> _stars = Star.generate(50);
@@ -95,17 +95,23 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
         }
 
         if (nextTime == null) {
-          final fajrStr = prayerTimes['Fajr']!;
-          final parts = fajrStr.split(':');
-          nextTime = DateTime(
-            now.year,
-            now.month,
-            now.day + 1,
-            int.parse(parts[0]),
-            int.parse(parts[1]),
-          );
-          nextName = l10n.fajr;
+          final fajrStr = prayerTimes['Fajr'];
+          if (fajrStr != null) {
+            final parts = fajrStr.split(':');
+            if (parts.length >= 2) {
+              nextTime = DateTime(
+                now.year,
+                now.month,
+                now.day + 1,
+                int.parse(parts[0]),
+                int.parse(parts[1]),
+              );
+              nextName = l10n.fajr;
+            }
+          }
         }
+
+        if (nextTime == null) return;
 
         final remaining = nextTime.difference(now);
         final remStr = _formatDuration(remaining);
@@ -145,8 +151,8 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
   }
 
   String _formatDuration(Duration d) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    return "${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}";
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    return '${twoDigits(d.inHours)}:${twoDigits(d.inMinutes.remainder(60))}:${twoDigits(d.inSeconds.remainder(60))}';
   }
 
   @override
@@ -774,7 +780,7 @@ class _HomeHeaderWidgetState extends ConsumerState<HomeHeaderWidget>
             const SizedBox(height: 16),
 
             // ── SAFE AREA BOTTOM ─────────────────────────────────────
-            SafeArea(child: const SizedBox.shrink()),
+            const SafeArea(child: SizedBox.shrink()),
           ],
         ),
       ),

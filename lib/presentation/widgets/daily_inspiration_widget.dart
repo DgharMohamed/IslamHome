@@ -73,17 +73,21 @@ class _VerseCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final dailyVerseAsync = ref.watch(rotatingDailyVerseProvider);
     final locale = ref.watch(localeProvider);
     final isArabic = locale.languageCode == 'ar';
-    final verse = ref.watch(rotatingDailyVerseProvider);
 
-    return _BaseCard(
-      title: l10n.verseOfTheDay,
-      icon: Icons.auto_awesome,
-      color: const Color(0xFFC2185B),
-      content: isArabic ? verse.text : verse.translation,
-      subtitle: verse.surah,
-      isArabicContent: isArabic,
+    return dailyVerseAsync.when(
+      data: (verse) => _BaseCard(
+        title: l10n.verseOfTheDay,
+        icon: Icons.auto_awesome,
+        color: const Color(0xFFC2185B),
+        content: isArabic ? verse.text : verse.translation,
+        subtitle: verse.surah,
+        isArabicContent: isArabic,
+      ),
+      loading: () => _LoadingCard(title: l10n.verseOfTheDay),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

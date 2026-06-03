@@ -2,11 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:islam_home/firebase_options.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:islam_home/presentation/screens/splash_screen.dart';
+import 'package:islam_home/presentation/screens/maintenance_screen.dart';
 import 'package:islam_home/presentation/screens/language_selection_screen.dart';
 import 'package:islam_home/presentation/screens/permissions_onboarding_screen.dart';
 import 'package:islam_home/presentation/screens/home_screen.dart';
@@ -34,6 +38,8 @@ import 'package:islam_home/presentation/screens/profile_screen.dart';
 import 'package:islam_home/presentation/screens/all_sections_screen.dart';
 import 'package:islam_home/presentation/screens/quran_mushaf_screen.dart';
 import 'package:islam_home/presentation/screens/tafsir_screen.dart';
+import 'package:islam_home/presentation/screens/auth/login_screen.dart';
+import 'package:islam_home/presentation/screens/auth/register_screen.dart';
 import 'package:islam_home/presentation/widgets/main_scaffold.dart';
 import 'package:islam_home/data/models/reciter_model.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -58,16 +64,19 @@ import 'package:islam_home/presentation/screens/adhkar_list_screen.dart';
 import 'package:islam_home/presentation/screens/adhkar_details_screen.dart';
 import 'package:islam_home/presentation/screens/adhkar_favorite_screen.dart';
 import 'package:islam_home/presentation/screens/adhkar_search_screen.dart';
+import 'package:islam_home/presentation/providers/app_settings_sync_provider.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 0. Show window early on Desktop to prevent white screen/freeze
   if (!kIsWeb && (defaultTargetPlatform == TargetPlatform.windows)) {
     await windowManager.ensureInitialized();
-    WindowOptions windowOptions = const WindowOptions(
-      size: Size(450, 850),
+    const WindowOptions windowOptions = WindowOptions(
+      size: Size(1280, 800),
+      minimumSize: Size(800, 604),
       center: true,
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
@@ -78,6 +87,19 @@ void main() async {
       await windowManager.show();
       await windowManager.focus();
     });
+  }
+
+  // 1. Initialize Firebase
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // Auto-sign in anonymously if no user is present
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
+  } catch (e) {
+    debugPrint('🔥 Firebase initialization failed: $e');
   }
 
   // Disable runtime fetching for Google Fonts to prevent offline crashes
@@ -146,8 +168,8 @@ void main() async {
     // Initialize notifications and then register the background Adhan job
     NotificationService().init().then((_) {
       debugPrint('🔔 Main: Notifications ready');
-      // workmanager is Android-only — skip on desktop/web/iOS
-      if (!kIsWeb && Platform.isAndroid) {
+      // workmanager is Android-only — skip on desktop/web/iOS/Windows
+      if (Platform.isAndroid) {
         Workmanager().initialize(callbackDispatcher)
             .then((_) => registerAdhanBackgroundTask());
       }
@@ -230,6 +252,7 @@ final _router = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+    GoRoute(path: '/maintenance', builder: (context, state) => const MaintenanceScreen()),
     GoRoute(
       path: '/language-selection',
       builder: (context, state) => const LanguageSelectionScreen(),
@@ -320,9 +343,7 @@ final _router = GoRouter(
         GoRoute(
           path: '/azkar/list/:category',
           builder: (context, state) {
-            final category = Uri.decodeComponent(
-              state.pathParameters['category'] ?? 'General',
-            );
+            final category = state.pathParameters['category'] ?? 'General';
             return AdhkarListScreen(category: category);
           },
         ),
@@ -333,7 +354,7 @@ final _router = GoRouter(
             final category = state.uri.queryParameters['category'];
             return AdhkarDetailsScreen(
               id: id,
-              category: category == null ? null : Uri.decodeComponent(category),
+              category: category,
             );
           },
         ),
@@ -437,6 +458,17 @@ final _router = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) {
+        final isUpgrading = state.uri.queryParameters['upgrade'] == 'true';
+        return RegisterScreen(isUpgrading: isUpgrading);
+      },
+    ),
   ],
 );
 
@@ -446,6 +478,8 @@ class IslamicLibraryApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(localeProvider);
+    // Initialize settings sync
+    ref.watch(appSettingsSyncProvider);
 
     return MaterialApp.router(
       title: 'Islam Home',
@@ -453,7 +487,7 @@ class IslamicLibraryApp extends ConsumerWidget {
       theme: AppTheme.darkTheme,
       routerConfig: _router,
       locale: locale,
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -463,3 +497,4 @@ class IslamicLibraryApp extends ConsumerWidget {
     );
   }
 }
+

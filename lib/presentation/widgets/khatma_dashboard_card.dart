@@ -206,6 +206,7 @@ class KhatmaDashboardCard extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GlassContainer(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -260,7 +261,7 @@ class KhatmaDashboardCard extends ConsumerWidget {
             const SizedBox(height: 10),
 
             Text(
-              AppLocalizations.of(context)!.khatmaV2NoActive,
+              l10n.khatmaV2NoActive,
               style: GoogleFonts.cairo(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -269,7 +270,7 @@ class KhatmaDashboardCard extends ConsumerWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              AppLocalizations.of(context)!.khatmaV2StartJourneyDesc,
+              l10n.khatmaV2StartJourneyDesc,
               textAlign: TextAlign.center,
               style: GoogleFonts.tajawal(
                 color: AppTheme.textSecondary,
@@ -281,14 +282,14 @@ class KhatmaDashboardCard extends ConsumerWidget {
             const SizedBox(height: 14),
 
             // Feature chips row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 6,
+              runSpacing: 6,
               children: [
-                _buildFeatureChip(Icons.chrome_reader_mode_outlined, 'قراءة'),
-                const SizedBox(width: 6),
-                _buildFeatureChip(Icons.headphones_outlined, 'استماع'),
-                const SizedBox(width: 6),
-                _buildFeatureChip(Icons.psychology_outlined, 'حفظ'),
+                _buildFeatureChip(Icons.chrome_reader_mode_outlined, l10n.khatmaV2Reading),
+                _buildFeatureChip(Icons.headphones_outlined, l10n.khatmaV2Listening),
+                _buildFeatureChip(Icons.psychology_outlined, l10n.khatmaV2Memorization),
               ],
             ),
 
@@ -320,7 +321,7 @@ class KhatmaDashboardCard extends ConsumerWidget {
                 ),
                 icon: const Icon(Icons.add_rounded, size: 18),
                 label: Text(
-                  AppLocalizations.of(context)!.khatmaV2SetupNew,
+                  l10n.khatmaV2SetupNew,
                   style: GoogleFonts.cairo(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -527,9 +528,9 @@ class KhatmaDashboardCard extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppTheme.surfaceColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -565,7 +566,7 @@ class KhatmaDashboardCard extends ConsumerWidget {
             const SizedBox(height: 20),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              leading: Icon(
+              leading: const Icon(
                 Icons.add_circle_outline,
                 color: AppTheme.primaryColor,
               ),

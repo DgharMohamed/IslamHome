@@ -3,50 +3,6 @@ import 'package:islam_home/data/models/adhkar_model.dart';
 import 'package:islam_home/data/services/adhkar_import_service.dart';
 
 class AdhkarService {
-  static const List<String> orderedCategories = [
-    'Morning',
-    'Evening',
-    'Sleep',
-    'Prayer',
-    'After Prayer',
-    'Mosque',
-    'Food',
-    'Travel',
-    'Home',
-    'General',
-    'Tasbeeh',
-    'Quran Dua',
-  ];
-
-  static const Map<String, String> _categoryAliases = {
-    'morning_azkar': 'Morning',
-    'evening_azkar': 'Evening',
-    'sleep_azkar': 'Sleep',
-    'wake_up_azkar': 'Sleep',
-    'adhan_azkar': 'Prayer',
-    'wudu_azkar': 'Prayer',
-    'mosque_azkar': 'Mosque',
-    'miscellaneous_azkar': 'General',
-    'prophetic_duas': 'General',
-    'prophets_duas': 'General',
-    'quran_duas': 'Quran Dua',
-  };
-
-  static const Map<String, List<String>> _searchAliases = {
-    'morning': ['fajr', 'sunrise', 'sabah', 'الصباح', 'اذكار الصباح'],
-    'evening': ['night', 'maghrib', 'isha', 'masa', 'المساء', 'اذكار المساء'],
-    'sleep': ['bed', 'wake', 'sleeping', 'النوم'],
-    'prayer': ['salah', 'salat', 'wudu', 'athan', 'prayers', 'الصلاة'],
-    'after prayer': ['after salah', 'taslim', 'post prayer', 'بعد الصلاة'],
-    'mosque': ['masjid', 'jumuah', 'المسجد'],
-    'food': ['eat', 'drink', 'meal', 'الطعام'],
-    'travel': ['journey', 'trip', 'ride', 'السفر'],
-    'home': ['house', 'entering home', 'المنزل'],
-    'tasbeeh': ['tasbih', 'tahmid', 'takbir', 'تسبيح'],
-    'quran dua': ['ayah', 'surah', 'rabbana', 'دعاء قرآني'],
-    'general': ['dua', 'dhikr', 'zikr', 'ذكر'],
-  };
-
   final AdhkarImportService _importService;
 
   AdhkarService({AdhkarImportService? importService})
@@ -61,29 +17,36 @@ class AdhkarService {
     await bootstrap();
     final box = AdhkarDatabase.adhkarBox;
     final all = box.values.toList(growable: false);
-    final existing = all.map((e) => normalizeCategory(e.category)).toSet();
-    return orderedCategories.where(existing.contains).toList(growable: false);
+    final categories = all.map((e) => e.category).toSet().toList();
+    // Maintain a basic sensible order for main categories if they exist
+    final topOrder = ['أذكار الصباح', 'أذكار المساء', 'أذكار النوم', 'أذكار الصلاة'];
+    categories.sort((a, b) {
+      final indexA = topOrder.indexOf(a);
+      final indexB = topOrder.indexOf(b);
+      if (indexA != -1 && indexB != -1) return indexA.compareTo(indexB);
+      if (indexA != -1) return -1;
+      if (indexB != -1) return 1;
+      return a.compareTo(b);
+    });
+    return categories;
   }
 
   Future<List<AdhkarModel>> getByCategory(String category) async {
     await bootstrap();
-    final normalized = normalizeCategory(category);
     final box = AdhkarDatabase.adhkarBox;
     final favoriteBox = AdhkarDatabase.favoriteBox;
 
     final filtered = box.values
-        .where((item) => normalizeCategory(item.category) == normalized)
+        .where((item) => item.category == category)
         .map((item) {
           final isFavorite = favoriteBox.get(item.id.toString()) ?? false;
           return item.copyWith(
-            category: normalized,
             favorite: isFavorite,
-            title: item.title.isEmpty ? normalized : item.title,
+            title: item.title.isEmpty ? category : item.title,
           );
         })
         .toList(growable: false);
 
-    filtered.sort((a, b) => a.id.compareTo(b.id));
     return filtered;
   }
 
@@ -94,7 +57,6 @@ class AdhkarService {
     final item = box.get(id);
     if (item == null) return null;
     return item.copyWith(
-      category: normalizeCategory(item.category),
       favorite: favoriteBox.get(id.toString()) ?? false,
     );
   }
@@ -103,7 +65,6 @@ class AdhkarService {
     await bootstrap();
     final normalizedQuery = _normalizeForSearch(query);
     if (normalizedQuery.isEmpty) return const [];
-    final queryTokens = _expandQueryTokens(normalizedQuery);
 
     final box = AdhkarDatabase.adhkarBox;
     final favoriteBox = AdhkarDatabase.favoriteBox;
@@ -112,26 +73,19 @@ class AdhkarService {
         .where((item) {
           final haystack = _normalizeForSearch(
             '${item.title} ${item.textAr} ${item.textEn} '
-            '${item.reference} ${normalizeCategory(item.category)}',
+            '${item.reference} ${item.category} '
+            '${item.textArWithoutDiacritics}',
           );
-          if (haystack.contains(normalizedQuery)) return true;
-          for (final token in queryTokens) {
-            if (!haystack.contains(token)) {
-              return false;
-            }
-          }
-          return queryTokens.isNotEmpty;
+          return haystack.contains(normalizedQuery);
         })
         .map((item) {
           final isFavorite = favoriteBox.get(item.id.toString()) ?? false;
           return item.copyWith(
-            category: normalizeCategory(item.category),
             favorite: isFavorite,
           );
         })
         .toList(growable: false);
 
-    results.sort((a, b) => a.id.compareTo(b.id));
     return results;
   }
 
@@ -157,13 +111,11 @@ class AdhkarService {
         .where((item) => favoriteBox.get(item.id.toString()) ?? false)
         .map(
           (item) => item.copyWith(
-            category: normalizeCategory(item.category),
             favorite: true,
           ),
         )
         .toList(growable: false);
 
-    favorites.sort((a, b) => a.id.compareTo(b.id));
     return favorites;
   }
 
@@ -208,69 +160,7 @@ class AdhkarService {
     return normalized;
   }
 
-  Set<String> _expandQueryTokens(String normalizedQuery) {
-    final expanded = <String>{};
-    final tokens = normalizedQuery.split(' ').where((e) => e.isNotEmpty);
-    expanded.addAll(tokens);
-
-    final whole = normalizedQuery;
-    if (_searchAliases.containsKey(whole)) {
-      expanded.addAll(_searchAliases[whole]!);
-    }
-
-    for (final entry in _searchAliases.entries) {
-      final key = entry.key;
-      final aliases = entry.value.map(_normalizeForSearch).toSet();
-      if (expanded.contains(key) ||
-          aliases.any((alias) => expanded.contains(alias))) {
-        expanded.add(key);
-        expanded.addAll(aliases);
-      }
-    }
-
-    return expanded.map(_normalizeForSearch).where((e) => e.isNotEmpty).toSet();
-  }
-
   String normalizeCategory(String raw) {
-    final trimmed = raw.trim();
-    if (trimmed.isEmpty) return 'General';
-
-    if (orderedCategories.contains(trimmed)) return trimmed;
-
-    final lower = trimmed.toLowerCase();
-    if (_categoryAliases.containsKey(lower)) {
-      return _categoryAliases[lower]!;
-    }
-
-    switch (lower) {
-      case 'morning':
-        return 'Morning';
-      case 'evening':
-        return 'Evening';
-      case 'sleep':
-        return 'Sleep';
-      case 'prayer':
-        return 'Prayer';
-      case 'after prayer':
-      case 'after_prayer':
-        return 'After Prayer';
-      case 'mosque':
-        return 'Mosque';
-      case 'food':
-        return 'Food';
-      case 'travel':
-        return 'Travel';
-      case 'home':
-        return 'Home';
-      case 'general':
-        return 'General';
-      case 'tasbeeh':
-        return 'Tasbeeh';
-      case 'quran dua':
-      case 'qurandua':
-        return 'Quran Dua';
-      default:
-        return 'General';
-    }
+    return raw.trim();
   }
 }

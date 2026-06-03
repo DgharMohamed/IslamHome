@@ -114,7 +114,7 @@ class AudioDownloadService {
       // We need to fetch audio URLs chapter by chapter from the API
       // endpoint: https://api.quran.com/api/v4/quran/recitations/{reciter_id}?chapter_number={chapter_id}
 
-      int totalAyahs = 6236;
+      const int totalAyahs = 6236;
       int downloadedAyahs = 0;
 
       for (int chapter = 1; chapter <= 114; chapter++) {

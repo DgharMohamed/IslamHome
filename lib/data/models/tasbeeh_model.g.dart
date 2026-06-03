@@ -23,13 +23,14 @@ class TasbeehModelAdapter extends TypeAdapter<TasbeehModel> {
       count: fields[3] as int,
       target: fields[4] as int,
       totalCount: fields[5] as int,
+      lastUpdated: fields[6] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, TasbeehModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class TasbeehModelAdapter extends TypeAdapter<TasbeehModel> {
       ..writeByte(4)
       ..write(obj.target)
       ..writeByte(5)
-      ..write(obj.totalCount);
+      ..write(obj.totalCount)
+      ..writeByte(6)
+      ..write(obj.lastUpdated);
   }
 
   @override

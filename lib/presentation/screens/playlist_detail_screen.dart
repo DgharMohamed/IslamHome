@@ -187,7 +187,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
     );
   }
 
-  void _playItem(WidgetRef ref, Playlist playlist, int index) async {
+  Future<void> _playItem(WidgetRef ref, Playlist playlist, int index) async {
     final audioService = ref.read(audioPlayerServiceProvider);
     if (audioService == null) {
       debugPrint('Audio service not initialized');
@@ -201,7 +201,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _playAll(WidgetRef ref, Playlist playlist) async {
+  Future<void> _playAll(WidgetRef ref, Playlist playlist) async {
     final audioService = ref.read(audioPlayerServiceProvider);
     if (audioService == null) {
       debugPrint('Audio service not initialized');

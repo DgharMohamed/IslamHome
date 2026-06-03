@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/presentation/widgets/quran_page_widget.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/data/models/quran_page_model.dart';
+import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 
 /// **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
 ///
@@ -126,6 +127,7 @@ void main() {
               quranPageProvider(
                 pageNumber,
               ).overrideWithValue(AsyncValue.data(page)),
+              mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
               home: Scaffold(body: QuranPageWidget(pageNumber: pageNumber)),
@@ -152,7 +154,7 @@ void main() {
         );
         final Container wordContainer = gestureDetector.child as Container;
 
-        BoxDecoration? decoration = wordContainer.decoration as BoxDecoration?;
+        final BoxDecoration? decoration = wordContainer.decoration as BoxDecoration?;
         expect(
           decoration?.color,
           Colors.transparent,
@@ -205,6 +207,7 @@ void main() {
               quranPageProvider(
                 pageNumber,
               ).overrideWithValue(AsyncValue.data(page)),
+              mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
               home: Scaffold(body: QuranPageWidget(pageNumber: pageNumber)),
@@ -286,6 +289,7 @@ void main() {
               quranPageProvider(
                 pageNumber,
               ).overrideWithValue(AsyncValue.data(page)),
+              mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
               home: Scaffold(body: QuranPageWidget(pageNumber: pageNumber)),
@@ -308,9 +312,12 @@ void main() {
           const BoxConstraints(maxWidth: 400, maxHeight: 100),
         );
 
-        // The built widget should be a Row
-        expect(builtWidget, isA<Row>());
-        final Row rowWidget = builtWidget as Row;
+        // The built widget is a SizedBox containing FittedBox containing ConstrainedBox containing Row
+        expect(builtWidget, isA<SizedBox>());
+        final SizedBox box = builtWidget as SizedBox;
+        final FittedBox fittedBox = box.child as FittedBox;
+        final ConstrainedBox constrainedBox = fittedBox.child as ConstrainedBox;
+        final Row rowWidget = constrainedBox.child as Row;
 
         // Verify spaceBetween alignment
         expect(
@@ -341,6 +348,7 @@ void main() {
               quranPageProvider(
                 pageNumber,
               ).overrideWithValue(AsyncValue.data(page)),
+              mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
               home: Scaffold(body: QuranPageWidget(pageNumber: pageNumber)),
@@ -389,6 +397,7 @@ void main() {
               quranPageProvider(
                 pageNumber,
               ).overrideWithValue(AsyncValue.data(page)),
+              mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
               home: Scaffold(body: QuranPageWidget(pageNumber: pageNumber)),
@@ -469,6 +478,7 @@ void main() {
             ProviderScope(
               overrides: [
                 quranPageProvider(1).overrideWithValue(AsyncValue.data(page)),
+                mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
               ],
               child: const MaterialApp(
                 home: Scaffold(body: QuranPageWidget(pageNumber: 1)),
@@ -497,11 +507,14 @@ void main() {
 
           expect(
             builtWidget,
-            isA<Row>(),
-            reason: 'Row should exist for config: $config',
+            isA<SizedBox>(),
+            reason: 'SizedBox should exist for config: $config',
           );
 
-          final Row rowWidget = builtWidget as Row;
+          final SizedBox box = builtWidget as SizedBox;
+          final FittedBox fittedBox = box.child as FittedBox;
+          final ConstrainedBox constrainedBox = fittedBox.child as ConstrainedBox;
+          final Row rowWidget = constrainedBox.child as Row;
           expect(
             rowWidget.mainAxisAlignment,
             MainAxisAlignment.spaceBetween,
@@ -537,4 +550,16 @@ void main() {
       },
     );
   });
+}
+
+class FakeMushafSettingsNotifier extends MushafSettingsNotifier {
+  @override
+  MushafSettings build() {
+    return const MushafSettings(fontSizeScale: 1.0);
+  }
+
+  @override
+  void setFontSizeScale(double scale) {
+    state = state.copyWith(fontSizeScale: scale);
+  }
 }

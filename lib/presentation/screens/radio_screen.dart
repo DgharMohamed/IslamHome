@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:islam_home/core/utils/scaffold_utils.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
+
 class RadioScreen extends ConsumerStatefulWidget {
   const RadioScreen({super.key});
 
@@ -18,6 +20,13 @@ class RadioScreen extends ConsumerStatefulWidget {
 class _RadioScreenState extends ConsumerState<RadioScreen> {
   String searchQuery = '';
   RadioModel? playingRadio;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,25 +93,11 @@ class _RadioScreenState extends ConsumerState<RadioScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: TextField(
-                  onChanged: (value) => setState(() => searchQuery = value),
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: l10n.searchRadioHint,
-                    border: InputBorder.none,
-                    icon: const Icon(Icons.search, color: Colors.white54),
-                    hintStyle: GoogleFonts.cairo(
-                      color: Colors.white24,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+              child: AppSearchField(
+                hintText: l10n.searchRadioHint,
+                controller: _searchController,
+                onChanged: (value) => setState(() => searchQuery = value),
+                onClear: () => setState(() => searchQuery = ''),
               ),
             ),
           ),

@@ -91,3 +91,14 @@ test_notifications_report_*.json
 *.apk
 !raw/artifacts/*.apk
 
+# AI and IDE tools
+.codex_tmp/
+.minimax/
+.antigravitycli/
+scratch/
+scratchpad.md
+
+# Node Modules
+node_modules/
+admin_panel_v2/node_modules/
+landing/node_modules/

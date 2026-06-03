@@ -73,7 +73,7 @@ class SurahTileWidget extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: isPlaying
-                    ? Icon(
+                    ? const Icon(
                         Icons.equalizer_rounded,
                         color: AppTheme.primaryColor,
                         size: 24,
@@ -101,6 +101,8 @@ class SurahTileWidget extends StatelessWidget {
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -109,10 +111,13 @@ class SurahTileWidget extends StatelessWidget {
                         color: Colors.white38,
                         fontSize: 12,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
 
               // Action Buttons
               Row(

@@ -23,6 +23,7 @@ import 'package:islam_home/data/models/video_model.dart';
 import 'package:islam_home/data/models/riwaya_model.dart';
 import 'package:islam_home/data/models/sira_model.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 // --- Core Service Providers ---
 
@@ -59,7 +60,7 @@ final playingAyahProvider = StreamProvider<String?>((ref) {
     if (item == null) return null;
     final surah = item.extras?['surah']?.toString();
     final ayah = item.extras?['ayah']?.toString();
-    debugPrint("🎵 playingAyahProvider: emitting $surah:$ayah");
+    debugPrint('🎵 playingAyahProvider: emitting $surah:$ayah');
     if (surah != null && ayah != null) {
       return '$surah:$ayah';
     }
@@ -579,11 +580,39 @@ final siraProvider = FutureProvider<List<SiraStage>>((ref) async {
   return service.loadSira();
 });
 
+final appLocalizationsProvider = FutureProvider<AppLocalizations>((ref) async {
+  final locale = ref.watch(localeProvider);
+  return await AppLocalizations.delegate.load(locale);
+});
+
 final audioPlayerServiceProvider = Provider<AudioPlayerService?>((ref) {
   final handlerAsync = ref.watch(audioHandlerProvider);
-  return handlerAsync.when(
-    data: (handler) => AudioPlayerService(handler),
-    loading: () => null,
-    error: (_, __) => null,
-  );
+  final l10nAsync = ref.watch(appLocalizationsProvider);
+
+  if (handlerAsync.hasValue && l10nAsync.hasValue) {
+    final handler = handlerAsync.value!;
+    final l10n = l10nAsync.value!;
+
+    final strings = AudioServiceStrings(
+      audioLibraryAlbum: l10n.audioLibraryAlbum,
+      quranRecitation: l10n.quranRecitation,
+      islamicPersonality: l10n.islamicPersonality,
+      videoClip: l10n.videoClip,
+      sheikhBadrAlMeshari: l10n.sheikhBadrAlMeshari,
+      muadhinIslamHome: l10n.muadhinIslamHome,
+      athan: l10n.athan,
+      athanNotificationsAlbum: l10n.athanNotificationsAlbum,
+      downloadedAudio: l10n.downloadedAudio,
+      invalidUrl: l10n.invalidUrl,
+      noAudioStreams: l10n.noAudioStreams,
+      streamTimeout: l10n.streamTimeout,
+      unableToStartPlayback: l10n.unableToStartPlayback,
+      seerahAlbum: l10n.seerahAlbum,
+      downloadsAlbum: l10n.downloadsAlbum,
+      reciterLabel: l10n.reciterLabel,
+    );
+
+    return AudioPlayerService(handler, strings);
+  }
+  return null;
 });

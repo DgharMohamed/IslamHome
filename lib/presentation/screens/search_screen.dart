@@ -8,6 +8,8 @@ import 'package:islam_home/data/models/hadith_model.dart';
 import 'package:islam_home/core/utils/quran_utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
+
 
 enum SearchType { quran, hadith, adhkar }
 
@@ -136,37 +138,37 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          autofocus: true,
-          style: GoogleFonts.cairo(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: l10n.searchHint,
-            hintStyle: GoogleFonts.cairo(color: Colors.white54),
-            border: InputBorder.none,
-          ),
-          onChanged: _performSearch,
+        title: Text(
+          l10n.search,
+          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
         ),
-        actions: [
-          if (_searchController.text.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {
-                _searchController.clear();
-                _performSearch('');
-              },
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: AppTheme.backgroundColor,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: AppSearchField(
+              hintText: l10n.searchHint,
+              controller: _searchController,
+              onChanged: _performSearch,
             ),
+          ),
+          Expanded(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppTheme.primaryColor),
+                  )
+                : _results.isEmpty && _searchController.text.isNotEmpty
+                    ? _buildNoResults(l10n)
+                    : _searchController.text.isEmpty
+                        ? _buildInitialState(l10n)
+                        : _buildResultsList(),
+          ),
         ],
       ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primaryColor),
-            )
-          : _results.isEmpty && _searchController.text.isNotEmpty
-          ? _buildNoResults(l10n)
-          : _searchController.text.isEmpty
-          ? _buildInitialState(l10n)
-          : _buildResultsList(),
     );
   }
 

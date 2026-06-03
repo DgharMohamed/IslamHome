@@ -28,13 +28,14 @@ class KhatmaTrackAdapter extends TypeAdapter<KhatmaTrack> {
       currentPage: fields[8] as int,
       progress: (fields[9] as Map).cast<String, int>(),
       remediationLog: (fields[10] as List).cast<String>(),
+      lastUpdated: fields[12] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, KhatmaTrack obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -58,7 +59,9 @@ class KhatmaTrackAdapter extends TypeAdapter<KhatmaTrack> {
       ..writeByte(9)
       ..write(obj.progress)
       ..writeByte(10)
-      ..write(obj.remediationLog);
+      ..write(obj.remediationLog)
+      ..writeByte(12)
+      ..write(obj.lastUpdated);
   }
 
   @override
@@ -253,30 +256,32 @@ class RemediationStrategyAdapter extends TypeAdapter<RemediationStrategy> {
 // **************************************************************************
 
 KhatmaTrack _$KhatmaTrackFromJson(Map<String, dynamic> json) => KhatmaTrack(
-  id: json['id'] as String,
-  title: json['title'] as String,
-  type: $enumDecode(_$KhatmaTypeEnumMap, json['type']),
-  schedulingMode: $enumDecode(_$SchedulingModeEnumMap, json['schedulingMode']),
-  startDate: DateTime.parse(json['startDate'] as String),
-  targetDate: json['targetDate'] == null
-      ? null
-      : DateTime.parse(json['targetDate'] as String),
-  startPage: (json['startPage'] as num?)?.toInt() ?? 1,
-  endPage: (json['endPage'] as num?)?.toInt() ?? 604,
-  currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
-  unit:
-      $enumDecodeNullable(_$KhatmaUnitEnumMap, json['unit']) ?? KhatmaUnit.page,
-  progress:
-      (json['progress'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, (e as num).toInt()),
-      ) ??
-      const {},
-  remediationLog:
-      (json['remediationLog'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      const [],
-);
+      id: json['id'] as String,
+      title: json['title'] as String,
+      type: $enumDecode(_$KhatmaTypeEnumMap, json['type']),
+      schedulingMode:
+          $enumDecode(_$SchedulingModeEnumMap, json['schedulingMode']),
+      startDate: DateTime.parse(json['startDate'] as String),
+      targetDate: json['targetDate'] == null
+          ? null
+          : DateTime.parse(json['targetDate'] as String),
+      startPage: (json['startPage'] as num?)?.toInt() ?? 1,
+      endPage: (json['endPage'] as num?)?.toInt() ?? 604,
+      currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
+      unit: $enumDecodeNullable(_$KhatmaUnitEnumMap, json['unit']) ??
+          KhatmaUnit.page,
+      progress: (json['progress'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, (e as num).toInt()),
+          ) ??
+          const {},
+      remediationLog: (json['remediationLog'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      lastUpdated: json['lastUpdated'] == null
+          ? null
+          : DateTime.parse(json['lastUpdated'] as String),
+    );
 
 Map<String, dynamic> _$KhatmaTrackToJson(KhatmaTrack instance) =>
     <String, dynamic>{
@@ -292,6 +297,7 @@ Map<String, dynamic> _$KhatmaTrackToJson(KhatmaTrack instance) =>
       'unit': _$KhatmaUnitEnumMap[instance.unit]!,
       'progress': instance.progress,
       'remediationLog': instance.remediationLog,
+      'lastUpdated': instance.lastUpdated.toIso8601String(),
     };
 
 const _$KhatmaTypeEnumMap = {

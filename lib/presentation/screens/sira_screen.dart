@@ -8,11 +8,27 @@ import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/data/models/sira_model.dart';
 import 'package:islam_home/core/utils/scaffold_utils.dart';
 
-class SiraScreen extends ConsumerWidget {
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
+
+class SiraScreen extends ConsumerStatefulWidget {
   const SiraScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SiraScreen> createState() => _SiraScreenState();
+}
+
+class _SiraScreenState extends ConsumerState<SiraScreen> {
+  String searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final siraAsync = ref.watch(siraProvider);
     final l10n = AppLocalizations.of(context)!;
     final bool isArabic = Localizations.localeOf(context).languageCode == 'ar';
@@ -93,21 +109,73 @@ class SiraScreen extends ConsumerWidget {
               ),
             ),
           ),
-          siraAsync.when(
-            data: (stages) => SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final stage = stages[index];
-                  return _buildSiraCard(
-                    context,
-                    stage,
-                    isArabic,
-                    index == stages.length - 1,
-                  );
-                }, childCount: stages.length),
+          
+          // Search Field
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: AppSearchField(
+                hintText: l10n.searchSiraHint,
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
               ),
             ),
+          ),
+
+          siraAsync.when(
+            data: (stages) {
+              final filteredStages = stages.where((stage) {
+                final languageCode = isArabic ? 'ar' : 'en';
+                final title = stage.getTitle(languageCode).toLowerCase();
+                final description = stage.getDescription(languageCode).toLowerCase();
+                final query = searchQuery.toLowerCase();
+                return title.contains(query) || description.contains(query);
+              }).toList();
+
+              if (filteredStages.isEmpty) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 64,
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          l10n.noResultsFound,
+                          style: GoogleFonts.cairo(
+                            color: Colors.white38,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final stage = filteredStages[index];
+                    return _buildSiraCard(
+                      context,
+                      stage,
+                      isArabic,
+                      index == filteredStages.length - 1,
+                    );
+                  }, childCount: filteredStages.length),
+                ),
+              );
+            },
             loading: () => const SliverFillRemaining(
               child: Center(
                 child: CircularProgressIndicator(color: AppTheme.primaryColor),
@@ -293,3 +361,4 @@ class SiraScreen extends ConsumerWidget {
     }
   }
 }
+

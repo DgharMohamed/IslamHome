@@ -169,10 +169,10 @@ class PlaylistsScreen extends ConsumerWidget {
           decoration: InputDecoration(
             hintText: l10n.playlistNameHint,
             hintStyle: const TextStyle(color: Colors.white38),
-            enabledBorder: UnderlineInputBorder(
+            enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white24),
             ),
-            focusedBorder: UnderlineInputBorder(
+            focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: AppTheme.primaryColor),
             ),
           ),

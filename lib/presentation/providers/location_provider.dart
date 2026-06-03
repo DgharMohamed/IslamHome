@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
@@ -68,17 +70,20 @@ class LocationNotifier extends Notifier<LocationState>
       Future.microtask(() => refreshLocation(requestPermissionIfNeeded: false));
     }
 
-    final subscription = Geolocator.getServiceStatusStream().listen((status) {
-      if (status == ServiceStatus.enabled) {
-        debugPrint(
-          '[LocationNotifier] Location service enabled, refreshing silently.',
-        );
-        refreshLocation(requestPermissionIfNeeded: false, force: true);
-      }
-    });
+    StreamSubscription<ServiceStatus>? subscription;
+    if (!kIsWeb) {
+      subscription = Geolocator.getServiceStatusStream().listen((status) {
+        if (status == ServiceStatus.enabled) {
+          debugPrint(
+            '[LocationNotifier] Location service enabled, refreshing silently.',
+          );
+          refreshLocation(requestPermissionIfNeeded: false, force: true);
+        }
+      });
+    }
 
     ref.onDispose(() {
-      subscription.cancel();
+      subscription?.cancel();
       WidgetsBinding.instance.removeObserver(this);
     });
 
@@ -173,7 +178,7 @@ class LocationNotifier extends Notifier<LocationState>
         // Try to get a fresh fix; if it fails we keep last-known position.
         final fresh = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.medium,
+            accuracy: LocationAccuracy.high,
             timeLimit: Duration(seconds: 10),
           ),
         );

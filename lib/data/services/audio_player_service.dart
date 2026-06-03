@@ -37,14 +37,53 @@ final playerProvider = Provider<AudioPlayer?>((ref) {
   );
 });
 
+class AudioServiceStrings {
+  final String audioLibraryAlbum;
+  final String quranRecitation;
+  final String islamicPersonality;
+  final String videoClip;
+  final String sheikhBadrAlMeshari;
+  final String muadhinIslamHome;
+  final String athan;
+  final String athanNotificationsAlbum;
+  final String downloadedAudio;
+  final String invalidUrl;
+  final String noAudioStreams;
+  final String streamTimeout;
+  final String unableToStartPlayback;
+  final String seerahAlbum;
+  final String downloadsAlbum;
+  final String reciterLabel;
+
+  AudioServiceStrings({
+    required this.audioLibraryAlbum,
+    required this.quranRecitation,
+    required this.islamicPersonality,
+    required this.videoClip,
+    required this.sheikhBadrAlMeshari,
+    required this.muadhinIslamHome,
+    required this.athan,
+    required this.athanNotificationsAlbum,
+    required this.downloadedAudio,
+    required this.invalidUrl,
+    required this.noAudioStreams,
+    required this.streamTimeout,
+    required this.unableToStartPlayback,
+    required this.seerahAlbum,
+    required this.downloadsAlbum,
+    required this.reciterLabel,
+  });
+}
+
 class AudioPlayerService {
   final AudioHandler _handler;
+  final AudioServiceStrings _strings;
   AudioHandler get handler => _handler;
   Timer? _sleepTimer;
   final _sleepTimerController = StreamController<Duration?>.broadcast();
   final _yt = YoutubeExplode();
 
-  AudioPlayerService(this._handler);
+  AudioPlayerService(this._handler, this._strings);
 
   bool _isInterruptionOrAbortError(Object error) {
     final type = error.runtimeType.toString().toLowerCase();
@@ -68,7 +107,7 @@ class AudioPlayerService {
       debugPrint('🎵 Service: playYoutubeAudio called - url: $url');
       final videoId = VideoId.parseVideoId(url);
       if (videoId == null) {
-        throw Exception('رابط غير صالح');
+        throw Exception(_strings.invalidUrl);
       }
 
       debugPrint('🎵 Service: Fetching YouTube manifest for $videoId');
@@ -76,7 +115,7 @@ class AudioPlayerService {
       final audioStreams = manifest.audioOnly;
 
       if (audioStreams.isEmpty) {
-        throw Exception('لا توجد مسارات صوتية متاحة لهذا المقطع');
+        throw Exception(_strings.noAudioStreams);
       }
 
       // Fallback Strategy:
@@ -106,12 +145,12 @@ class AudioPlayerService {
         },
         tag: MediaItem(
           id: url,
-          album: 'السيرة النبوية',
-          title: title ?? 'مقطع مرئي',
-          artist: artist ?? 'الشيخ بدر المشاري',
+          album: _strings.seerahAlbum,
+          title: title ?? _strings.videoClip,
+          artist: artist ?? _strings.sheikhBadrAlMeshari,
           artUri: thumbUrl != null ? Uri.parse(thumbUrl) : null,
-          displayTitle: title ?? 'مقطع مرئي',
-          displaySubtitle: artist ?? 'الشيخ بدر المشاري',
+          displayTitle: title ?? _strings.videoClip,
+          displaySubtitle: artist ?? _strings.sheikhBadrAlMeshari,
         ),
       );
 
@@ -128,7 +167,7 @@ class AudioPlayerService {
     } catch (e, st) {
       debugPrint('🎵 Service: Youtube Audio Error: $e');
       if (e is TimeoutException) {
-        throw Exception('انتهت مهلة انتظار اتصال البث، يرجى المحاولة مرة أخرى');
+        throw Exception(_strings.streamTimeout);
       }
       if (_isInterruptionOrAbortError(e)) {
         debugPrint(
@@ -137,7 +176,7 @@ class AudioPlayerService {
         return;
       }
       debugPrintStack(stackTrace: st);
-      throw Exception('Unable to start playback for this source');
+      throw Exception(_strings.unableToStartPlayback);
     }
   }
 
@@ -154,15 +193,15 @@ class AudioPlayerService {
         Uri.parse(url),
         tag: MediaItem(
           id: url,
-          album: album ?? 'المكتبة الصوتية',
-          title: title ?? 'تلاوة',
-          artist: artist ?? 'شخصية إسلامية',
+          album: album ?? _strings.audioLibraryAlbum,
+          title: title ?? _strings.quranRecitation,
+          artist: artist ?? _strings.islamicPersonality,
           artUri: Uri.parse(
             thumbUrl ??
                 'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=500',
           ),
-          displayTitle: title ?? 'تلاوة',
-          displaySubtitle: artist ?? 'شخصية إسلامية',
+          displayTitle: title ?? _strings.quranRecitation,
+          displaySubtitle: artist ?? _strings.islamicPersonality,
         ),
       );
 
@@ -266,16 +305,16 @@ class AudioPlayerService {
               Uri.parse(v.url!),
               tag: MediaItem(
                 id: v.url!,
-                album: v.reciter ?? 'السيرة النبوية',
-                title: v.title ?? 'مقطع مرئي',
-                artist: v.reciter ?? 'الشيخ بدر المشاري',
+                album: v.reciter ?? _strings.seerahAlbum,
+                title: v.title ?? _strings.videoClip,
+                artist: v.reciter ?? _strings.sheikhBadrAlMeshari,
                 artUri: Uri.parse(
                   reciterImageUrl ??
                       v.thumbUrl ??
                       'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=500',
                 ),
-                displayTitle: v.title ?? 'مقطع مرئي',
-                displaySubtitle: v.reciter ?? 'الشيخ بدر المشاري',
+                displayTitle: v.title ?? _strings.videoClip,
+                displaySubtitle: v.reciter ?? _strings.sheikhBadrAlMeshari,
                 extras: {'id': v.id},
               ),
             );
@@ -341,9 +380,9 @@ class AudioPlayerService {
         filePath,
         tag: MediaItem(
           id: filePath,
-          album: 'التنزيلات',
-          title: title ?? 'تنزيل',
-          artist: artist ?? 'القارئ',
+          album: _strings.downloadsAlbum,
+          title: title ?? _strings.downloadedAudio,
+          artist: artist ?? _strings.reciterLabel,
           artUri: Uri.parse(
             'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=500',
           ),
@@ -362,11 +401,11 @@ class AudioPlayerService {
       debugPrint('🎵 Service: playAthan called');
       final source = AudioSource.asset(
         'assets/audio/athan.mp3',
-        tag: const MediaItem(
+        tag: MediaItem(
           id: 'athan_preview',
-          album: 'تنبيهات الآذان',
-          title: 'الآذان',
-          artist: 'مؤذن إسلام هوم',
+          album: _strings.athanNotificationsAlbum,
+          title: _strings.athan,
+          artist: _strings.muadhinIslamHome,
           artUri: null,
         ),
       );
@@ -393,11 +432,11 @@ class AudioPlayerService {
 
         final source = AudioSource.file(
           tempFile.path,
-          tag: const MediaItem(
+          tag: MediaItem(
             id: 'athan_preview',
-            album: 'تنبيهات الآذان',
-            title: 'الآذان',
-            artist: 'مؤذن إسلام هوم',
+            album: _strings.athanNotificationsAlbum,
+            title: _strings.athan,
+            artist: _strings.muadhinIslamHome,
             artUri: null,
           ),
         );

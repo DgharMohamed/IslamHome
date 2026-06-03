@@ -8,13 +8,13 @@ import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 import 'package:islam_home/core/utils/scaffold_utils.dart';
-import 'package:islam_home/core/services/update_manager.dart';
 import 'package:islam_home/presentation/providers/navigation_provider.dart';
 import 'package:islam_home/presentation/providers/khatma_listening_sync_provider.dart';
 import 'package:islam_home/core/utils/responsive_utils.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
+import 'package:islam_home/presentation/screens/home_screen.dart';
 
 class MainScaffold extends ConsumerStatefulWidget {
   final Widget child;
@@ -29,13 +29,6 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   void initState() {
     super.initState();
     debugPrint('🔔 MainScaffold: initState');
-
-    // Check for updates on app startup
-    Future.microtask(() {
-      if (mounted) {
-        UpdateManager.check(context);
-      }
-    });
   }
 
   @override
@@ -55,7 +48,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final mobileBottomOverlayHeight = kBottomNavigationBarHeight + bottomInset;
 
-    Widget scaffoldContent = Column(
+    final bool isAtRoot = location == '/';
+
+    final Widget scaffoldContent = Column(
       children: [
         const ConnectivityBanner(),
         Expanded(
@@ -85,22 +80,66 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                   NavigationRail(
                     extended: ResponsiveUtils.isDesktop(context),
                     backgroundColor: const Color(0xFF0F172A),
+                    indicatorColor: AppTheme.primaryColor.withValues(alpha: 0.15),
+                    leading: ResponsiveUtils.isDesktop(context)
+                        ? Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor
+                                        .withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.auto_awesome,
+                                    color: AppTheme.primaryColor,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Islam Home',
+                                  style: GoogleFonts.cairo(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Icon(
+                              Icons.auto_awesome,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
                     unselectedIconTheme: const IconThemeData(
                       color: Color(0xFF64748B),
+                      size: 24,
                     ),
                     selectedIconTheme: const IconThemeData(
                       color: AppTheme.primaryColor,
+                      size: 28,
                     ),
-                    unselectedLabelTextStyle: const TextStyle(
-                      color: Color(0xFF64748B),
+                    unselectedLabelTextStyle: GoogleFonts.cairo(
+                      color: const Color(0xFF64748B),
+                      fontSize: 14,
                     ),
-                    selectedLabelTextStyle: const TextStyle(
+                    selectedLabelTextStyle: GoogleFonts.cairo(
                       color: AppTheme.primaryColor,
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                     destinations: [
                       NavigationRailDestination(
-                        icon: const Icon(Icons.home_filled),
+                        icon: const Icon(Icons.home_outlined),
+                        selectedIcon: const Icon(Icons.home_filled),
                         label: Text(l10n.home),
                       ),
                       NavigationRailDestination(
@@ -133,7 +172,16 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                     width: 1,
                     color: Colors.white12,
                   ),
-                  Expanded(child: scaffoldContent),
+                  Expanded(
+                    child: isAtRoot
+                        ? scaffoldContent
+                        : Row(
+                            children: [
+                              const Expanded(child: HomeScreen()),
+                              _DetailPane(child: scaffoldContent),
+                            ],
+                          ),
+                  ),
                 ],
               ),
             ),
@@ -322,5 +370,36 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         }
         break;
     }
+  }
+}
+
+class _DetailPane extends StatelessWidget {
+  final Widget child;
+  const _DetailPane({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 450, // Phone-like width
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        border: Border(
+          left: BorderSide(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 30,
+            offset: const Offset(-10, 0),
+          ),
+        ],
+      ),
+      child: ClipRect(
+        child: child,
+      ),
+    );
   }
 }

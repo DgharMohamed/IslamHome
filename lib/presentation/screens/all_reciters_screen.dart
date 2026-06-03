@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
 import 'package:islam_home/presentation/widgets/reciter_card_widget.dart';
 import 'package:islam_home/core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/core/utils/scaffold_utils.dart';
-import 'package:islam_home/presentation/widgets/glass_container.dart';
 import 'package:islam_home/core/utils/responsive_utils.dart';
 
 class AllRecitersScreen extends ConsumerStatefulWidget {
@@ -163,38 +163,20 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
 
   Widget _buildSearchBar(AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-      child: GlassContainer(
-        borderRadius: 16,
-        opacity: 0.05,
-        child: TextField(
-          controller: _searchController,
-          onChanged: (value) {
-            setState(() {
-              searchQuery = value.toLowerCase();
-            });
-          },
-          style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
-          decoration: InputDecoration(
-            hintText: l10n.searchForReciter,
-            hintStyle: GoogleFonts.cairo(color: Colors.white38),
-            prefixIcon: const Icon(Icons.search_rounded, color: Colors.white38),
-            suffixIcon: searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.white38,
-                    ),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => searchQuery = '');
-                    },
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
-          ),
-        ),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: AppSearchField(
+        hintText: l10n.searchForReciter,
+        controller: _searchController,
+        onChanged: (value) {
+          setState(() {
+            searchQuery = value.toLowerCase();
+          });
+        },
+        onClear: () {
+          setState(() {
+            searchQuery = '';
+          });
+        },
       ),
     );
   }
@@ -317,11 +299,11 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
           crossAxisCount: ResponsiveUtils.getCrossAxisCount(
             context,
             tablet: 2,
-            desktop: 3,
+            desktop: 4,
           ),
-          childAspectRatio: ResponsiveUtils.isMobile(context) ? 3.5 : 2.5,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          childAspectRatio: ResponsiveUtils.isDesktop(context) ? 3.2 : (ResponsiveUtils.isMobile(context) ? 3.5 : 2.8),
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) => ReciterCardWidget(reciter: filtered[index]),
@@ -339,11 +321,11 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
           crossAxisCount: ResponsiveUtils.getCrossAxisCount(
             context,
             tablet: 2,
-            desktop: 3,
+            desktop: 4,
           ),
-          childAspectRatio: ResponsiveUtils.isMobile(context) ? 3.5 : 2.5,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          childAspectRatio: ResponsiveUtils.isDesktop(context) ? 3.2 : (ResponsiveUtils.isMobile(context) ? 3.5 : 2.8),
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) => Container(

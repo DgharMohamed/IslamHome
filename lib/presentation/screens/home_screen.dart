@@ -32,6 +32,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _checkAdhanOnboarding() async {
+    if (!Hive.isBoxOpen('settings')) {
+      debugPrint('⚠️ HomeScreen: settings box not open yet');
+      return;
+    }
     final box = Hive.box('settings');
     final shown =
         box.get('athan_onboarding_shown', defaultValue: false) as bool;
@@ -125,6 +129,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _finishOnboarding(bool enabled) async {
+    if (!Hive.isBoxOpen('settings')) return;
     final box = Hive.box('settings');
     await box.put('athan_onboarding_shown', true);
     await ref.read(prayerNotifierProvider.notifier).toggleAthan(enabled);
@@ -133,53 +138,89 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     debugPrint('🏠 HomeScreen: build started');
-
-    return Scaffold(
-      extendBodyBehindAppBar: true, // Allow header to go behind status bar
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 1. Premium Header
-            const HomeHeaderWidget(),
-
-            // 2. Main Content
-            Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 160), // Spacing
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Khatma Dashboard (daily continuation first)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: KhatmaDashboardCard(),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Daily Inspiration (ayah / hadith / adhkar)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: DailyInspirationWidget(),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Spiritual Moods (personal guidance)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: SpiritualMoodsWidget(),
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  // Feature Grid (exploration after daily essentials)
-                  const FeatureGridWidget(),
-                ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWideLayout = constraints.maxWidth >= 900;
+        if (isWideLayout) {
+          return Scaffold(
+        extendBodyBehindAppBar: true,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const HomeHeaderWidget(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Main Area: Feature Grid
+                    const Expanded(
+                      flex: 3,
+                      child: FeatureGridWidget(),
+                    ),
+                    const SizedBox(width: 32),
+                    // Sidebar Area: Daily Tools
+                    Expanded(
+                      flex: 1,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 450, minWidth: 300),
+                        child: const Column(
+                          children: [
+                            KhatmaDashboardCard(),
+                            SizedBox(height: 24),
+                            DailyInspirationWidget(),
+                            SizedBox(height: 24),
+                            SpiritualMoodsWidget(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 100),
+            ],
+          ),
         ),
-      ),
+      );
+        }
+        
+        // Mobile/Tablet layout
+        return const Scaffold(
+          extendBodyBehindAppBar: true,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                HomeHeaderWidget(),
+                Padding(
+                  padding: EdgeInsets.only(top: 12, bottom: 160),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: KhatmaDashboardCard(),
+                      ),
+                      SizedBox(height: 32),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: DailyInspirationWidget(),
+                      ),
+                      SizedBox(height: 24),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: SpiritualMoodsWidget(),
+                      ),
+                      SizedBox(height: 32),
+                      FeatureGridWidget(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

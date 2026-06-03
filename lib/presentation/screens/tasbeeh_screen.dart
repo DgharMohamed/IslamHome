@@ -198,50 +198,55 @@ class _TasbeehScreenState extends ConsumerState<TasbeehScreen>
                   Expanded(
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(16, 8, 16, bottomPadding),
-                      child: Column(
-                        children: [
-                          _buildStatsRow(
-                            context,
-                            l10n: l10n,
-                            totalCount: totalCount,
-                            todayTotal: todayTotal,
-                            streak: streak,
-                          ),
-                          const SizedBox(height: 26),
-                          if (activeDhikr != null)
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 280),
-                              switchInCurve: Curves.easeOut,
-                              switchOutCurve: Curves.easeIn,
-                              child: Column(
-                                key: ValueKey(activeDhikr.id),
-                                children: [
-                                  _buildDhikrTitle(activeDhikr, isArabic),
-                                  const SizedBox(height: 24),
-                                  _buildCounterOrb(activeDhikr, l10n),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    l10n.tapToCount,
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 13,
-                                      color: Colors.white.withValues(
-                                        alpha: 0.58,
-                                      ),
-                                      letterSpacing: 0.2,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 800),
+                          child: Column(
+                            children: [
+                              _buildStatsRow(
+                                context,
+                                l10n: l10n,
+                                totalCount: totalCount,
+                                todayTotal: todayTotal,
+                                streak: streak,
                               ),
-                            ),
-                          const SizedBox(height: 22),
-                          _buildActionRow(
-                            context,
-                            l10n: l10n,
-                            activeDhikr: activeDhikr,
-                            dhikrList: dhikrList,
+                              const SizedBox(height: 26),
+                              if (activeDhikr != null)
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 280),
+                                  switchInCurve: Curves.easeOut,
+                                  switchOutCurve: Curves.easeIn,
+                                  child: Column(
+                                    key: ValueKey(activeDhikr.id),
+                                    children: [
+                                      _buildDhikrTitle(activeDhikr, isArabic),
+                                      const SizedBox(height: 24),
+                                      _buildCounterOrb(activeDhikr, l10n),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        l10n.tapToCount,
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 13,
+                                          color: Colors.white.withValues(
+                                            alpha: 0.58,
+                                          ),
+                                          letterSpacing: 0.2,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              const SizedBox(height: 22),
+                              _buildActionRow(
+                                context,
+                                l10n: l10n,
+                                activeDhikr: activeDhikr,
+                                dhikrList: dhikrList,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

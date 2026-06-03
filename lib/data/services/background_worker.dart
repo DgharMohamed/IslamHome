@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:islam_home/data/services/notification_service.dart';
@@ -16,6 +17,7 @@ const String kAdhanRescheduleOneshotName = 'adhan_reschedule_oneshot';
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) async {
+    WidgetsFlutterBinding.ensureInitialized();
     debugPrint('🔄 BackgroundWorker: task "$taskName" started');
 
     try {
@@ -113,8 +115,8 @@ void callbackDispatcher() {
         if (activeTracks.isNotEmpty) {
           // If the user has active tracks, send a daily reminder
           await notifService.showKhatmaReminderNotification(
-            title: "تذكير الورد القرآني",
-            body: "لا تنس وردك من القرآن الكريم اليوم",
+            title: notifService.l10n.notificationKhatmaTitle,
+            body: notifService.l10n.notificationKhatmaBody,
           );
           debugPrint('🔄 BackgroundWorker: Shown Khatma reminder');
         }
@@ -133,6 +135,7 @@ void callbackDispatcher() {
 /// Helper to register the periodic Adhan reschedule background task.
 /// Call this once from [main] after Workmanager is initialized.
 Future<void> registerAdhanBackgroundTask() async {
+  if (!Platform.isAndroid) return;
   try {
     // Register a periodic task that fires approximately every 24 hours.
     // workmanager uses a minimum interval of 15 minutes on Android,

@@ -19,6 +19,8 @@ import 'package:islam_home/data/models/playlist_model.dart';
 import 'package:islam_home/presentation/providers/locale_provider.dart';
 import 'package:islam_home/core/utils/quran_utils.dart';
 import 'package:islam_home/data/services/download_service.dart';
+import 'package:islam_home/presentation/widgets/app_search_field.dart';
+
 
 class ReciterScreen extends ConsumerStatefulWidget {
   final Reciter reciter;
@@ -114,7 +116,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                   l10n,
                 ),
                 loading: () => _buildLoadingStateSliver(),
-                error: (err, _) => _buildErrorStateSliver(err),
+                error: (err, _) => _buildErrorStateSliver(err, l10n),
               );
             },
           ),
@@ -248,7 +250,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
           ),
 
           // 2. Reciter Info Card
-          _buildReciterInfo(moshaf),
+          _buildReciterInfo(moshaf, l10n),
 
           // 3. Actions
           surahsAsync.maybeWhen(
@@ -304,7 +306,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
     );
   }
 
-  Widget _buildReciterInfo(dynamic moshaf) {
+  Widget _buildReciterInfo(dynamic moshaf, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: GlassContainer(
@@ -339,7 +341,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    moshaf.name ?? 'المصحف',
+                    moshaf.name ?? l10n.mushaf,
                     style: GoogleFonts.cairo(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -348,7 +350,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${moshaf.surahList?.split(',').length ?? 0} سورة',
+                    l10n.surahsCount(moshaf.surahList?.split(',').length ?? 0),
                     style: GoogleFonts.cairo(
                       fontSize: 13,
                       color: Colors.white54,
@@ -366,33 +368,10 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
   Widget _buildSearchBar(AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      child: GlassContainer(
-        borderRadius: 16,
-        opacity: 0.05,
-        child: TextField(
-          controller: _searchController,
-          onChanged: (value) => setState(() => searchQuery = value),
-          style: GoogleFonts.cairo(color: Colors.white, fontSize: 14),
-          decoration: InputDecoration(
-            hintText: l10n.searchSurah,
-            hintStyle: GoogleFonts.cairo(color: Colors.white38),
-            prefixIcon: const Icon(Icons.search_rounded, color: Colors.white38),
-            suffixIcon: searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.white38,
-                    ),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() => searchQuery = '');
-                    },
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
-          ),
-        ),
+      child: AppSearchField(
+        hintText: l10n.searchSurah,
+        controller: _searchController,
+        onChanged: (value) => setState(() => searchQuery = value),
       ),
     );
   }
@@ -424,9 +403,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
       try {
         surahObj =
             surahs.firstWhere((s) => s.number.toString() == surahId) as Surah;
-        if (isEnglish && surahObj.englishName != null) {
-          surahName = surahObj.englishName!;
-        } else if (!isEnglish && surahObj.name != null) {
+        if (!isEnglish && surahObj.name != null) {
           surahName = surahObj.name!;
         }
       } catch (_) {}
@@ -496,11 +473,11 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
     );
   }
 
-  Widget _buildErrorStateSliver(Object err) {
-    return SliverFillRemaining(child: _buildErrorState(err));
+  Widget _buildErrorStateSliver(Object err, AppLocalizations l10n) {
+    return SliverFillRemaining(child: _buildErrorState(err, l10n));
   }
 
-  Widget _buildErrorState(Object err) {
+  Widget _buildErrorState(Object err, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -510,7 +487,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
             const Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
             const SizedBox(height: 20),
             Text(
-              'حدث خطأ في تحميل البيانات',
+              l10n.dataLoadError,
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(fontSize: 18, color: Colors.white70),
             ),
@@ -528,6 +505,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
 
   void _showPlaylistSelector(Surah? surah, dynamic moshaf) {
     if (surah == null) return;
+    final l10n = AppLocalizations.of(context)!;
 
     final favorites = ref.read(favoritesProvider);
     final playlists = (favorites['playlists'] as List)
@@ -548,7 +526,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'إضافة إلى قائمة تشغيل',
+                l10n.addToPlaylist,
                 style: GoogleFonts.cairo(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -560,7 +538,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Text(
-                  'لا توجد قوائم تشغيل. أنشئ واحدة من قسم المفضلات.',
+                  l10n.noPlaylistsMessage,
                   style: GoogleFonts.cairo(color: Colors.white54),
                   textAlign: TextAlign.center,
                 ),
@@ -603,7 +581,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'تمت الإضافة إلى ${playlist.name}',
+                                l10n.addedToPlaylist(playlist.name),
                                 style: GoogleFonts.cairo(),
                               ),
                             ),
@@ -698,7 +676,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                       .read(downloadProvider.notifier)
                       .cancelAllByReciter(widget.reciter.id.toString());
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('تم إلغاء جميع التحميلات')),
+                    SnackBar(content: Text(l10n.allDownloadsCancelled)),
                   );
                 },
               ),
@@ -747,9 +725,7 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
       String name = QuranUtils.getSurahName(surahNum, isEnglish: isEnglish);
       try {
         final surah = surahs.firstWhere((s) => s.number.toString() == id);
-        if (isEnglish && surah.englishName != null) {
-          name = surah.englishName!;
-        } else if (!isEnglish && surah.name != null) {
+        if (!isEnglish && surah.name != null) {
           name = surah.name!;
         }
       } catch (_) {}

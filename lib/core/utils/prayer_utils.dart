@@ -43,7 +43,7 @@ class PrayerUtils {
     };
 
     DateTime? nextPrayerTime;
-    String nextName = "";
+    String nextName = '';
 
     for (var name in prayerNames) {
       final rawTime = timings[name];

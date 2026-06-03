@@ -89,8 +89,8 @@ void main() {
 
     test('Retry logic respects attempt limit', () {
       // Simulate the retry logic in _attemptJumpToAyah
-      bool mounted = true;
-      int maxAttempts = 20;
+      const bool mounted = true;
+      const int maxAttempts = 20;
       int actualAttempts = 0;
 
       void attemptJump(int attempt) {
@@ -120,7 +120,7 @@ void main() {
     test('Retry logic stops when widget is disposed', () {
       // Simulate the retry logic with widget disposal
       bool mounted = true;
-      int maxAttempts = 20;
+      const int maxAttempts = 20;
       int actualAttempts = 0;
 
       void attemptJump(int attempt) {
@@ -154,8 +154,8 @@ void main() {
 
     test('Map clearing is safe with rapid updates', () {
       // Simulate the key clearing in _goToLastRead
-      Map<String, GlobalKey> ayahKeys = {};
-      Map<int, GlobalKey> surahKeys = {};
+      final Map<String, GlobalKey> ayahKeys = {};
+      final Map<int, GlobalKey> surahKeys = {};
 
       // Populate maps
       ayahKeys['1_1'] = GlobalKey();
@@ -189,8 +189,8 @@ void main() {
 
     test('Multiple delayed callbacks execute in order when mounted', () async {
       // Simulate the timing of callbacks in _goToLastRead
-      bool mounted = true;
-      List<String> executionOrder = [];
+      const bool mounted = true;
+      final List<String> executionOrder = [];
 
       // First navigation request
       Future.delayed(const Duration(milliseconds: 50), () {
@@ -299,7 +299,7 @@ void main() {
 
     test('Attempt counter overflow protection', () {
       // Verify that attempt counter doesn't overflow
-      int maxAttempts = 20;
+      const int maxAttempts = 20;
       int attempt = 0;
 
       // Simulate many retries
@@ -320,8 +320,8 @@ void main() {
 
     test('Empty key maps are safe to clear', () {
       // Verify that clearing empty maps doesn't cause errors
-      Map<String, GlobalKey> ayahKeys = {};
-      Map<int, GlobalKey> surahKeys = {};
+      final Map<String, GlobalKey> ayahKeys = {};
+      final Map<int, GlobalKey> surahKeys = {};
 
       // Clear empty maps (should not throw)
       expect(() {
@@ -337,7 +337,7 @@ void main() {
   group('Timing and Concurrency', () {
     test('Rapid state updates maintain consistency', () async {
       // Simulate rapid state updates with async operations
-      List<int> updateHistory = [];
+      final List<int> updateHistory = [];
 
       // Simulate rapid navigation requests with async operations
       Future<void> navigate(int surahNumber) async {
@@ -358,8 +358,8 @@ void main() {
 
     test('Delayed callbacks with different timings', () async {
       // Simulate the various delayed callbacks in the navigation system
-      bool mounted = true;
-      List<String> events = [];
+      const bool mounted = true;
+      final List<String> events = [];
 
       // Animation completion callback (1000ms)
       Future.delayed(const Duration(milliseconds: 100), () {

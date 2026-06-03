@@ -1,44 +1,115 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:islam_home/data/models/playlist_model.dart';
+import 'package:islam_home/data/services/auth_service.dart';
+import 'package:islam_home/data/services/firestore_sync_service.dart';
 import 'dart:convert';
 
 class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
+  late final _auth = ref.read(authServiceProvider);
+  late final _syncService = ref.read(firestoreSyncServiceProvider);
+  final _box = Hive.box('favorites');
+  StreamSubscription? _cloudSubscription;
+  String? _listeningUid;
+
   @override
   Map<String, List<dynamic>> build() {
-    _loadFavorites();
-    return {
-      'reciters': [],
-      'surahs': [],
-      'ayahs': [],
-      'playlists': [],
-      'hadiths': [],
-      'tafsir': [],
-      'seerah': [],
-    };
+    ref.onDispose(() => _cloudSubscription?.cancel());
+    ref.listen(authStateProvider, (previous, next) {
+      _listenToCloudChanges(next.asData?.value?.uid);
+    });
+
+    // We can't use state = _loadFavorites() directly here because build must return the initial state.
+    // However, Notifier build() should return the state.
+    return _getInitialFavorites();
   }
 
-  final _box = Hive.box('favorites');
+  Map<String, List<dynamic>> _getInitialFavorites() {
+    final categories = ['reciters', 'surahs', 'ayahs', 'playlists', 'hadiths', 'tafsir', 'seerah'];
+    final Map<String, List<dynamic>> loadedState = {};
+    
+    for (final category in categories) {
+      final json = _box.get(category, defaultValue: '[]');
+      loadedState[category] = jsonDecode(json);
+    }
+    
+    // Set up listener after state is initialized
+    Future.microtask(() => _listenToCloudChanges(_auth.currentUser?.uid));
+    
+    return loadedState;
+  }
 
-  void _loadFavorites() {
-    final recitersJson = _box.get('reciters', defaultValue: '[]');
-    final surahsJson = _box.get('surahs', defaultValue: '[]');
-    final ayahsJson = _box.get('ayahs', defaultValue: '[]');
-    final playlistsJson = _box.get('playlists', defaultValue: '[]');
-    final hadithsJson = _box.get('hadiths', defaultValue: '[]');
-    final tafsirJson = _box.get('tafsir', defaultValue: '[]');
-    final seerahJson = _box.get('seerah', defaultValue: '[]');
+  void _listenToCloudChanges(String? uid) {
+    if (_listeningUid == uid) return;
 
-    state = {
-      'reciters': jsonDecode(recitersJson),
-      'surahs': jsonDecode(surahsJson),
-      'ayahs': jsonDecode(ayahsJson),
-      'playlists': jsonDecode(playlistsJson),
-      'hadiths': jsonDecode(hadithsJson),
-      'tafsir': jsonDecode(tafsirJson),
-      'seerah': jsonDecode(seerahJson),
-    };
+    _cloudSubscription?.cancel();
+    _cloudSubscription = null;
+    _listeningUid = uid;
+    if (uid == null) return;
+
+    _cloudSubscription = _syncService
+        .getUserCollectionStream('favorites', uid: uid)
+        .listen((snapshot) {
+      bool localUpdated = false;
+      final newState = Map<String, List<dynamic>>.from(state);
+
+      for (var doc in snapshot.docs) {
+        final category = doc.id;
+        final cloudData = doc.data();
+        final List<dynamic> cloudList = cloudData['items'] ?? [];
+        
+        // Handle both ISO string and Firestore Timestamp
+        final cloudTimestampVal = cloudData['lastUpdated'];
+        final DateTime cloudTimestamp;
+        if (cloudTimestampVal is Timestamp) {
+          cloudTimestamp = cloudTimestampVal.toDate();
+        } else if (cloudTimestampVal is String) {
+          cloudTimestamp = DateTime.parse(cloudTimestampVal);
+        } else {
+          cloudTimestamp = DateTime.fromMillisecondsSinceEpoch(0);
+        }
+        
+        final localTimestampStr = _box.get('${category}_timestamp');
+        final localTimestamp = localTimestampStr != null 
+            ? DateTime.parse(localTimestampStr) 
+            : DateTime.fromMillisecondsSinceEpoch(0);
+
+        if (cloudTimestamp.isAfter(localTimestamp)) {
+          newState[category] = cloudList;
+          _box.put(category, jsonEncode(cloudList));
+          _box.put('${category}_timestamp', cloudTimestamp.toIso8601String());
+          localUpdated = true;
+        }
+      }
+
+      if (localUpdated) {
+        state = newState;
+      }
+    }, onError: (Object error) {
+      debugPrint('FavoritesNotifier: cloud listener error: $error');
+    });
+  }
+
+  Future<void> _syncToCloud(String category, List<dynamic> list) async {
+    final now = DateTime.now();
+    _box.put(category, jsonEncode(list));
+    _box.put('${category}_timestamp', now.toIso8601String());
+    
+    state = {...state, category: list};
+
+    if (_auth.currentUser != null) {
+      await _syncService.saveUserData(
+        collection: 'favorites',
+        docId: category,
+        data: {
+          'items': list,
+          'lastUpdated': now.toIso8601String(),
+        },
+      );
+    }
   }
 
   void toggleFavoriteReciter(dynamic reciter) {
@@ -51,8 +122,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       list.add(reciter.toJson());
     }
 
-    state = {...state, 'reciters': list};
-    _box.put('reciters', jsonEncode(list));
+    _syncToCloud('reciters', list);
   }
 
   void toggleFavoriteSurah(dynamic surah, dynamic reciter, {String? url}) {
@@ -71,13 +141,12 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
         'surah_name': surah.name,
         'reciter_id': reciter.id,
         'reciter_name': reciter.name,
-        'url': url, // Save the URL
+        'url': url,
         'created_at': DateTime.now().millisecondsSinceEpoch,
       });
     }
 
-    state = {...state, 'surahs': list};
-    _box.put('surahs', jsonEncode(list));
+    _syncToCloud('surahs', list);
   }
 
   bool isFavoriteReciter(String id) {
@@ -111,8 +180,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       });
     }
 
-    state = {...state, 'ayahs': list};
-    _box.put('ayahs', jsonEncode(list));
+    _syncToCloud('ayahs', list);
   }
 
   bool isFavoriteAyah(int surah, int ayah) {
@@ -148,8 +216,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       });
     }
 
-    state = {...state, 'tafsir': list};
-    _box.put('tafsir', jsonEncode(list));
+    _syncToCloud('tafsir', list);
   }
 
   bool isFavoriteTafsir(String tafsirName, int partId) {
@@ -181,8 +248,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       });
     }
 
-    state = {...state, 'seerah': list};
-    _box.put('seerah', jsonEncode(list));
+    _syncToCloud('seerah', list);
   }
 
   bool isFavoriteSeerah(String scholarName, String episodeId) {
@@ -195,7 +261,6 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
   // --- Hadith Methods ---
 
   void toggleFavoriteHadith(dynamic hadith) {
-    // Check if hadith is HadithModel or Map, convert to map if needed
     final hadithMap = (hadith is Map) ? hadith : hadith.toJson();
     final list = List<dynamic>.from(state['hadiths'] ?? []);
     final hadithId = hadithMap['id'].toString();
@@ -207,8 +272,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       list.add(hadithMap);
     }
 
-    state = {...state, 'hadiths': list};
-    _box.put('hadiths', jsonEncode(list));
+    _syncToCloud('hadiths', list);
   }
 
   bool isFavoriteHadith(String id) {
@@ -227,15 +291,13 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
     );
 
     playlists.add(newPlaylist.toJson());
-    state = {...state, 'playlists': playlists};
-    _savePlaylists();
+    _syncToCloud('playlists', playlists);
   }
 
   void deletePlaylist(String id) {
     final playlists = List<dynamic>.from(state['playlists']!);
     playlists.removeWhere((p) => p['id'] == id);
-    state = {...state, 'playlists': playlists};
-    _savePlaylists();
+    _syncToCloud('playlists', playlists);
   }
 
   void updatePlaylist(Playlist updatedPlaylist) {
@@ -243,8 +305,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
     final index = playlists.indexWhere((p) => p['id'] == updatedPlaylist.id);
     if (index >= 0) {
       playlists[index] = updatedPlaylist.toJson();
-      state = {...state, 'playlists': playlists};
-      _savePlaylists();
+      _syncToCloud('playlists', playlists);
     }
   }
 
@@ -271,8 +332,7 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
 
       final updatedItems = [...playlist.items, newItem];
       playlists[index] = playlist.copyWith(items: updatedItems).toJson();
-      state = {...state, 'playlists': playlists};
-      _savePlaylists();
+      _syncToCloud('playlists', playlists);
     }
   }
 
@@ -284,14 +344,12 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       final playlist = Playlist.fromJson(playlists[pIndex]);
       final updatedItems = playlist.items.where((i) => i.id != itemId).toList();
 
-      // Re-order remaining items
       for (int i = 0; i < updatedItems.length; i++) {
         updatedItems[i] = updatedItems[i].copyWith(order: i);
       }
 
       playlists[pIndex] = playlist.copyWith(items: updatedItems).toJson();
-      state = {...state, 'playlists': playlists};
-      _savePlaylists();
+      _syncToCloud('playlists', playlists);
     }
   }
 
@@ -309,19 +367,13 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       final item = items.removeAt(oldIndex);
       items.insert(newIndex, item);
 
-      // Update order property
       for (int i = 0; i < items.length; i++) {
         items[i] = items[i].copyWith(order: i);
       }
 
       playlists[pIndex] = playlist.copyWith(items: items).toJson();
-      state = {...state, 'playlists': playlists};
-      _savePlaylists();
+      _syncToCloud('playlists', playlists);
     }
-  }
-
-  void _savePlaylists() {
-    _box.put('playlists', jsonEncode(state['playlists']));
   }
 
   String exportPlaylist(String id) {
@@ -335,15 +387,13 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       final decoded = utf8.decode(base64Decode(base64Data));
       final Map<String, dynamic> json = jsonDecode(decoded);
 
-      // Reset ID to avoid conflicts
       json['id'] = DateTime.now().millisecondsSinceEpoch.toString();
       json['name'] = '${json['name']} (Imported)';
 
       final playlists = List<dynamic>.from(state['playlists']!);
       playlists.add(json);
 
-      state = {...state, 'playlists': playlists};
-      _savePlaylists();
+      _syncToCloud('playlists', playlists);
     } catch (e) {
       debugPrint('Error importing playlist: $e');
     }
@@ -352,5 +402,5 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
 
 final favoritesProvider =
     NotifierProvider<FavoritesNotifier, Map<String, List<dynamic>>>(() {
-      return FavoritesNotifier();
-    });
+  return FavoritesNotifier();
+});

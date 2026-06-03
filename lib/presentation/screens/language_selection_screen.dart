@@ -68,7 +68,6 @@ class LanguageSelectionScreen extends ConsumerWidget {
                     title: l10n.arabic,
                     subtitle: l10n.languageArabicSubtitle,
                     locale: const Locale('ar'),
-                    icon: '🌙',
                   ),
 
                   const SizedBox(height: 16),
@@ -79,7 +78,6 @@ class LanguageSelectionScreen extends ConsumerWidget {
                     title: l10n.english,
                     subtitle: l10n.languageEnglishSubtitle,
                     locale: const Locale('en'),
-                    icon: '🌍',
                   ),
                 ],
               ),
@@ -96,7 +94,6 @@ class LanguageSelectionScreen extends ConsumerWidget {
     required String title,
     required String subtitle,
     required Locale locale,
-    required String icon,
   }) {
     return GestureDetector(
       onTap: () async {
@@ -111,18 +108,6 @@ class LanguageSelectionScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(20.0),
           child: Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(icon, style: const TextStyle(fontSize: 24)),
-                ),
-              ),
-              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

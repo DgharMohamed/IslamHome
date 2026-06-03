@@ -208,11 +208,16 @@ class AudioPlayerHandler extends BaseAudioHandler
   Future<void> stop() async {
     debugPrint('🎵 AudioHandler: stop() called');
     await _player.stop();
-    // Reset position
-    await _player.seek(Duration.zero);
-    // Broadcast stopped state
+    
+    // Clear queue and mediaItem to dismiss the notification
+    queue.add([]);
+    mediaItem.add(null);
+    
+    // Broadcast stopped state with empty controls to force UI/Notification clear
     playbackState.add(
       playbackState.value.copyWith(
+        controls: [],
+        systemActions: const {},
         processingState: AudioProcessingState.idle,
         playing: false,
       ),

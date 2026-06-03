@@ -85,6 +85,9 @@ class KhatmaTrack extends HiveObject {
   @HiveField(10)
   final List<String> remediationLog;
 
+  @HiveField(12)
+  final DateTime lastUpdated;
+
   KhatmaTrack({
     required this.id,
     required this.title,
@@ -98,7 +101,9 @@ class KhatmaTrack extends HiveObject {
     KhatmaUnit unit = KhatmaUnit.page,
     this.progress = const {},
     this.remediationLog = const [],
-  }) : unitOrNull = unit;
+    DateTime? lastUpdated,
+  }) : unitOrNull = unit,
+       lastUpdated = lastUpdated ?? DateTime.now();
 
   factory KhatmaTrack.fromJson(Map<String, dynamic> json) =>
       _$KhatmaTrackFromJson(json);
@@ -117,6 +122,7 @@ class KhatmaTrack extends HiveObject {
     KhatmaUnit? unit,
     Map<String, int>? progress,
     List<String>? remediationLog,
+    DateTime? lastUpdated,
   }) {
     return KhatmaTrack(
       id: id ?? this.id,
@@ -131,6 +137,7 @@ class KhatmaTrack extends HiveObject {
       unit: unit ?? this.unit,
       progress: progress ?? this.progress,
       remediationLog: remediationLog ?? this.remediationLog,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
 

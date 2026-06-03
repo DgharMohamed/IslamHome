@@ -486,7 +486,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            l10n.audioCount(sequence.length.toString()),
+                            l10n.audioCount(sequence.length),
                             style: GoogleFonts.cairo(
                               color: Colors.white54,
                               fontSize: 14,

@@ -21,7 +21,6 @@ class _PermissionsOnboardingScreenState
     with WidgetsBindingObserver {
   bool _notificationsGranted = false;
   bool _locationGranted = false;
-  bool _installGranted = false;
   bool _isRequesting = false;
 
   @override
@@ -47,13 +46,11 @@ class _PermissionsOnboardingScreenState
   Future<void> _checkPermissions() async {
     final notificationStatus = await Permission.notification.status;
     final locationStatus = await Permission.location.status;
-    final installStatus = await Permission.requestInstallPackages.status;
 
     if (mounted) {
       setState(() {
         _notificationsGranted = notificationStatus.isGranted;
         _locationGranted = locationStatus.isGranted;
-        _installGranted = installStatus.isGranted;
       });
     }
   }
@@ -63,6 +60,8 @@ class _PermissionsOnboardingScreenState
       context.go('/prayer-method-selection');
     }
   }
+
+
 
   Future<void> _handlePermissionChange(
     Permission permission,
@@ -184,23 +183,11 @@ class _PermissionsOnboardingScreenState
                                   setState(() => _locationGranted = status),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          _buildPermissionTile(
-                            icon: Icons.system_update_rounded,
-                            title: l10n.permissionsUpdatesTitle,
-                            subtitle: l10n.permissionsUpdatesSubtitle,
-                            status: _installGranted,
-                            isArabic: isArabic,
-                            onTap: () => _handlePermissionChange(
-                              Permission.requestInstallPackages,
-                              _installGranted,
-                              (status) =>
-                                  setState(() => _installGranted = status),
-                            ),
-                          ),
+
                         ],
                       ),
                     ),
+
 
                     const SizedBox(height: 24),
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/presentation/widgets/quran_mushaf_view.dart';
 import 'package:islam_home/presentation/widgets/quran_english_view.dart';
 import 'package:quran/quran.dart' as quran;
+import 'package:islam_home/core/utils/quran_utils.dart';
 import 'package:islam_home/presentation/providers/api_providers.dart';
 import 'package:islam_home/presentation/widgets/ayah_dedicated_player.dart';
 import 'package:islam_home/presentation/widgets/surah_index_bottom_sheet.dart';
@@ -144,6 +145,52 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     _persistLastReadPage(safePage);
   }
 
+  Future<void> _saveCurrentPageAsLastRead() async {
+    final page = _currentPageNotifier.value.clamp(1, quran.totalPagesCount);
+    final data = quran.getPageData(page).cast<Map<String, dynamic>>();
+    if (data.isEmpty) return;
+
+    final surah = data.first['surah'] as int;
+    final ayah = data.first['start'] as int;
+
+    await ref.read(lastReadServiceProvider).saveLastRead(
+      surahNumber: surah,
+      ayahNumber: ayah,
+    );
+    ref.read(lastReadUpdateProvider.notifier).increment();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.pageSavedAsBookmark(page),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveAyahAsLastRead(int surah, int ayah) async {
+    await ref.read(lastReadServiceProvider).saveLastRead(
+      surahNumber: surah,
+      ayahNumber: ayah,
+    );
+    ref.read(lastReadUpdateProvider.notifier).increment();
+
+    if (mounted) {
+      final page = quran.getPageNumber(surah, ayah);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.pageSavedAsBookmark(page),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   void _navigateToSurah(int surahId) {
     if (_isEnglishUi) {
       _englishViewKey.currentState?.navigateToSurah(surahId);
@@ -187,7 +234,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
             children: [
               Text(
                 _isEnglishUi
-                    ? quran.getSurahName(surah)
+                    ? QuranUtils.getSurahName(surah, isEnglish: true)
                     : quran.getSurahNameArabic(surah),
                 style: TextStyle(
                   color: mushafTheme.secondaryColor,
@@ -208,6 +255,12 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
         ),
         const PopupMenuDivider(height: 1),
         _bubbleItem(
+          'bookmark',
+          Icons.bookmark_add_outlined,
+          l10n.bookmark,
+          mushafTheme,
+        ),
+        _bubbleItem(
           'tafsir',
           Icons.menu_book_rounded,
           l10n.tafsirLabel,
@@ -224,6 +277,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
       _clearAyahSelection();
       if (!mounted) return;
       switch (value) {
+        case 'bookmark':
+          _saveAyahAsLastRead(surah, ayah);
+          break;
         case 'tafsir':
           _showTafsirDialog(surah, ayah);
           break;
@@ -315,13 +371,16 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     final audioService = ref.read(audioPlayerServiceProvider);
     if (audioService == null) return;
     final l10n = AppLocalizations.of(context)!;
+    final isEnglishUi = _isEnglishUi;
 
     await _syncSelectedReciterWithRiwaya();
+    if (!mounted) return;
+
     final QFRecitation? reciter = ref.read(selectedReciterProvider);
     final reciterName = reciter?.displayName ?? 'Mishary Alafasy';
     final reciterId = reciter?.id ?? 7; // Default to Alafasy if not selected
 
-    List<AudioSource> playlist = [];
+    final List<AudioSource> playlist = [];
 
     // Fetch verse audio list from QF
     final audioFiles = await ref
@@ -345,8 +404,8 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
             }
             final mediaItem = MediaItem(
               id: 'quran_${surah}_$localAyah',
-              album: _isEnglishUi
-                  ? quran.getSurahName(surah)
+              album: isEnglishUi
+                  ? QuranUtils.getSurahName(surah, isEnglish: true)
                   : quran.getSurahNameArabic(surah),
               title: l10n.verseN(localAyah),
               artist: reciterName,
@@ -411,8 +470,8 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
 
       final mediaItem = MediaItem(
         id: 'quran_${surah}_$ayahNumber',
-        album: _isEnglishUi
-            ? quran.getSurahName(surah)
+        album: isEnglishUi
+            ? QuranUtils.getSurahName(surah, isEnglish: true)
             : quran.getSurahNameArabic(surah),
         title: l10n.verseN(ayahNumber),
         artist: reciterName,
@@ -928,7 +987,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     );
   }
 
-  void _showSurahIndex() async {
+  Future<void> _showSurahIndex() async {
     await showModalBottomSheet<int>(
       context: context,
       isScrollControlled: true,
@@ -1020,7 +1079,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                 Expanded(
                   child: Text(
                     _isEnglishUi
-                        ? quran.getSurahName(surahId)
+                        ? QuranUtils.getSurahName(surahId, isEnglish: true)
                         : quran.getSurahNameArabic(surahId),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1100,7 +1159,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
         final surahValue = _surahForPage(currentPage);
         recordLabel = l10n.khatmaV2RecordSurah(
           _isEnglishUi
-              ? quran.getSurahName(surahValue)
+              ? QuranUtils.getSurahName(surahValue, isEnglish: true)
               : quran.getSurahNameArabic(surahValue),
         );
         break;
@@ -1258,6 +1317,15 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                         linkedTrack.title,
                       ),
                     ),
+                  // Save Last Read Button
+                  IconButton(
+                    onPressed: _saveCurrentPageAsLastRead,
+                    icon: Icon(
+                      Icons.bookmark_add_outlined,
+                      color: mushafTheme.textColor.withValues(alpha: 0.7),
+                    ),
+                    tooltip: AppLocalizations.of(context)!.bookmark,
+                  ),
                   // Theme Button
                   IconButton(
                     onPressed: _showThemeSettings,
@@ -1312,8 +1380,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                         Icons.auto_stories_outlined,
                         AppLocalizations.of(context)!.khatmaV2RecordSurah(
                           _isEnglishUi
-                              ? quran.getSurahName(
+                              ? QuranUtils.getSurahName(
                                   _surahForPage(_currentPageNotifier.value),
+                                  isEnglish: true,
                                 )
                               : quran.getSurahNameArabic(
                                   _surahForPage(_currentPageNotifier.value),

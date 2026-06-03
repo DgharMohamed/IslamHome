@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 
 /// Service responsible for scheduling and managing Islamic prayer (Adhan)
 /// notifications with audio playback.
@@ -17,6 +18,16 @@ class NotificationService {
 
   static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
+
+  static const String _adhanChannelId = 'adhan_channel_v6';
+  static const List<String> _legacyAdhanChannelIds = [
+    'adhan_channel_v4',
+    'adhan_channel_v5',
+  ];
+  static const String _reminderChannelId = 'prayer_reminder_channel';
+  static const String _dailyContentChannelId = 'daily_content_channel';
+  static const RawResourceAndroidNotificationSound _adhanSound =
+      RawResourceAndroidNotificationSound('athan');
 
   // Notification IDs
   // 100–104 = Fajr, Dhuhr, Asr, Maghrib, Isha (adhan)
@@ -37,17 +48,39 @@ class NotificationService {
     'Isha': 204,
   };
 
-  /// Maps prayer name → Arabic display name
-  static const Map<String, String> _prayerNamesAr = {
-    'Fajr': 'الفجر',
-    'Dhuhr': 'الظهر',
-    'Asr': 'العصر',
-    'Maghrib': 'المغرب',
-    'Isha': 'العشاء',
-  };
   static const int _dailyVerseNotificationId = 710;
   static const int _dailyDhikrNotificationId = 711;
   static const int _khatmaReminderNotificationId = 712;
+
+  static AppLocalizations? _localizations;
+  static String _currentLocale = 'ar';
+
+  /// Returns the current localizations. 
+  /// Loads them synchronously if not already loaded.
+  AppLocalizations get l10n {
+    _localizations ??= lookupAppLocalizations(Locale(_currentLocale));
+    return _localizations!;
+  }
+
+  /// Updates the current locale used for notifications.
+  void updateLocale(String locale) {
+    _currentLocale = locale;
+    _localizations = lookupAppLocalizations(Locale(locale));
+    debugPrint('🔔 NotificationService: locale updated to $locale');
+  }
+
+  /// Reloads the locale from Hive settings (called when user switches language).
+  void reloadLocale() {
+    try {
+      if (Hive.isBoxOpen('settings')) {
+        final saved = Hive.box('settings').get('language', defaultValue: 'ar');
+        updateLocale(saved);
+        debugPrint('🔔 NotificationService: locale reloaded to $saved');
+      }
+    } catch (e) {
+      debugPrint('🔔 NotificationService: reloadLocale error: $e');
+    }
+  }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Initialization
@@ -59,6 +92,23 @@ class NotificationService {
     tz_data.initializeTimeZones();
     await _configureLocalTimezone();
 
+    // Load current locale from Hive
+    try {
+      if (!Hive.isBoxOpen('settings')) {
+        await Hive.openBox('settings');
+      }
+      _currentLocale = Hive.box('settings').get('language', defaultValue: 'ar');
+      _localizations = lookupAppLocalizations(Locale(_currentLocale));
+    } catch (e) {
+      debugPrint('🔔 NotificationService: failed to load locale from Hive: $e');
+    }
+
+    if (Platform.isWindows || kIsWeb) {
+      _initialized = true;
+      debugPrint('🔔 NotificationService: initialization skipped for this platform');
+      return;
+    }
+
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
     );
@@ -68,9 +118,13 @@ class NotificationService {
       requestSoundPermission: true,
     );
 
-    await _plugin.initialize(
-      const InitializationSettings(android: androidSettings, iOS: iosSettings),
-    );
+    try {
+      await _plugin.initialize(
+        const InitializationSettings(android: androidSettings, iOS: iosSettings),
+      );
+    } catch (e) {
+      debugPrint('🔔 NotificationService initialize error: $e');
+    }
     await ensureNotificationPermission();
 
     // Create notification channels
@@ -80,30 +134,31 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin
           >();
 
-      final soundPath = await _getAdhanSoundPath();
-      
+      for (final channelId in _legacyAdhanChannelIds) {
+        await androidPlugin?.deleteNotificationChannel(channelId);
+      }
+
       // Adhan channel (with custom sound)
       await androidPlugin?.createNotificationChannel(
         AndroidNotificationChannel(
-          'adhan_channel_v4',
-          'أوقات الصلاة',
-          description: 'إشعارات الأذان عند دخول وقت الصلاة',
+          _adhanChannelId,
+          l10n.prayerTimes,
+          description: l10n.notificationAdhanDesc,
           importance: Importance.max,
           playSound: true,
-          sound: soundPath != null
-              ? UriAndroidNotificationSound('file://$soundPath')
-              : null,
+          sound: _adhanSound,
           enableVibration: true,
           showBadge: true,
+          audioAttributesUsage: AudioAttributesUsage.alarm,
         ),
       );
 
-      // Reminder channel (silent)
+      // Reminder channel
       await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'prayer_reminder_channel',
-          'تذكير قبل الصلاة',
-          description: 'تذكير قبل موعد الصلاة',
+        AndroidNotificationChannel(
+          _reminderChannelId,
+          l10n.notificationReminders,
+          description: l10n.notificationRemindersDesc,
           importance: Importance.high,
           playSound: true,
           enableVibration: true,
@@ -113,10 +168,10 @@ class NotificationService {
 
       // Daily content channel
       await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'daily_content_channel',
-          'المحتوى اليومي',
-          description: 'إشعارات آية اليوم والمحتوى الإيماني',
+        AndroidNotificationChannel(
+          _dailyContentChannelId,
+          l10n.notificationDailyContent,
+          description: l10n.notificationDailyDesc,
           importance: Importance.high,
           playSound: true,
           enableVibration: true,
@@ -126,7 +181,7 @@ class NotificationService {
     }
 
     _initialized = true;
-    debugPrint('🔔 NotificationService: initialized');
+    debugPrint('🔔 NotificationService: initialized (locale: $_currentLocale)');
   }
 
   Future<void> _configureLocalTimezone() async {
@@ -262,27 +317,6 @@ class NotificationService {
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // Adhan audio — copy bundled asset to file system so the plugin can use it
-  // ──────────────────────────────────────────────────────────────────────────
-
-  Future<String?> _getAdhanSoundPath() async {
-    try {
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/athan.mp3');
-
-      if (!file.existsSync()) {
-        final data = await rootBundle.load('assets/audio/athan.mp3');
-        final bytes = data.buffer.asUint8List();
-        await file.writeAsBytes(bytes);
-        debugPrint('🔔 Adhan audio copied to: ${file.path}');
-      }
-      return file.path;
-    } catch (e) {
-      debugPrint('🔔 _getAdhanSoundPath error: $e');
-      return null;
-    }
-  }
 
   // ──────────────────────────────────────────────────────────────────────────
   // Schedule daily prayers
@@ -296,8 +330,9 @@ class NotificationService {
     int reminderMinutes = 15,
   }) async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
 
-    final soundPath = await _getAdhanSoundPath();
+    final scheduleMode = await _scheduleModeForPrayerAlerts();
 
     // 1. Cancel existing future notifications (to avoid overlaps)
     // We use a safe range to clear IDs (100-350) which covers ~10 days
@@ -333,28 +368,37 @@ class NotificationService {
 
         final notifId = _calculateId(baseId, dayIndex);
 
+        final prayerDisplayName = prayerName == 'Fajr' 
+            ? l10n.fajr 
+            : prayerName == 'Dhuhr' 
+                ? l10n.dhuhr 
+                : prayerName == 'Asr' 
+                    ? l10n.asr 
+                    : prayerName == 'Maghrib' 
+                        ? l10n.maghrib 
+                        : l10n.isha;
+        final title = l10n.notificationAthanTimeFor(prayerDisplayName);
+
         final androidDetails = AndroidNotificationDetails(
-          'adhan_channel_v4',
-          'أوقات الصلاة',
-          channelDescription: 'إشعارات الأذان',
+          _adhanChannelId,
+          l10n.prayerTimes,
+          channelDescription: l10n.notificationAdhanDesc,
           importance: Importance.max,
           priority: Priority.max,
-          ticker: 'حان وقت ${_prayerNamesAr[prayerName] ?? prayerName}',
+          ticker: title,
+          category: AndroidNotificationCategory.alarm,
           fullScreenIntent: true,
-          sound: soundPath != null
-              ? UriAndroidNotificationSound('file://$soundPath')
-              : null,
+          sound: _adhanSound,
+          audioAttributesUsage: AudioAttributesUsage.alarm,
         );
 
-        await _plugin.zonedSchedule(
+        await _zonedScheduleWithFallback(
           notifId,
-          'حان وقت ${_prayerNamesAr[prayerName] ?? prayerName}',
-          'اللهم صلِّ على محمد',
+          title,
+          l10n.notificationAllahBlessing,
           scheduledTime,
           NotificationDetails(android: androidDetails),
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
+          scheduleMode,
         );
 
         // Schedule reminder if enabled
@@ -367,22 +411,24 @@ class NotificationService {
 
             if (reminderTime.isAfter(tz.TZDateTime.now(tz.local))) {
               final reminderId = _calculateId(reminderBaseId, dayIndex);
-              const reminderAndroid = AndroidNotificationDetails(
-                'prayer_reminder_channel',
-                'تذكير قبل الصلاة',
+              final reminderTitle = l10n.notificationReminderBefore(
+                  prayerDisplayName, reminderMinutes.toString());
+              final reminderBody = l10n.notificationPrepareFor(prayerDisplayName);
+
+              final reminderAndroid = AndroidNotificationDetails(
+                _reminderChannelId,
+                l10n.notificationReminders,
                 importance: Importance.high,
                 priority: Priority.high,
               );
 
-              await _plugin.zonedSchedule(
+              await _zonedScheduleWithFallback(
                 reminderId,
-                '${_prayerNamesAr[prayerName] ?? prayerName} بعد $reminderMinutes دقيقة',
-                'استعد لصلاة ${_prayerNamesAr[prayerName] ?? prayerName}',
+                reminderTitle,
+                reminderBody,
                 reminderTime,
-                const NotificationDetails(android: reminderAndroid),
-                androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-                uiLocalNotificationDateInterpretation:
-                    UILocalNotificationDateInterpretation.absoluteTime,
+                NotificationDetails(android: reminderAndroid),
+                scheduleMode,
               );
             }
           }
@@ -437,22 +483,22 @@ class NotificationService {
 
   Future<void> testAthan() async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
     try {
-      final soundPath = await _getAdhanSoundPath();
       final androidDetails = AndroidNotificationDetails(
-        'adhan_channel_v4',
-        'أوقات الصلاة',
-        channelDescription: 'إشعارات الأذان',
+        _adhanChannelId,
+        l10n.prayerTimes,
+        channelDescription: l10n.notificationAdhanDesc,
         importance: Importance.max,
         priority: Priority.max,
-        sound: soundPath != null
-            ? UriAndroidNotificationSound('file://$soundPath')
-            : null,
+        category: AndroidNotificationCategory.alarm,
+        sound: _adhanSound,
+        audioAttributesUsage: AudioAttributesUsage.alarm,
       );
       await _plugin.show(
         999,
-        'تجربة الأذان',
-        'الصوت يعمل بنجاح',
+        l10n.notificationTestAthanTitle,
+        l10n.notificationTestAthanBody,
         NotificationDetails(android: androidDetails),
       );
     } catch (e) {
@@ -462,18 +508,19 @@ class NotificationService {
 
   Future<void> showTestNotification() async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
     try {
-      const androidDetails = AndroidNotificationDetails(
+      final androidDetails = AndroidNotificationDetails(
         'test_channel',
-        'إشعارات التجربة',
+        l10n.notificationTestNotifTitle,
         importance: Importance.high,
         priority: Priority.high,
       );
       await _plugin.show(
         998,
-        'إشعار تجريبي',
-        'الإشعارات تعمل بكفاءة على جهازك',
-        const NotificationDetails(android: androidDetails),
+        l10n.notificationTestNotifTitle,
+        l10n.notificationTestNotifBody,
+        NotificationDetails(android: androidDetails),
       );
     } catch (e) {
       debugPrint('🔔 showTestNotification error: $e');
@@ -486,6 +533,7 @@ class NotificationService {
     String? subtitle,
   }) async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return false;
     final hasPermission = await holdsNotificationPermission();
     if (!hasPermission) return false;
 
@@ -493,15 +541,15 @@ class NotificationService {
       final safeBody = body.trim().isEmpty ? subtitle ?? '' : body.trim();
 
       final androidDetails = AndroidNotificationDetails(
-        'daily_content_channel',
-        'المحتوى اليومي',
-        channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
+        _dailyContentChannelId,
+        l10n.notificationDailyContent,
+        channelDescription: l10n.notificationDailyDesc,
         importance: Importance.high,
         priority: Priority.high,
         styleInformation: BigTextStyleInformation(
           safeBody,
           contentTitle: title,
-          summaryText: 'محتوى اليوم',
+          summaryText: l10n.notificationDailyVerse,
         ),
       );
 
@@ -524,6 +572,7 @@ class NotificationService {
     String? subtitle,
   }) async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return false;
     final hasPermission = await holdsNotificationPermission();
     if (!hasPermission) return false;
 
@@ -531,15 +580,15 @@ class NotificationService {
       final safeBody = body.trim().isEmpty ? (subtitle ?? '') : body.trim();
 
       final androidDetails = AndroidNotificationDetails(
-        'daily_content_channel',
-        'المحتوى اليومي',
-        channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
+        _dailyContentChannelId,
+        l10n.notificationDailyContent,
+        channelDescription: l10n.notificationDailyDesc,
         importance: Importance.high,
         priority: Priority.high,
         styleInformation: BigTextStyleInformation(
           safeBody,
           contentTitle: title,
-          summaryText: 'ذكر اليوم',
+          summaryText: l10n.notificationDailyDhikr,
         ),
       );
 
@@ -561,14 +610,15 @@ class NotificationService {
     required String body,
   }) async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return false;
     final hasPermission = await holdsNotificationPermission();
     if (!hasPermission) return false;
 
     try {
       final androidDetails = AndroidNotificationDetails(
-        'daily_content_channel',
-        'المحتوى اليومي',
-        channelDescription: 'إشعارات آية اليوم والمحتوى الإيماني',
+        _dailyContentChannelId,
+        l10n.notificationDailyContent,
+        channelDescription: l10n.notificationDailyDesc,
         importance: Importance.high,
         priority: Priority.high,
         styleInformation: BigTextStyleInformation(
@@ -598,11 +648,12 @@ class NotificationService {
     required int maxProgress,
   }) async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
     try {
       final androidDetails = AndroidNotificationDetails(
         'download_channel',
-        'التحميلات',
-        channelDescription: 'إشعارات تقدم التحميل',
+        l10n.notificationDownloads,
+        channelDescription: l10n.notificationDownloadProgress,
         importance: Importance.low,
         priority: Priority.low,
         showProgress: true,
@@ -628,11 +679,12 @@ class NotificationService {
     required String body,
   }) async {
     if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
     try {
-      const androidDetails = AndroidNotificationDetails(
+      final androidDetails = AndroidNotificationDetails(
         'download_channel',
-        'التحميلات',
-        channelDescription: 'إشعارات تقدم التحميل',
+        l10n.notificationDownloads,
+        channelDescription: l10n.notificationDownloadProgress,
         importance: Importance.high,
         priority: Priority.high,
         showProgress: false, // Explicitly disable progress bar
@@ -643,7 +695,7 @@ class NotificationService {
         id,
         title,
         body,
-        const NotificationDetails(android: androidDetails),
+        NotificationDetails(android: androidDetails),
       );
     } catch (e) {
       debugPrint('🔔 showDownloadCompleteNotification error: $e');
@@ -655,11 +707,13 @@ class NotificationService {
   // ──────────────────────────────────────────────────────────────────────────
 
   Future<void> cancelNotification(int id) async {
+    if (Platform.isWindows || kIsWeb) return;
     await _plugin.cancel(id);
     debugPrint('🔕 Cancelled notification id=$id');
   }
 
   Future<void> cancelAll() async {
+    if (Platform.isWindows || kIsWeb) return;
     await _plugin.cancelAll();
     debugPrint('🔕 All notifications cancelled');
   }
@@ -691,6 +745,58 @@ class NotificationService {
     } catch (e) {
       debugPrint('🔔 _getSpecificTime error for "$timeStr": $e');
       return null;
+    }
+  }
+
+  Future<AndroidScheduleMode> _scheduleModeForPrayerAlerts() async {
+    final canUseExactAlarms = await holdsExactAlarmPermission();
+    if (canUseExactAlarms) {
+      return AndroidScheduleMode.exactAllowWhileIdle;
+    }
+
+    debugPrint(
+      'Exact alarm permission missing; using inexact prayer alert schedule',
+    );
+    return AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
+  Future<void> _zonedScheduleWithFallback(
+    int id,
+    String? title,
+    String? body,
+    tz.TZDateTime scheduledDate,
+    NotificationDetails notificationDetails,
+    AndroidScheduleMode androidScheduleMode,
+  ) async {
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: androidScheduleMode,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    } catch (e) {
+      if (androidScheduleMode != AndroidScheduleMode.exactAllowWhileIdle) {
+        rethrow;
+      }
+
+      debugPrint(
+        'Exact schedule failed for notification $id; retrying inexact: $e',
+      );
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
     }
   }
 }

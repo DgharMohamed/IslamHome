@@ -7,186 +7,219 @@ import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/providers/favorites_provider.dart';
 
-class ReciterCardWidget extends ConsumerWidget {
+class ReciterCardWidget extends ConsumerStatefulWidget {
   final Reciter reciter;
 
   const ReciterCardWidget({super.key, required this.reciter});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReciterCardWidget> createState() => _ReciterCardWidgetState();
+}
+
+class _ReciterCardWidgetState extends ConsumerState<ReciterCardWidget> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
     ref.watch(favoritesProvider);
     final isFavorite = ref
         .read(favoritesProvider.notifier)
-        .isFavoriteReciter(reciter.id?.toString() ?? '');
+        .isFavoriteReciter(widget.reciter.id?.toString() ?? '');
 
-    return GestureDetector(
-      onTap: () {
-        debugPrint('🎵 ReciterCard: Tapping on ${reciter.name}');
-        context.push('/reciter', extra: reciter);
-      },
-      child: Container(
-        height: 100,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              AppTheme.surfaceColor,
-              AppTheme.darkBlue.withValues(alpha: 0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          debugPrint('🎵 ReciterCard: Tapping on ${widget.reciter.name}');
+          context.push('/reciter', extra: widget.reciter);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          transform: Matrix4.diagonal3Values(
+            _isHovered ? 1.03 : 1.0,
+            _isHovered ? 1.03 : 1.0,
+            1.0,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+          transformAlignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                _isHovered 
+                    ? AppTheme.primaryColor.withValues(alpha: 0.15) 
+                    : AppTheme.surfaceColor,
+                AppTheme.darkBlue.withValues(alpha: 0.8),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // Decorative Border Pattern
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.3),
-                    width: 1.5,
+            boxShadow: [
+              BoxShadow(
+                color: _isHovered
+                    ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.3),
+                blurRadius: _isHovered ? 20 : 12,
+                spreadRadius: _isHovered ? 2 : 0,
+                offset: Offset(0, _isHovered ? 8 : 6),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Decorative Border Pattern
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _isHovered 
+                          ? AppTheme.primaryColor 
+                          : AppTheme.primaryColor.withValues(alpha: 0.3),
+                      width: _isHovered ? 2 : 1.5,
+                    ),
                   ),
-                ),
-                child: CustomPaint(
-                  painter: _GeometricBorderPainter(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                  child: CustomPaint(
+                    painter: _GeometricBorderPainter(
+                      color: _isHovered
+                          ? AppTheme.primaryColor.withValues(alpha: 0.4)
+                          : AppTheme.primaryColor.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Main Content
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  // Avatar
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.6),
-                        width: 2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.15),
-                          blurRadius: 12,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/reciters/${reciter.id}.jpg',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                            child: Icon(
-                              Icons.person,
-                              size: 35,
-                              color: AppTheme.primaryColor.withValues(
-                                alpha: 0.5,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  // Info Section
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Reciter Name
-                        Text(
-                          reciter.name ??
-                              AppLocalizations.of(context)!.unknownName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.cairo(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        // Mushaf Count
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.library_books_rounded,
-                              size: 14,
-                              color: AppTheme.primaryColor.withValues(
-                                alpha: 0.7,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '${reciter.moshaf?.length ?? 0} ${AppLocalizations.of(context)!.mushafCount(1).split(' ').last}',
-                              style: GoogleFonts.cairo(
-                                color: AppTheme.primaryColor.withValues(
-                                  alpha: 0.8,
-                                ),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Favorite Button
-                  GestureDetector(
-                    onTap: () {
-                      ref
-                          .read(favoritesProvider.notifier)
-                          .toggleFavoriteReciter(reciter);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
+              // Main Content
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    // Avatar
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: _isHovered ? 74 : 70,
+                      height: _isHovered ? 74 : 70,
                       decoration: BoxDecoration(
-                        color: isFavorite
-                            ? Colors.red.withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isFavorite
-                              ? Colors.red.withValues(alpha: 0.3)
-                              : Colors.white.withValues(alpha: 0.1),
-                          width: 1,
+                          color: _isHovered 
+                              ? AppTheme.primaryColor 
+                              : AppTheme.primaryColor.withValues(alpha: 0.6),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryColor.withValues(
+                              alpha: _isHovered ? 0.3 : 0.15,
+                            ),
+                            blurRadius: _isHovered ? 16 : 12,
+                            spreadRadius: _isHovered ? 2 : 1,
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/reciters/${widget.reciter.id}.jpg',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                              child: Icon(
+                                Icons.person,
+                                size: 35,
+                                color: AppTheme.primaryColor.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                      child: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : Colors.white38,
-                        size: 20,
+                    ),
+
+                    const SizedBox(width: 16),
+
+                    // Info Section
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Reciter Name
+                          Text(
+                            widget.reciter.name ??
+                                AppLocalizations.of(context)!.unknownName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // Mushaf Count
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.library_books_rounded,
+                                size: 14,
+                                color: AppTheme.primaryColor.withValues(
+                                  alpha: 0.7,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${widget.reciter.moshaf?.length ?? 0} ${AppLocalizations.of(context)!.mushafCount(1).split(' ').last}',
+                                style: GoogleFonts.cairo(
+                                  color: AppTheme.primaryColor.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+
+                    // Favorite Button
+                    GestureDetector(
+                      onTap: () {
+                        ref
+                            .read(favoritesProvider.notifier)
+                            .toggleFavoriteReciter(widget.reciter);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isFavorite
+                              ? Colors.red.withValues(alpha: 0.15)
+                              : Colors.white.withValues(alpha: 0.05),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isFavorite
+                                ? Colors.red.withValues(alpha: 0.3)
+                                : Colors.white.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white38,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -206,7 +239,7 @@ class _GeometricBorderPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     // Draw corner ornaments (small diamonds)
-    final cornerSize = 6.0;
+    const cornerSize = 6.0;
 
     // Top-left
     _drawDiamond(canvas, paint, const Offset(12, 12), cornerSize);

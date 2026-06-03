@@ -286,19 +286,61 @@ class LocalHadithService {
   Future<List<HadithModel>> searchHadiths(String query) async {
     final allHadiths = await loadAllHadiths();
     final results = <HadithModel>[];
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return results;
+
+    final normalizedQuery = _normalizeForSearch(trimmed);
 
     allHadiths.forEach((book, hadiths) {
       results.addAll(
         hadiths.where(
-          (hadith) =>
-              hadith.arab?.contains(query) == true ||
-              hadith.english?.contains(query) == true ||
-              hadith.chapter?.contains(query) == true,
+          (hadith) {
+            // Match by number
+            final number = (hadith.number ?? '').toString();
+            if (number.contains(trimmed)) return true;
+
+            // Match by Arabic text (diacritics-tolerant)
+            if (hadith.arab != null &&
+                _normalizeForSearch(hadith.arab!).contains(normalizedQuery)) {
+              return true;
+            }
+            // Match by English text
+            if (hadith.english != null &&
+                _normalizeForSearch(hadith.english!).contains(normalizedQuery)) {
+              return true;
+            }
+            // Match by chapter
+            if (hadith.chapter != null &&
+                _normalizeForSearch(hadith.chapter!).contains(normalizedQuery)) {
+              return true;
+            }
+            return false;
+          },
         ),
       );
     });
 
     return results;
+  }
+
+  /// Normalize text for tolerant Arabic/English search
+  String _normalizeForSearch(String text) {
+    if (text.isEmpty) return '';
+    var value = text.toLowerCase().trim();
+    // Remove Arabic diacritics and tatweel
+    value = value.replaceAll(RegExp(r'[\u064B-\u065F\u0670\u0640]'), '');
+    // Normalize Arabic letters
+    value = value
+        .replaceAll('أ', 'ا')
+        .replaceAll('إ', 'ا')
+        .replaceAll('آ', 'ا')
+        .replaceAll('ة', 'ه')
+        .replaceAll('ى', 'ي')
+        .replaceAll('ؤ', 'و')
+        .replaceAll('ئ', 'ي');
+    // Collapse spaces
+    value = value.replaceAll(RegExp(r'\s+'), ' ');
+    return value;
   }
 
   /// Get random Hadith (for daily hadith widget)

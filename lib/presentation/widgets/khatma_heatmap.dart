@@ -84,7 +84,7 @@ class KhatmaHeatmap extends StatelessWidget {
       children: [
         Text(
           AppLocalizations.of(context)!.khatmaHeatmapLess,
-          style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+          style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
         ),
         const SizedBox(width: 4),
         _buildSquareLegend(AppTheme.surfaceColor.withValues(alpha: 0.3)),
@@ -97,7 +97,7 @@ class KhatmaHeatmap extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           AppLocalizations.of(context)!.khatmaHeatmapMore,
-          style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+          style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
         ),
       ],
     );

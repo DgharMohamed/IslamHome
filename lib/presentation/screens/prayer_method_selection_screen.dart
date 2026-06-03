@@ -99,7 +99,7 @@ class _PrayerMethodSelectionScreenState
                                 vertical: 4,
                               ),
                               title: Text(
-                                isArabic ? method.nameAr : method.nameEn,
+                                PrayerMethod.getLocalizedName(method.id, l10n),
                                 style: GoogleFonts.cairo(
                                   fontSize: 15,
                                   fontWeight: isSelected

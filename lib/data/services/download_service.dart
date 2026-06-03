@@ -147,7 +147,7 @@ class DownloadService {
         cancelToken: cancelToken,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            double progress = received / total;
+            final double progress = received / total;
             _notifyProgress(request.id, progress, DownloadStatus.downloading);
 
             // Throttle notification updates. Update every 5%, but skip exactly 100%

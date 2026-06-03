@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 import 'package:islam_home/core/utils/quran_utils.dart';
+import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 class SurahIndexBottomSheet extends ConsumerStatefulWidget {
   final Function(int)? onSurahSelected;
@@ -15,17 +16,18 @@ class SurahIndexBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
-  String _searchQuery = "";
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     final theme = ref.watch(mushafThemeProvider);
-    final surahCount = quran.totalSurahCount;
+    const surahCount = quran.totalSurahCount;
     final normalizedQuery = QuranUtils.normalizeForSearch(_searchQuery);
+    final isEnglish = AppLocalizations.of(context)!.localeName == 'en';
 
     final filteredSurahs = List.generate(surahCount, (i) => i + 1).where((id) {
       final nameAr = quran.getSurahNameArabic(id);
-      final nameEn = quran.getSurahName(id);
+      final nameEn = QuranUtils.getSurahName(id, isEnglish: true);
       return QuranUtils.matchesSearch(nameAr, normalizedQuery) ||
           QuranUtils.matchesSearch(nameEn, normalizedQuery) ||
           QuranUtils.matchesSearch(id.toString(), normalizedQuery);
@@ -55,7 +57,7 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "فهرس السور",
+                  AppLocalizations.of(context)!.surahIndex,
                   style: GoogleFonts.amiri(
                     color: theme.secondaryColor,
                     fontSize: 24,
@@ -63,7 +65,7 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
                   ),
                 ),
                 Text(
-                  "$surahCount سورة",
+                  AppLocalizations.of(context)!.surahsCount(surahCount),
                   style: TextStyle(
                     color: theme.textColor.withValues(alpha: 0.5),
                     fontSize: 14,
@@ -79,7 +81,7 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
               onChanged: (v) => setState(() => _searchQuery = v),
               style: TextStyle(color: theme.textColor),
               decoration: InputDecoration(
-                hintText: "بحث عن سورة...",
+                hintText: AppLocalizations.of(context)!.searchSurah,
                 hintStyle: TextStyle(
                   color: theme.textColor.withValues(alpha: 0.4),
                 ),
@@ -118,7 +120,7 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
                       shape: BoxShape.circle,
                     ),
                     child: Text(
-                      "$id",
+                      '$id',
                       style: TextStyle(
                         color: theme.secondaryColor,
                         fontWeight: FontWeight.bold,
@@ -127,7 +129,9 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
                     ),
                   ),
                   title: Text(
-                    quran.getSurahNameArabic(id),
+                    isEnglish
+                        ? QuranUtils.getSurahName(id, isEnglish: true)
+                        : quran.getSurahNameArabic(id),
                     style: GoogleFonts.amiri(
                       color: theme.textColor,
                       fontSize: 18,
@@ -135,7 +139,9 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
                     ),
                   ),
                   subtitle: Text(
-                    "${quran.getVerseCount(id)} آية",
+                    isEnglish
+                        ? '${quran.getSurahNameArabic(id)} • ${AppLocalizations.of(context)!.ayahsCount(quran.getVerseCount(id))}'
+                        : AppLocalizations.of(context)!.ayahsCount(quran.getVerseCount(id)),
                     style: TextStyle(
                       color: theme.textColor.withValues(alpha: 0.5),
                       fontSize: 12,

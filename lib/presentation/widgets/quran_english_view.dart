@@ -10,6 +10,8 @@ import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart'
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:islam_home/data/services/last_read_service.dart';
+import 'package:islam_home/core/utils/quran_utils.dart';
 
 class QuranEnglishView extends ConsumerStatefulWidget {
   final ValueChanged<int> onPageChanged;
@@ -215,6 +217,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
     final selectedRiwaya = ref.watch(selectedRiwayaProvider);
     final playingAyah = ref.watch(playingAyahProvider).value;
     final mushafSettings = ref.watch(mushafSettingsProvider);
+    final lastReadPos = ref.watch(lastReadPositionProvider).value;
 
     return NotificationListener<UserScrollNotification>(
       onNotification: (notification) {
@@ -289,6 +292,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
                               currentSelection: selection,
                               l10n: l10n,
                               fontSizeScale: mushafSettings.fontSizeScale,
+                              lastReadPos: lastReadPos,
                             ),
                           ),
                         ],
@@ -313,7 +317,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
         : 1;
     final startAyah = pageData.isNotEmpty ? pageData.first['start'] as int : 1;
     final juzNumber = quran.getJuzNumber(surahNumber, startAyah);
-    final surahName = quran.getSurahName(surahNumber);
+    final surahName = QuranUtils.getSurahName(surahNumber, isEnglish: true);
 
     return Row(
       children: [
@@ -342,7 +346,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
     required MushafTheme theme,
     required int surah,
   }) {
-    final surahName = quran.getSurahName(surah);
+    final surahName = QuranUtils.getSurahName(surah, isEnglish: true);
     final versesCount = quran.getVerseCount(surah);
 
     return Container(
@@ -387,6 +391,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
     required String? currentSelection,
     required AppLocalizations l10n,
     required double fontSizeScale,
+    required LastReadPosition? lastReadPos,
   }) {
     final ayahKey = '$surah:$ayah';
     final isHighlighted = playingAyah == ayahKey || currentSelection == ayahKey;
@@ -418,7 +423,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
               children: [
                 Expanded(
                   child: Text(
-                    'Surah ${quran.getSurahName(surah)} • Ayah $ayah',
+                    'Surah ${QuranUtils.getSurahName(surah, isEnglish: true)} • Ayah $ayah',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -428,6 +433,15 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
                     ),
                   ),
                 ),
+                if (lastReadPos?.surahNumber == surah && lastReadPos?.ayahNumber == ayah)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Icon(
+                      Icons.bookmark,
+                      size: 16 * fontSizeScale,
+                      color: Colors.redAccent.withValues(alpha: 0.8),
+                    ),
+                  ),
                 IconButton(
                   onPressed: () {
                     selectedAyahNotifier.value = ayahKey;

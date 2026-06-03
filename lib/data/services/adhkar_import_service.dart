@@ -7,7 +7,7 @@ import 'package:islam_home/data/models/adhkar_model.dart';
 
 class AdhkarImportService {
   static const String _adhkarAssetPath = 'assets/adhkar/adhkar.json';
-  static const int _datasetVersion = 3;
+  static const int _datasetVersion = 5;
   static const String _datasetVersionKey = 'dataset_version';
 
   Future<void> importIfNeeded() async {
@@ -52,6 +52,10 @@ class AdhkarImportService {
   }
 
   List<AdhkarModel> _parseJson(dynamic decoded) {
+    if (decoded is Map<String, dynamic> && decoded['rows'] is List) {
+      return _parseRows(decoded['rows'] as List);
+    }
+
     if (decoded is List) {
       return _parseList(decoded);
     }
@@ -79,6 +83,41 @@ class AdhkarImportService {
     }
 
     return const [];
+  }
+
+  List<AdhkarModel> _parseRows(List<dynamic> rows) {
+    final result = <AdhkarModel>[];
+    int generatedId = 1;
+
+    for (final row in rows) {
+      if (row is! List || row.length < 5) continue;
+
+      // Index mapping based on osamayy/azkar-db:
+      // 0: category, 1: zekr, 2: description, 3: count, 4: reference, 5: search
+      final String category = row[0]?.toString() ?? 'General';
+      final String textAr = row[1]?.toString() ?? '';
+      final String description = row[2]?.toString() ?? '';
+      final int repeat = int.tryParse(row[3]?.toString() ?? '1') ?? 1;
+      final String reference = row[4]?.toString() ?? '';
+      final String searchTags = row.length > 5 ? row[5]?.toString() ?? '' : '';
+
+      // Combine description and search tags into textEn for searchable content
+      final String combinedTextEn = [description, searchTags]
+          .where((s) => s.isNotEmpty)
+          .join(' | ');
+
+      result.add(AdhkarModel(
+        id: generatedId++,
+        category: category,
+        title: category, 
+        textAr: textAr,
+        textEn: combinedTextEn,
+        reference: reference,
+        repeat: repeat < 1 ? 1 : repeat,
+      ));
+    }
+
+    return result;
   }
 
   List<AdhkarModel> _parseList(List<dynamic> list) {

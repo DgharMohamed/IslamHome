@@ -31,7 +31,7 @@ class ResponsiveUtils {
 
   /// Returns a constrained width for content to prevent over-stretching on wide screens
   static double getPreferredContentWidth(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    final double width = MediaQuery.of(context).size.width;
     if (isDesktop(context)) return 1200;
     if (isTablet(context)) return 800;
     return width;

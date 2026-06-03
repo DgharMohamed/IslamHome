@@ -200,8 +200,8 @@ class CompassNeedlePainter extends CustomPainter {
 
     // 4. Draw the Mosque Silhouette - larger and clearer
     final Path mosquePath = Path();
-    double mx = w / 2;
-    double my = h * 0.25;
+    final double mx = w / 2;
+    final double my = h * 0.25;
 
     // Base of mosque - wider
     mosquePath.moveTo(mx - 10, my + 10);

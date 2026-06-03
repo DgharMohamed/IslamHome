@@ -9,6 +9,27 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get albumGeneral => 'General';
+
+  @override
+  String get mushafThemeCream => 'Creamy';
+
+  @override
+  String get mushafThemeGreen => 'Green';
+
+  @override
+  String get mushafThemeBlue => 'Blue';
+
+  @override
+  String get mushafThemeSepia => 'Old Paper';
+
+  @override
+  String get mushafThemeDark => 'Night';
+
+  @override
+  String get mushafThemeBlack => 'Black';
+
+  @override
   String get appTitle => 'Islam Home';
 
   @override
@@ -153,6 +174,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchSurah => 'Search for surah...';
 
   @override
+  String get searchForCategory => 'Search for category...';
+
+  @override
+  String get searchHadithBooksHint => 'Search hadith books...';
+
+  @override
+  String get searchInHadithHint => 'Search in hadith...';
+
+  @override
+  String get searchSiraHint => 'Search sira...';
+
+  @override
   String get downloadAll => 'Download All';
 
   @override
@@ -209,6 +242,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String hadithCount(int count) {
     return '$count Hadith';
+  }
+
+  @override
+  String adhkarCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Adhkar',
+      one: '1 Dhikr',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -372,6 +416,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String surahsCount(int count) {
+    return '$count Surahs';
+  }
+
+  @override
   String pageN(int page) {
     return 'Page $page';
   }
@@ -381,6 +430,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectTranslation => 'Select Translation';
+
+  @override
+  String get noSurahsAvailable => 'No surahs available for this tafsir';
+
+  @override
+  String get errorLoadingTafsir => 'Error loading tafsir';
 
   @override
   String get selectTafsir => 'Select Tafsir';
@@ -395,7 +450,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseSurah => 'Choose Surah';
 
   @override
-  String verseN(Object number) {
+  String verseN(int number) {
     return 'Verse $number';
   }
 
@@ -529,7 +584,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share => 'Share';
 
   @override
-  String comingSoon(Object feature) {
+  String comingSoon(String feature) {
     return '$feature will be enabled soon';
   }
 
@@ -546,7 +601,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentPlaylist => 'Current Playlist';
 
   @override
-  String audioCount(Object count) {
+  String audioCount(int count) {
     return '$count audios';
   }
 
@@ -554,7 +609,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nowPlayingLabel => 'Now Playing';
 
   @override
-  String timeRemaining(Object time) {
+  String timeRemaining(String time) {
     return 'Time remaining: $time';
   }
 
@@ -565,7 +620,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sleepTimerStopped => 'Sleep timer stopped';
 
   @override
-  String timerSetFor(Object time) {
+  String timerSetFor(String time) {
     return 'Timer set for $time';
   }
 
@@ -576,12 +631,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadingText => 'Error loading text';
 
   @override
-  String shareRecitationText(Object link, Object reciter, Object title) {
+  String shareRecitationText(String title, String reciter, String link) {
     return 'Listen to $title by $reciter via Islamic Library App.\n\n$link';
   }
 
   @override
-  String minutes(Object count) {
+  String minutes(int count) {
     return '$count minutes';
   }
 
@@ -674,7 +729,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Downloaded files will appear here';
 
   @override
-  String downloadedSurahCount(Object count) {
+  String downloadedSurahCount(int count) {
     return '$count downloaded';
   }
 
@@ -951,7 +1006,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueYourKhatma => 'Continue Your Khatma';
 
   @override
-  String juzAndSurah(Object juz, Object surah) {
+  String juzAndSurah(int juz, String surah) {
     return 'Juz $juz - $surah';
   }
 
@@ -972,7 +1027,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fifteenPagesDaily => '15 pages daily';
 
   @override
-  String pagesRemainingToday(Object count) {
+  String pagesRemainingToday(int count) {
     return '$count pages remaining today';
   }
 
@@ -1065,7 +1120,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prayerAdjustmentSubtitle => 'Add or subtract minutes (DST)';
 
   @override
-  String adjustMinutes(Object minutes) {
+  String adjustMinutes(int minutes) {
     return 'Adjust $minutes minutes';
   }
 
@@ -1073,7 +1128,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manualOffset => 'Manual Time Offset';
 
   @override
-  String hours(Object count) {
+  String hours(int count) {
     return '$count hours';
   }
 
@@ -1122,8 +1177,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get grantPermission => 'Grant Permission';
 
   @override
-  String error(String message) {
-    return 'Error: $message';
+  String error(String error) {
+    return 'Error: $error';
   }
 
   @override
@@ -1225,7 +1280,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add or subtract days for regional accuracy';
 
   @override
-  String adjustDays(Object days) {
+  String adjustDays(int days) {
     return 'Adjust $days days';
   }
 
@@ -1263,16 +1318,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get create => 'Create';
 
   @override
-  String surahsCount(int count) {
-    return '$count Surahs';
-  }
-
-  @override
   String get noPlaylistsMessage =>
       'No playlists found. Create one from the favorites section.';
 
   @override
-  String addedToPlaylist(Object playlistName) {
+  String addedToPlaylist(String playlistName) {
     return 'Added to $playlistName';
   }
 
@@ -1299,6 +1349,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String navigatedToAyah(String surah, int ayah) {
     return 'Navigated to $surah - Ayah $ayah';
+  }
+
+  @override
+  String errorMessage(String message) {
+    return 'Error: $message';
   }
 
   @override
@@ -1353,6 +1408,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get calculationMethodTitle => 'Calculation Method';
+
+  @override
+  String get methodKarachi => 'University of Islamic Sciences, Karachi';
+
+  @override
+  String get methodIsna => 'Islamic Society of North America (ISNA)';
+
+  @override
+  String get methodMWL => 'Muslim World League';
+
+  @override
+  String get methodUmmAlQura => 'Umm Al-Qura University, Makkah';
+
+  @override
+  String get methodEgyptian => 'Egyptian General Authority of Survey';
+
+  @override
+  String get methodGulf => 'Gulf Region';
+
+  @override
+  String get methodKuwait => 'Kuwait';
+
+  @override
+  String get methodQatar => 'Qatar';
+
+  @override
+  String get methodSingapore => 'Majlis Ugama Islam Singapura, Singapore';
+
+  @override
+  String get methodFrance => 'Union Organization Islamic de France';
+
+  @override
+  String get methodTurkey => 'Diyanet İşleri Başkanlığı, Turkey';
+
+  @override
+  String get methodRussia => 'Spiritual Administration of Muslims of Russia';
+
+  @override
+  String get methodMoonsighting => 'Moonsighting Committee Worldwide';
+
+  @override
+  String get methodDubai => 'Dubai';
+
+  @override
+  String get methodJakim => 'Jabatan Kemajuan Islam Malaysia (JAKIM)';
+
+  @override
+  String get methodTunisia => 'Tunisia';
+
+  @override
+  String get methodAlgeria => 'Algeria';
+
+  @override
+  String get methodIndonesia => 'Kementerian Agama Republik Indonesia';
+
+  @override
+  String get methodMorocco => 'Morocco';
+
+  @override
+  String get methodPortugal => 'Comunidade Islamica de Lisboa';
+
+  @override
+  String get methodJordan =>
+      'Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan';
+
+  @override
+  String get methodShia => 'Shia Ithna-Ashari, Leva Institute, Qum';
+
+  @override
+  String get methodTehran => 'Institute of Geophysics, University of Tehran';
 
   @override
   String get sidebarMainQuran => 'Home & Quran';
@@ -1495,7 +1620,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khatmaV2Back => 'Back';
 
   @override
-  String khatmaV2MyKhatma(Object type) {
+  String khatmaV2MyKhatma(String type) {
     return 'My $type Khatma';
   }
 
@@ -1521,7 +1646,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String khatmaV2RecordPage(Object page) {
+  String khatmaV2RecordPage(int page) {
     return 'Record Page $page';
   }
 
@@ -1529,12 +1654,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khatmaV2SelectTrack => 'Select Track';
 
   @override
-  String khatmaV2ProgressSaved(Object track) {
+  String khatmaV2ProgressSaved(String track) {
     return 'Progress saved to $track';
   }
 
   @override
-  String khatmaV2TrackTypeSuffix(Object type) {
+  String khatmaV2TrackTypeSuffix(String type) {
     return '$type TRACK';
   }
 
@@ -1557,7 +1682,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khatmaV2JuzCount => 'Total Juz';
 
   @override
-  String khatmaV2RecordJuz(Object juz) {
+  String khatmaV2RecordJuz(int juz) {
     return 'Record Juz $juz';
   }
 
@@ -1586,7 +1711,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khatmaV2EndSurah => 'End Surah';
 
   @override
-  String khatmaV2RecordSurah(Object surah) {
+  String khatmaV2RecordSurah(String surah) {
     return 'Record Surah $surah';
   }
 
@@ -1724,6 +1849,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhkarCategoryQuranDua => 'Quranic Duas';
+
+  @override
+  String get adhkarCategoryWakingUp => 'Waking Up';
+
+  @override
+  String get adhkarCategoryWudu => 'Wudu Adhkar';
+
+  @override
+  String get adhkarCategoryAdhan => 'Adhan Adhkar';
+
+  @override
+  String get adhkarCategoryDistress => 'Distress & Relief';
+
+  @override
+  String get adhkarCategoryIstighfar => 'Istighfar & Repentance';
+
+  @override
+  String get adhkarCategoryRuqyah => 'Ruqyah Shariah';
+
+  @override
+  String get adhkarCategoryHajj => 'Hajj & Umrah';
+
+  @override
+  String get adhkarCategoryIllness => 'Sickness & Illness';
 
   @override
   String get athanOnboardingPrompt =>
@@ -2028,4 +2177,336 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get khatmaRemediationAction => 'Review Options';
+
+  @override
+  String get logout => 'Log out';
+
+  @override
+  String get upgradeBannerTitle => 'Upgrade to Cloud';
+
+  @override
+  String get upgradeBannerSubtitle =>
+      'Register to sync your progress across devices and never lose your data.';
+
+  @override
+  String get createAccountNow => 'Create Account Now';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account?';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account?';
+
+  @override
+  String get logoutConfirmTitle => 'Logout';
+
+  @override
+  String get logoutConfirmBody => 'Are you sure you want to log out?';
+
+  @override
+  String get guestStatus => 'Guest Member';
+
+  @override
+  String get anonymousUsage => 'Using as Guest';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Confirm Account Deletion';
+
+  @override
+  String get deleteAccountConfirmBody =>
+      'Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be lost.';
+
+  @override
+  String get updateNameHint => 'Full Name';
+
+  @override
+  String get requiresRecentLogin =>
+      'This action requires a recent login. Please log out, log in again, and retry.';
+
+  @override
+  String get audioLibraryAlbum => 'Audio Library';
+
+  @override
+  String get quranRecitation => 'Quran Recitation';
+
+  @override
+  String get islamicPersonality => 'Islamic Personality';
+
+  @override
+  String get videoClip => 'Video Clip';
+
+  @override
+  String get sheikhBadrAlMeshari => 'Sheikh Badr Al-Meshari';
+
+  @override
+  String get muadhinIslamHome => 'Islam Home Muadhin';
+
+  @override
+  String get athan => 'Athan';
+
+  @override
+  String get athanNotificationsAlbum => 'Athan Notifications';
+
+  @override
+  String get downloadedAudio => 'Downloaded Audio';
+
+  @override
+  String get invalidUrl => 'Invalid URL';
+
+  @override
+  String get noAudioStreams => 'No audio streams available';
+
+  @override
+  String get streamTimeout => 'Loading timeout, please try again';
+
+  @override
+  String get unableToStartPlayback => 'Unable to start playback';
+
+  @override
+  String get seerahAlbum => 'Prophetic Seerah';
+
+  @override
+  String get downloadsAlbum => 'Downloads';
+
+  @override
+  String get notificationChannelAdhan => 'Prayer Times';
+
+  @override
+  String get notificationChannelAdhanDesc =>
+      'Athan notifications at prayer times';
+
+  @override
+  String get notificationChannelReminders => 'Pre-Prayer Reminders';
+
+  @override
+  String get notificationChannelRemindersDesc =>
+      'Reminders before prayer times';
+
+  @override
+  String get notificationChannelDaily => 'Daily Content';
+
+  @override
+  String get notificationChannelDailyDesc =>
+      'Daily verse and spiritual content notifications';
+
+  @override
+  String athanTimeFor(String prayer) {
+    return 'It\'s time for $prayer';
+  }
+
+  @override
+  String get fajrName => 'Fajr';
+
+  @override
+  String get dhuhrName => 'Dhuhr';
+
+  @override
+  String get asrName => 'Asr';
+
+  @override
+  String get maghribName => 'Maghrib';
+
+  @override
+  String get ishaName => 'Isha';
+
+  @override
+  String get allahBlessing => 'May Allah bless you';
+
+  @override
+  String reminderBefore(String prayer, int minutes) {
+    return '$prayer in $minutes minutes';
+  }
+
+  @override
+  String prepareFor(String prayer) {
+    return 'Prepare for $prayer';
+  }
+
+  @override
+  String get khatmaReminderTitle => 'Khatma Daily Reminder';
+
+  @override
+  String get khatmaReminderBody =>
+      'Don\'t forget your daily portion of the Holy Quran today';
+
+  @override
+  String get testAthanTitle => 'Athan Test';
+
+  @override
+  String get testAthanBody => 'Audio is working successfully';
+
+  @override
+  String get testNotifTitle => 'Test Notification';
+
+  @override
+  String get testNotifBody =>
+      'Notifications are working efficiently on your device';
+
+  @override
+  String get notificationChannelDownloads => 'Downloads';
+
+  @override
+  String get notificationChannelDownloadsDesc =>
+      'Download progress notifications';
+
+  @override
+  String get notificationChannelDailyVerse => 'Daily Verse';
+
+  @override
+  String get notificationChannelDailyDhikr => 'Daily Dhikr';
+
+  @override
+  String get offlineBanner => 'You are offline — using local data';
+
+  @override
+  String get or => 'Or';
+
+  @override
+  String get calibrateCompass =>
+      'Move your phone in a figure-8 pattern to calibrate the compass';
+
+  @override
+  String get compassLowAccuracy => 'Compass accuracy is low - please calibrate';
+
+  @override
+  String get qiblaNotSupportedOnWindows =>
+      'Qibla compass is not supported on Windows yet';
+
+  @override
+  String get qiblaWindowsHint =>
+      'Please use the mobile app for the best experience';
+
+  @override
+  String get distanceFromKabah => 'Distance from Kaaba';
+
+  @override
+  String get qiblaDirectionLabel => 'Qibla Direction';
+
+  @override
+  String get timeUntilAdhan => 'Time until Adhan';
+
+  @override
+  String get prayerTimesLoadError =>
+      'Sorry, could not load prayer times. Please check your internet connection or location settings.';
+
+  @override
+  String get dataLoadError => 'An error occurred while loading data';
+
+  @override
+  String get allDownloadsCancelled => 'All downloads cancelled';
+
+  @override
+  String qiblaSourceApi(String declination) {
+    return 'Source: AlAdhan API • Decl: $declination°';
+  }
+
+  @override
+  String qiblaSourceOffline(String declination) {
+    return 'Source: Offline • Decl: $declination°';
+  }
+
+  @override
+  String get notificationAdhanDesc => 'Athan notifications at prayer times';
+
+  @override
+  String get notificationReminders => 'Pre-Prayer Reminders';
+
+  @override
+  String get notificationRemindersDesc => 'Reminders before prayer times';
+
+  @override
+  String get notificationDailyContent => 'Daily Content';
+
+  @override
+  String get notificationDailyDesc =>
+      'Daily verse and spiritual content notifications';
+
+  @override
+  String notificationAthanTimeFor(String prayer) {
+    return 'It\'s time for $prayer';
+  }
+
+  @override
+  String get notificationAllahBlessing => 'May Allah bless you';
+
+  @override
+  String notificationReminderBefore(String prayer, String minutes) {
+    return '$prayer in $minutes minutes';
+  }
+
+  @override
+  String notificationPrepareFor(String prayer) {
+    return 'Prepare for $prayer';
+  }
+
+  @override
+  String get notificationKhatmaTitle => 'Khatma Daily Reminder';
+
+  @override
+  String get notificationKhatmaBody =>
+      'Don\'t forget your daily portion of the Holy Quran today';
+
+  @override
+  String get notificationTestAthanTitle => 'Athan Test';
+
+  @override
+  String get notificationTestAthanBody => 'Audio is working successfully';
+
+  @override
+  String get notificationTestNotifTitle => 'Test Notification';
+
+  @override
+  String get notificationTestNotifBody =>
+      'Notifications are working efficiently on your device';
+
+  @override
+  String get notificationDownloadProgress => 'Download Progress';
+
+  @override
+  String get notificationDailyDhikr => 'Daily Dhikr';
+
+  @override
+  String get notificationDailyVerse => 'Daily Verse';
+
+  @override
+  String get notificationDownloads => 'Downloads';
+
+  @override
+  String get themeCream => 'Cream';
+
+  @override
+  String get themeGreen => 'Green';
+
+  @override
+  String get themeBlue => 'Blue';
+
+  @override
+  String get themeSepia => 'Sepia';
+
+  @override
+  String get themeNight => 'Night';
+
+  @override
+  String get themeBlack => 'Black';
 }
