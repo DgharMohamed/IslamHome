@@ -1,0 +1,46 @@
+name: Build and Release APK
+
+on:
+  push:
+    tags:
+      - 'v*' # سيتم تشغيل هذا الإجراء فقط عند دفع tag يبدأ بحرف v (مثال: v1.0.3)
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # ضروري لإنشاء Release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0' # يمكنك تعديل هذا حسب إصدار Flutter المستخدم لديك
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: mv build/app/outputs/flutter-apk/app-release.apk IslamHome.apk
+
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          files: IslamHome.apk
+          name: Islam Home ${{ github.ref_name }}
+          body: "إصدار جديد من تطبيق بيت الإسلام (${{ github.ref_name }})."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
