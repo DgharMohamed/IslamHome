@@ -1,8 +1,11 @@
-﻿const appConfig = {
+const appConfig = {
   links: {
-    android: "https://github.com/DgharMohamed/IslamHome/raw/main/raw/artifacts/app-release.apk",
+    apkpure: "https://apkpure.com/p/com.islamHome.app",
+    universal: "https://github.com/DgharMohamed/IslamHome/releases/latest/download/IslamHome.apk",
+    arm64: "https://github.com/DgharMohamed/IslamHome/releases/latest/download/IslamHome-arm64-v8a.apk",
+    arm32: "https://github.com/DgharMohamed/IslamHome/releases/latest/download/IslamHome-armeabi-v7a.apk",
+    x86_64: "https://github.com/DgharMohamed/IslamHome/releases/latest/download/IslamHome-x86_64.apk",
     ios: "", // ضع رابط App Store هنا عند توفره
-    apk: "https://github.com/DgharMohamed/IslamHome/raw/main/raw/artifacts/app-release.apk",
   },
 };
 
@@ -179,14 +182,19 @@ const translations = {
     page_title: "بيت الإسلام | تطبيق إسلامي شامل",
     brand_name: "بيت الإسلام",
     nav_features: "المميزات",
+    nav_screenshots: "صور التطبيق",
     nav_download: "التحميل",
     nav_about: "عن التطبيق",
     nav_privacy: "سياسة الخصوصية",
     badge_text: "رفيقك اليومي",
     hero_title: "مرحباً بك في <br><span class=\"text-gradient\">بيت الإسلام</span>",
     hero_subtitle: "كل ما يحتاجه المسلم في تطبيق واحد.. القرآن الكريم، الأذكار، مواقيت الصلاة، الخواطر الإيمانية، اتجاه القبلة، والمزيد بتصميم عصري وتجربة فائقة الجمال.",
-    btn_android: "تحميل للأندرويد",
-    btn_apk: "إصدار APK",
+    btn_apkpure: "تحميل من APKPure",
+    btn_universal: "نسخة (APK)",
+    btn_arm64: "نسخة (ARM64)",
+    btn_arm32: "نسخة (ARM32)",
+    btn_x86: "نسخة (x86_64)",
+    btn_all_versions: "تصفح جميع النسخ",
     btn_ios: "متوفر قريباً",
     hero_note: "آمن، سريع، ويعمل بدون إنترنت (في أغلب الخصائص)",
     card1_title: "تلاوات خاشعة",
@@ -242,20 +250,27 @@ const translations = {
     dev_role: "صاحب الفكرة ومطور التطبيق",
     dev_bio: "تم تطوير تطبيق \"بيت الإسلام\" كمشروع تخرج وصدقة جارية لمساعدة المسلمين حول العالم في الحفاظ على أداء عباداتهم وأذكارهم بكل سهولة من خلال واجهة عصرية، سلسة، وخالية تماماً من الإعلانات المزعجة.",
     dev_github: "حساب المطور (GitHub)",
-    dev_linkedin: "تواصل معي (LinkedIn)"
+    dev_linkedin: "تواصل معي (LinkedIn)",
+    screenshots_title: "لقطات من التطبيق",
+    screenshots_subtitle: "نظرة سريعة على تصميم التطبيق وواجهته الأنيقة"
   },
   en: {
     page_title: "IslamHome | Complete Islamic App",
     brand_name: "IslamHome",
     nav_features: "Features",
+    nav_screenshots: "Screenshots",
     nav_download: "Download",
     nav_about: "About",
     nav_privacy: "Privacy Policy",
     badge_text: "Your Daily Companion",
     hero_title: "Welcome to <br><span class=\"text-gradient\">IslamHome</span>",
     hero_subtitle: "Everything a Muslim needs in one app... Holy Quran, Azkar, Prayer Times, Islamic Thoughts, Qibla Direction, and more. Modern design and a beautiful experience.",
-    btn_android: "Download for Android",
-    btn_apk: "APK Version",
+    btn_apkpure: "Download from APKPure",
+    btn_universal: "Version (APK)",
+    btn_arm64: "Version (ARM64)",
+    btn_arm32: "Version (ARM32)",
+    btn_x86: "Version (x86_64)",
+    btn_all_versions: "View All Versions",
     btn_ios: "Coming Soon",
     hero_note: "Secure, fast, and works offline (for most features)",
     card1_title: "Reverent Recitations",
@@ -311,7 +326,9 @@ const translations = {
     dev_role: "Founder & Full-stack Developer",
     dev_bio: "The \"IslamHome\" application was developed as a graduation project and continuous charity (Sadaqah Jariyah) to help Muslims around the world maintain their worship and Azkar easily through a modern, smooth, and completely ad-free interface.",
     dev_github: "Developer Profile (GitHub)",
-    dev_linkedin: "Connect on LinkedIn"
+    dev_linkedin: "Connect on LinkedIn",
+    screenshots_title: "App Screenshots",
+    screenshots_subtitle: "A quick look at the app's elegant design and interface"
   }
 };
 
@@ -343,10 +360,58 @@ function applyLanguage(lang) {
     }
   });
 
+  // Update screenshots based on language
+  const screenPath = lang === 'en' ? 'English' : 'Arabic';
+  document.querySelectorAll('.screenshot-img').forEach(img => {
+    const fileName = img.getAttribute('data-filename');
+    if (fileName) {
+      img.src = `assets/screenshots/${screenPath}/${fileName}`;
+    }
+  });
+
   // Restart typewriter with new language
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     initTypewriter();
   }
+}
+
+function initCarousel() {
+  const carousel = document.getElementById('screenshotsCarousel');
+  if (!carousel) return;
+
+  let autoScrollInterval;
+  let isHovering = false;
+
+  // Auto-scroll logic
+  const startAutoScroll = () => {
+    if (autoScrollInterval) clearInterval(autoScrollInterval);
+    autoScrollInterval = setInterval(() => {
+      if (!isHovering) {
+        const isRtl = document.documentElement.dir === 'rtl';
+        // Scroll continuously by a small amount
+        carousel.scrollBy({ left: isRtl ? -1 : 1, behavior: 'auto' });
+        
+        // Loop when reaching the end
+        if (isRtl) {
+           if (Math.abs(carousel.scrollLeft) >= carousel.scrollWidth - carousel.clientWidth - 5) {
+             carousel.scrollTo({ left: 0, behavior: 'auto' });
+           }
+        } else {
+           if (carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 5) {
+             carousel.scrollTo({ left: 0, behavior: 'auto' });
+           }
+        }
+      }
+    }, 20); // Smooth continuous speed
+  };
+
+  startAutoScroll();
+
+  // Pause auto-scroll on hover or touch
+  carousel.addEventListener('mouseenter', () => isHovering = true);
+  carousel.addEventListener('mouseleave', () => isHovering = false);
+  carousel.addEventListener('touchstart', () => isHovering = true, {passive: true});
+  carousel.addEventListener('touchend', () => isHovering = false);
 }
 
 function initLanguageSwitch() {
@@ -369,6 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileMenu();
   initScrollReveal();
   initSmoothScroll();
+  initCarousel();
 });
 
 
