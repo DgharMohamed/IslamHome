@@ -2,77 +2,67 @@
   <img src="assets/icon/app_icon.png" width="160" alt="Islam Home Logo">
 </p>
 
-# 🕋 Islam Home | بيت الإسلام
+# Islam Home | بيت الإسلام
 
-### 🎓 Graduation Project - (Work in Progress / نسخة قيد التطوير)
+A clean, offline-first Islamic companion app built with Flutter. Originally started as a graduation project, it's now growing into a fully-featured tool for daily worship and religious reading.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Flutter-blue.svg?style=flat-square&logo=flutter" />
   <img src="https://img.shields.io/badge/Language-Dart-0175C2.svg?style=flat-square&logo=dart" />
-  <img src="https://img.shields.io/badge/Localization-AR%20%7C%20EN%20%7C%20FR%20(Soon)-green.svg?style=flat-square" />
+  <img src="https://img.shields.io/badge/Localization-AR%20%7C%20EN-green.svg?style=flat-square" />
   <img src="https://img.shields.io/badge/Status-In--Development-orange.svg?style=flat-square" />
 </p>
 
 ---
 
-## 🌍 English Description
+## English
 
-**Islam Home** is a comprehensive Islamic application developed as a **graduation project**. It serves as an all-in-one platform for every Muslim's daily worship and religious knowledge. The app is built with a scalable architecture, allowing for continuous updates and new feature integration.
+**Islam Home** provides essential Islamic tools in one place without clutter. The focus is on a smooth user experience, offline availability, and accurate content.
 
-### ✨ Key Features
+### What's Inside
+- **The Holy Quran:** Read and listen to various reciters. Tap any verse to view its Tafsir and translation instantly.
+- **Offline First:** Most of the app (reading, pre-downloaded audio) works completely offline.
+- **Prophetic Biography (Seerah):** High-quality audio library of the Prophet's life in Arabic and English.
+- **Hadith Sharing:** Browse authentic Hadith books and share them directly to your social media.
+- **Daily Tools:** Accurate prayer times, Qibla compass, and a digital Tasbih.
+- **Live Streams:** Watch live Islamic TV channels directly from the app.
 
-- **Multi-Language Support:** Currently supports Arabic and English, with **French** currently under integration.
-- **The Holy Quran:** Read and listen to famous reciters, with instant access to Tafsir and translations by tapping on any verse.
-- **Offline Capability:** Most features, including reading and pre-downloaded content, work seamlessly without an internet connection.
-- **Prophetic Biography (Seerah):** High-quality audio library of the Prophet’s life in both Arabic and English.
-- **Social Interaction:** Ability to share **Prophetic Hadiths** directly to social media platforms.
-- **Smart Tools:** Accurate prayer times based on location, Qibla compass, and a smart electronic Tasbih.
-- **Live Stream:** Watch Islamic channels live and browse Hadith books.
-
-### 🚀 Future Roadmap
-
-- **[ ] Expansion:** Finalizing the **French** language support and planning for more global languages.
-- **[ ] Advanced Notifications:** Smart alerts for Athkar, Sunnah, and prayer times.
-- **[ ] Visual Customization:** Implementing Dark/Light modes and font size controls.
+### What's Next?
+- Add full French localization.
+- Smart local notifications for Athkar and prayer times.
+- Dark/Light mode toggle and better font size controls.
 
 ---
 
-## 🌍 الوصف العربي
+## بالعربية
 
-**بيت الإسلام (Islam Home)** هو تطبيق إسلامي شامل تم تطويره كـ **مشروع تخرج**. يهدف ليكون منصة جامعة لكل ما يحتاجه المسلم في عباداته اليومية ومعرفته بدينه. تم بناء التطبيق بهيكلية مرنة تسمح بالتطوير المستمر وإضافة ميزات جديدة بشكل دوري.
+**بيت الإسلام** هو تطبيق مبني بـ Flutter يهدف لتوفير أدوات المسلم اليومية في واجهة نظيفة وبسيطة. بدأ التطبيق كمشروع تخرج وهو الآن قيد التطوير ليكون رفيقك الدائم للعبادة.
 
-### ✨ المميزات الرئيسية
+### مميزات التطبيق
+- **القرآن الكريم:** تلاوة واستماع لأشهر القراء. اضغط على أي آية لفتح التفسير والترجمة فوراً.
+- **يعمل بدون إنترنت:** الأجزاء الأساسية من التطبيق (القراءة والصوتيات المحملة) لا تحتاج لاتصال بالإنترنت.
+- **السيرة النبوية:** مكتبة صوتية متكاملة للسيرة النبوية.
+- **مشاركة الأحاديث:** تصفح كتب الحديث النبوي وشارك الأحاديث بسهولة كصور أو نصوص.
+- **أدوات المسلم:** مواقيت صلاة دقيقة حسب موقعك، بوصلة للقبلة، ومسبحة إلكترونية.
+- **بث مباشر:** قنوات إسلامية تلفزيونية وإذاعية تعمل على مدار الساعة.
 
-- **دعم اللغات:** يدعم حالياً العربية والإنجليزية، والعمل جارٍ حالياً على إضافة **اللغة الفرنسية**.
-- **القرآن الكريم:** قراءة واستماع لأشهر القراء، مع ميزة الوصول الفوري للتفسير والترجمة بمجرد الضغط على الآية.
-- **العمل بدون إنترنت (Offline):** تعمل معظم ميزات التطبيق بدون اتصال، بما في ذلك القراءة والمحتوى المحمل مسبقاً.
-- **السيرة النبوية:** مكتبة صوتية عالية الجودة للسيرة النبوية باللغتين العربية والإنجليزية.
-- **التفاعل الاجتماعي:** إمكانية مشاركة **الأحاديث النبوية الشريفة** عبر منصات التواصل الاجتماعي.
-- **أدوات ذكية:** مواقيت صلاة دقيقة، بوصلة القبلة، ومسبحة إلكترونية ذكية.
-- **بث مباشر:** مشاهدة القنوات الإسلامية مباشرة وتصفح كتب الحديث.
-
-### 🚀 خطة التطوير المستقبلية
-
-- **[ ] توسيع اللغات:** إتمام دعم **اللغة الفرنسية** كلياً والتخطيط للغات عالمية أخرى.
-- **[ ] تنبيهات متطورة:** نظام إشعارات ذكي للأذكار والسنن ومواعيد الصلاة.
-- **[ ] تخصيص المظهر:** إضافة الوضع الليلي (Dark Mode) والتحكم في أحجام الخطوط.
+### قريباً
+- إضافة دعم اللغة الفرنسية بالكامل.
+- تنبيهات ذكية لأوقات الصلاة والأذكار.
+- إضافة الوضع الليلي (Dark Mode) والتحكم بحجم خط المصحف.
 
 ---
 
-## 🛠️ Technical Details | الجانب التقني
+## Tech Stack | الجانب التقني
+- **Framework:** Flutter (Dart)
+- **Architecture:** Built with clean code principles for easy maintenance and scalability.
+- **Localization:** Standard `flutter_localizations` for easy translation scaling.
 
-- **Framework:** Flutter.
-- **Architecture:** Designed for scalability and clean code.
-- **Localization:** Flexible system for multi-language support (i18n).
-
-## 👨‍💻 Development | إعداد وتطوير
-
-- **Student Name / اسم الطالب:** Mohamed Dghar
+## Developer | المطور
+- **Mohamed Dghar** 
 
 ---
 
 > [!NOTE]
-> This project represents the first version (Beta), and work is ongoing to make it the most comprehensive Islamic app.
-> يمثل هذا المشروع النسخة الأولية، والعمل مستمر لتحديثه ليكون التطبيق الإسلامي الأكثر شمولاً.
-
----
+> This project is currently in active development. Feel free to explore the code, report issues, or suggest features!
+> المشروع لا يزال قيد التطوير المستمر. نرحب بأي اقتراحات أو ملاحظات!
