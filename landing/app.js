@@ -388,18 +388,14 @@ function initCarousel() {
     autoScrollInterval = setInterval(() => {
       if (!isHovering) {
         const isRtl = document.documentElement.dir === 'rtl';
+        const oldScrollLeft = carousel.scrollLeft;
+        
         // Scroll continuously by a small amount
         carousel.scrollBy({ left: isRtl ? -1 : 1, behavior: 'auto' });
         
-        // Loop when reaching the end
-        if (isRtl) {
-           if (Math.abs(carousel.scrollLeft) >= carousel.scrollWidth - carousel.clientWidth - 5) {
-             carousel.scrollTo({ left: 0, behavior: 'auto' });
-           }
-        } else {
-           if (carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 5) {
-             carousel.scrollTo({ left: 0, behavior: 'auto' });
-           }
+        // If scrollLeft didn't change, we hit the end. Reset to start.
+        if (carousel.scrollLeft === oldScrollLeft) {
+          carousel.scrollTo({ left: 0, behavior: 'auto' });
         }
       }
     }, 20); // Smooth continuous speed
