@@ -4608,6 +4608,180 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أسود'**
   String get themeBlack;
+
+  /// No description provided for @adhkarTasbeehSettingsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات تنبيهات الأذكار والتسبيح'**
+  String get adhkarTasbeehSettingsTitle;
+
+  /// No description provided for @adhkarTasbeehSettingsSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخصيص أوقات الأذكار والتذكير بالتسبيح اليومي'**
+  String get adhkarTasbeehSettingsSubtitle;
+
+  /// No description provided for @morningAdhkar.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get morningAdhkar;
+
+  /// No description provided for @morningAdhkarEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل إشعارات أذكار الصباح'**
+  String get morningAdhkarEnable;
+
+  /// No description provided for @morningAdhkarOffset.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه بعد الفجر بـ'**
+  String get morningAdhkarOffset;
+
+  /// No description provided for @eveningAdhkar.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المساء'**
+  String get eveningAdhkar;
+
+  /// No description provided for @eveningAdhkarEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل إشعارات أذكار المساء'**
+  String get eveningAdhkarEnable;
+
+  /// No description provided for @eveningAdhkarOffset.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه بعد العصر بـ'**
+  String get eveningAdhkarOffset;
+
+  /// No description provided for @sleepAdhkar.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار النوم'**
+  String get sleepAdhkar;
+
+  /// No description provided for @sleepAdhkarEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل إشعارات أذكار النوم'**
+  String get sleepAdhkarEnable;
+
+  /// No description provided for @sleepAdhkarOffset.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه بعد العشاء بـ'**
+  String get sleepAdhkarOffset;
+
+  /// No description provided for @dailyTasbeeh.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسبيح اليومي'**
+  String get dailyTasbeeh;
+
+  /// No description provided for @dailyTasbeehEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير التسبيح اليومي (Streak)'**
+  String get dailyTasbeehEnable;
+
+  /// No description provided for @dailyTasbeehEnableSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُذكرك بالتسبيح إذا لم تقم به حتى وقت التذكير'**
+  String get dailyTasbeehEnableSubtitle;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت التذكير'**
+  String get reminderTime;
+
+  /// No description provided for @adhkarMorningNotificationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get adhkarMorningNotificationTitle;
+
+  /// No description provided for @adhkarMorningNotificationBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار الصباح، حصن نفسك.'**
+  String get adhkarMorningNotificationBody;
+
+  /// No description provided for @adhkarEveningNotificationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المساء'**
+  String get adhkarEveningNotificationTitle;
+
+  /// No description provided for @adhkarEveningNotificationBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار المساء، لا تنسى ذكر الله.'**
+  String get adhkarEveningNotificationBody;
+
+  /// No description provided for @adhkarSleepNotificationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار النوم'**
+  String get adhkarSleepNotificationTitle;
+
+  /// No description provided for @adhkarSleepNotificationBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختم يومك بأذكار النوم.'**
+  String get adhkarSleepNotificationBody;
+
+  /// No description provided for @tasbeehStreakNotificationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنسى وردك اليومي'**
+  String get tasbeehStreakNotificationTitle;
+
+  /// No description provided for @tasbeehStreakNotificationBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'حافظ على سلسلة التسبيح الخاصة بك (Streak)! 📿'**
+  String get tasbeehStreakNotificationBody;
+
+  /// No description provided for @shareAsText.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة كنص'**
+  String get shareAsText;
+
+  /// No description provided for @shareAsImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة كصورة'**
+  String get shareAsImage;
+
+  /// No description provided for @shareAsAudio.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة كصوت'**
+  String get shareAsAudio;
+
+  /// No description provided for @sharedFromApp.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت المشاركة من تطبيق بيت الإسلام - Islam Home'**
+  String get sharedFromApp;
+
+  /// No description provided for @downloadingAudioForShare.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري تحميل الصوت للمشاركة...'**
+  String get downloadingAudioForShare;
+
+  /// No description provided for @audioNeedsInternetToShare.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الصوت يحتاج لاتصال بالإنترنت ليتم مشاركته.'**
+  String get audioNeedsInternetToShare;
 }
 
 class _AppLocalizationsDelegate

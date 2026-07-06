@@ -19,7 +19,7 @@ final audioHandlerProvider = FutureProvider<AudioHandler>((ref) async {
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.islamhome.app.audio',
       androidNotificationChannelName: 'Islam Home Audio',
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
       androidStopForegroundOnPause: true,
     ),
   );
@@ -96,6 +96,7 @@ class AudioPlayerService {
   // Expose player and streams for widgets
   AudioPlayer get player => (_handler as dynamic).player;
   Stream<MediaItem?> get mediaItemStream => _handler.mediaItem;
+  MediaItem? get currentMediaItem => _handler.mediaItem.value;
 
   Future<void> playYoutubeAudio(
     String url, {

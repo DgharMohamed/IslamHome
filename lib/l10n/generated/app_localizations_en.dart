@@ -2509,4 +2509,97 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeBlack => 'Black';
+
+  @override
+  String get adhkarTasbeehSettingsTitle => 'Adhkar & Tasbeeh Settings';
+
+  @override
+  String get adhkarTasbeehSettingsSubtitle =>
+      'Customize Adhkar times and daily Tasbeeh reminder';
+
+  @override
+  String get morningAdhkar => 'Morning Adhkar';
+
+  @override
+  String get morningAdhkarEnable => 'Enable Morning Adhkar Notifications';
+
+  @override
+  String get morningAdhkarOffset => 'Alert after Fajr by';
+
+  @override
+  String get eveningAdhkar => 'Evening Adhkar';
+
+  @override
+  String get eveningAdhkarEnable => 'Enable Evening Adhkar Notifications';
+
+  @override
+  String get eveningAdhkarOffset => 'Alert after Asr by';
+
+  @override
+  String get sleepAdhkar => 'Sleep Adhkar';
+
+  @override
+  String get sleepAdhkarEnable => 'Enable Sleep Adhkar Notifications';
+
+  @override
+  String get sleepAdhkarOffset => 'Alert after Isha by';
+
+  @override
+  String get dailyTasbeeh => 'Daily Tasbeeh';
+
+  @override
+  String get dailyTasbeehEnable => 'Daily Tasbeeh Reminder (Streak)';
+
+  @override
+  String get dailyTasbeehEnableSubtitle =>
+      'Reminds you to do Tasbeeh if you haven\'t by the reminder time';
+
+  @override
+  String get reminderTime => 'Reminder Time';
+
+  @override
+  String get adhkarMorningNotificationTitle => 'Morning Adhkar';
+
+  @override
+  String get adhkarMorningNotificationBody =>
+      'It\'s time for Morning Adhkar, protect yourself.';
+
+  @override
+  String get adhkarEveningNotificationTitle => 'Evening Adhkar';
+
+  @override
+  String get adhkarEveningNotificationBody =>
+      'It\'s time for Evening Adhkar, don\'t forget the remembrance of Allah.';
+
+  @override
+  String get adhkarSleepNotificationTitle => 'Sleep Adhkar';
+
+  @override
+  String get adhkarSleepNotificationBody => 'End your day with Sleep Adhkar.';
+
+  @override
+  String get tasbeehStreakNotificationTitle => 'Don\'t forget your daily Wird';
+
+  @override
+  String get tasbeehStreakNotificationBody =>
+      'Keep your Tasbeeh streak alive! 📿';
+
+  @override
+  String get shareAsText => 'Share as Text';
+
+  @override
+  String get shareAsImage => 'Share as Image';
+
+  @override
+  String get shareAsAudio => 'Share as Audio';
+
+  @override
+  String get sharedFromApp => 'Shared from Islam Home app';
+
+  @override
+  String get downloadingAudioForShare => 'Downloading audio for sharing...';
+
+  @override
+  String get audioNeedsInternetToShare =>
+      'This audio needs an internet connection to be shared.';
 }

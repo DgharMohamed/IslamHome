@@ -1394,6 +1394,43 @@
   "themeBlue": "أزرق",
   "themeSepia": "ورق قديم",
   "themeNight": "ليلي",
-  "themeBlack": "أسود"
+  "themeBlack": "أسود",
+  "adhkarTasbeehSettingsTitle": "إعدادات تنبيهات الأذكار والتسبيح",
+  "adhkarTasbeehSettingsSubtitle": "تخصيص أوقات الأذكار والتذكير بالتسبيح اليومي",
+  "morningAdhkar": "أذكار الصباح",
+  "morningAdhkarEnable": "تفعيل إشعارات أذكار الصباح",
+  "morningAdhkarOffset": "تنبيه بعد الفجر بـ",
+  "eveningAdhkar": "أذكار المساء",
+  "eveningAdhkarEnable": "تفعيل إشعارات أذكار المساء",
+  "eveningAdhkarOffset": "تنبيه بعد العصر بـ",
+  "sleepAdhkar": "أذكار النوم",
+  "sleepAdhkarEnable": "تفعيل إشعارات أذكار النوم",
+  "sleepAdhkarOffset": "تنبيه بعد العشاء بـ",
+  "dailyTasbeeh": "التسبيح اليومي",
+  "dailyTasbeehEnable": "تذكير التسبيح اليومي (Streak)",
+  "dailyTasbeehEnableSubtitle": "يُذكرك بالتسبيح إذا لم تقم به حتى وقت التذكير",
+  "reminderTime": "وقت التذكير",
+  "minutes": "{count} دقيقة",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarMorningNotificationTitle": "أذكار الصباح",
+  "adhkarMorningNotificationBody": "حان وقت أذكار الصباح، حصن نفسك.",
+  "adhkarEveningNotificationTitle": "أذكار المساء",
+  "adhkarEveningNotificationBody": "حان وقت أذكار المساء، لا تنسى ذكر الله.",
+  "adhkarSleepNotificationTitle": "أذكار النوم",
+  "adhkarSleepNotificationBody": "اختم يومك بأذكار النوم.",
+  "tasbeehStreakNotificationTitle": "لا تنسى وردك اليومي",
+  "tasbeehStreakNotificationBody": "حافظ على سلسلة التسبيح الخاصة بك (Streak)! 📿",
+  "shareAsText": "مشاركة كنص",
+  "shareAsImage": "مشاركة كصورة",
+  "shareAsAudio": "مشاركة كصوت",
+  "sharedFromApp": "تمت المشاركة من تطبيق بيت الإسلام - Islam Home",
+  "downloadingAudioForShare": "جاري تحميل الصوت للمشاركة...",
+  "audioNeedsInternetToShare": "هذا الصوت يحتاج لاتصال بالإنترنت ليتم مشاركته."
 }
 

@@ -8,7 +8,9 @@ import 'package:islam_home/data/models/tasbeeh_model.dart';
 import 'package:islam_home/data/models/khatma_v2_models.dart';
 import 'package:islam_home/data/models/tasbeeh_log.dart';
 
-final firestoreSyncServiceProvider = Provider<FirestoreSyncService>((ref) => FirestoreSyncService());
+final firestoreSyncServiceProvider = Provider<FirestoreSyncService>(
+  (ref) => FirestoreSyncService(),
+);
 
 class FirestoreSyncService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -21,7 +23,9 @@ class FirestoreSyncService {
     final uid = _uid;
     if (uid == null) return;
 
-    debugPrint('FirestoreSyncService: Starting initial migration for UID: $uid');
+    debugPrint(
+      'FirestoreSyncService: Starting initial migration for UID: $uid',
+    );
 
     try {
       // 1. Sync Tasbeeh
@@ -59,7 +63,15 @@ class FirestoreSyncService {
 
       // 4. Sync Favorites
       final favBox = Hive.box('favorites');
-      final categories = ['reciters', 'surahs', 'ayahs', 'playlists', 'hadiths', 'tafsir', 'seerah'];
+      final categories = [
+        'reciters',
+        'surahs',
+        'ayahs',
+        'playlists',
+        'hadiths',
+        'tafsir',
+        'seerah',
+      ];
       for (var cat in categories) {
         final json = favBox.get(cat);
         if (json != null) {
@@ -86,7 +98,9 @@ class FirestoreSyncService {
         await syncSettings(appSettings);
       }
 
-      debugPrint('FirestoreSyncService: Initial migration completed successfully');
+      debugPrint(
+        'FirestoreSyncService: Initial migration completed successfully',
+      );
     } catch (e) {
       debugPrint('FirestoreSyncService: Initial migration failed: $e');
     }
@@ -108,9 +122,9 @@ class FirestoreSyncService {
           .collection(collection)
           .doc(docId)
           .set({
-        ...data,
-        'lastUpdated': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+            ...data,
+            'lastUpdated': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
     } catch (e) {
       debugPrint('FirestoreSyncService: saveUserData error: $e');
     }

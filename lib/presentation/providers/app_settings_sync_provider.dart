@@ -66,7 +66,8 @@ class AppSettingsSyncProvider {
 
         // 2. Mushaf Font Size
         if (cloudSettings.containsKey('mushaf_font_size_scale')) {
-          final scale = (cloudSettings['mushaf_font_size_scale'] as num).toDouble();
+          final scale = (cloudSettings['mushaf_font_size_scale'] as num)
+              .toDouble();
           await box.put('mushaf_font_size_scale', scale);
           _ref.read(mushafSettingsProvider.notifier).setFontSizeScale(scale);
         }

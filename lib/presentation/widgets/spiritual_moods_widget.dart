@@ -68,8 +68,14 @@ class SpiritualMoodsWidget extends ConsumerWidget {
     BuildContext context,
     MoodRecommendationSuggestion suggestion,
   ) {
-    final action = _getLocalizedValue(context, suggestion.recommendation.actionKey);
-    final title = _getLocalizedValue(context, suggestion.recommendation.titleKey);
+    final action = _getLocalizedValue(
+      context,
+      suggestion.recommendation.actionKey,
+    );
+    final title = _getLocalizedValue(
+      context,
+      suggestion.recommendation.titleKey,
+    );
     return '$action - $title';
   }
 
@@ -209,7 +215,9 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                     context.push(alternative.recommendation.route);
                   },
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.25),
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -311,7 +319,9 @@ class SpiritualMoodsWidget extends ConsumerWidget {
                         color: Colors.white.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: (mood['color'] as Color).withValues(alpha: 0.15),
+                          color: (mood['color'] as Color).withValues(
+                            alpha: 0.15,
+                          ),
                         ),
                       ),
                       child: Column(

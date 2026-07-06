@@ -37,7 +37,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     try {
-      await ref.read(authServiceProvider).loginWithEmail(
+      await ref
+          .read(authServiceProvider)
+          .loginWithEmail(
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
@@ -104,15 +106,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 hintText: 'البريد الإلكتروني',
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.08),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                prefixIcon: const Icon(Icons.alternate_email_rounded,
-                    color: AppTheme.primaryColor, size: 20),
+                prefixIcon: const Icon(
+                  Icons.alternate_email_rounded,
+                  color: AppTheme.primaryColor,
+                  size: 20,
+                ),
               ),
             ),
           ],
@@ -127,15 +134,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               final email = resetEmailController.text.trim();
               if (email.isEmpty || !email.contains('@')) return;
               try {
-                await ref.read(authServiceProvider).sendPasswordResetEmail(email);
+                await ref
+                    .read(authServiceProvider)
+                    .sendPasswordResetEmail(email);
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني'),
+                      content: const Text(
+                        'تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني',
+                      ),
                       backgroundColor: Colors.green.shade700,
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   );
                 }
@@ -144,16 +157,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('حدث خطأ. تأكد من صحة البريد الإلكتروني'),
+                      content: const Text(
+                        'حدث خطأ. تأكد من صحة البريد الإلكتروني',
+                      ),
                       backgroundColor: Colors.redAccent,
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   );
                 }
               }
             },
-            child: const Text('إرسال', style: TextStyle(color: AppTheme.primaryColor)),
+            child: const Text(
+              'إرسال',
+              style: TextStyle(color: AppTheme.primaryColor),
+            ),
           ),
         ],
       ),
@@ -166,7 +186,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (err.contains('wrong-password')) return 'كلمة المرور غير صحيحة';
     if (err.contains('invalid-email')) return 'البريد الإلكتروني غير صالح';
     if (err.contains('invalid-credential')) return 'بيانات الدخول غير صحيحة';
-    if (err.contains('network-request-failed')) return 'لا يوجد اتصال بالإنترنت';
+    if (err.contains('network-request-failed')) {
+      return 'لا يوجد اتصال بالإنترنت';
+    }
     if (err.contains('sign_in_failed') ||
         err.contains('developer_error') ||
         err.contains('api exception: 10')) {
@@ -193,7 +215,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height -
+              minHeight:
+                  MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top,
             ),
             child: IntrinsicHeight(
@@ -278,15 +301,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               padding: const EdgeInsets.only(bottom: 20),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: Colors.redAccent.withValues(alpha: 0.1),
+                                  color: Colors.redAccent.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   _errorMessage!,
                                   style: const TextStyle(
-                                      color: Colors.redAccent, fontSize: 13),
+                                    color: Colors.redAccent,
+                                    fontSize: 13,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -300,7 +329,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           const AuthDivider(),
                           const SizedBox(height: 20),
                           SocialAuthButton(
-                            onPressed: _isGoogleLoading ? null : _handleGoogleSignIn,
+                            onPressed: _isGoogleLoading
+                                ? null
+                                : _handleGoogleSignIn,
                             isLoading: _isGoogleLoading,
                             icon: Container(
                               width: 24,

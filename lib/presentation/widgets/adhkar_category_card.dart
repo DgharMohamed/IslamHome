@@ -54,10 +54,7 @@ class _AdhkarCategoryCardState extends State<AdhkarCategoryCard>
                 AppTheme.surfaceColor.withValues(alpha: 0.85),
               ],
             ),
-            border: Border.all(
-              color: accent.withValues(alpha: 0.18),
-              width: 1,
-            ),
+            border: Border.all(color: accent.withValues(alpha: 0.18), width: 1),
             boxShadow: [
               BoxShadow(
                 color: accent.withValues(alpha: 0.08),
@@ -97,11 +94,7 @@ class _AdhkarCategoryCardState extends State<AdhkarCategoryCard>
                           width: 1,
                         ),
                       ),
-                      child: Icon(
-                        widget.icon,
-                        color: accent,
-                        size: 22,
-                      ),
+                      child: Icon(widget.icon, color: accent, size: 22),
                     ),
                     const Spacer(),
                     // Category title

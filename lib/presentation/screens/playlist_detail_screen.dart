@@ -126,7 +126,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
 
     return SliverReorderableList(
       itemCount: playlist.items.length,
-      onReorder: (oldIndex, newIndex) {
+      onReorderItem: (oldIndex, newIndex) {
         ref
             .read(favoritesProvider.notifier)
             .reorderPlaylistItems(playlist.id, oldIndex, newIndex);
@@ -143,43 +143,49 @@ class PlaylistDetailScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(12),
-              leading: const CircleAvatar(
-                backgroundColor: Colors.white10,
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  color: AppTheme.primaryColor,
-                ),
-              ),
-              title: Text(
-                item.surahName,
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              subtitle: Text(
-                item.reciterName,
-                style: GoogleFonts.cairo(color: Colors.white54, fontSize: 13),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.remove_circle_outline,
-                      color: Colors.redAccent,
-                      size: 20,
-                    ),
-                    onPressed: () => ref
-                        .read(favoritesProvider.notifier)
-                        .removeFromPlaylist(playlist.id, item.id),
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(12),
+                leading: const CircleAvatar(
+                  backgroundColor: Colors.white10,
+                  child: Icon(
+                    Icons.play_arrow_rounded,
+                    color: AppTheme.primaryColor,
                   ),
-                  const Icon(Icons.drag_handle_rounded, color: Colors.white24),
-                ],
+                ),
+                title: Text(
+                  item.surahName,
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                subtitle: Text(
+                  item.reciterName,
+                  style: GoogleFonts.cairo(color: Colors.white54, fontSize: 13),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        color: Colors.redAccent,
+                        size: 20,
+                      ),
+                      onPressed: () => ref
+                          .read(favoritesProvider.notifier)
+                          .removeFromPlaylist(playlist.id, item.id),
+                    ),
+                    const Icon(
+                      Icons.drag_handle_rounded,
+                      color: Colors.white24,
+                    ),
+                  ],
+                ),
+                onTap: () => _playItem(ref, playlist, index),
               ),
-              onTap: () => _playItem(ref, playlist, index),
             ),
           ),
         );

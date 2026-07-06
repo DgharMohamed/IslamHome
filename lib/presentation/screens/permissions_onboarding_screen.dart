@@ -61,8 +61,6 @@ class _PermissionsOnboardingScreenState
     }
   }
 
-
-
   Future<void> _handlePermissionChange(
     Permission permission,
     bool isGranted,
@@ -183,11 +181,9 @@ class _PermissionsOnboardingScreenState
                                   setState(() => _locationGranted = status),
                             ),
                           ),
-
                         ],
                       ),
                     ),
-
 
                     const SizedBox(height: 24),
 
@@ -233,40 +229,43 @@ class _PermissionsOnboardingScreenState
   }) {
     return GlassContainer(
       borderRadius: 20,
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 12,
-        ),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: (status ? Colors.green : AppTheme.primaryColor).withValues(
-              alpha: 0.1,
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 12,
+          ),
+          leading: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: (status ? Colors.green : AppTheme.primaryColor).withValues(
+                alpha: 0.1,
+              ),
+              shape: BoxShape.circle,
             ),
-            shape: BoxShape.circle,
+            child: Icon(
+              icon,
+              color: status ? Colors.green : AppTheme.primaryColor,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: status ? Colors.green : AppTheme.primaryColor,
+          title: Text(
+            title,
+            style: GoogleFonts.cairo(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-        title: Text(
-          title,
-          style: GoogleFonts.cairo(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          subtitle: Text(
+            subtitle,
+            style: GoogleFonts.montserrat(fontSize: 12, color: Colors.white54),
           ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: GoogleFonts.montserrat(fontSize: 12, color: Colors.white54),
-        ),
-        trailing: Switch(
-          value: status,
-          onChanged: (_) => onTap(),
-          activeThumbColor: AppTheme.primaryColor,
+          trailing: Switch(
+            value: status,
+            onChanged: (_) => onTap(),
+            activeThumbColor: AppTheme.primaryColor,
+          ),
         ),
       ),
     );

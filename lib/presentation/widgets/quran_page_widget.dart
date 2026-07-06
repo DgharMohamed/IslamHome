@@ -16,7 +16,13 @@ class QuranPageWidget extends ConsumerWidget {
     final mushafSettings = ref.watch(mushafSettingsProvider);
 
     return pageAsync.when(
-      data: (page) => _buildPage(context, ref, page, activeVerseKey, mushafSettings.fontSizeScale),
+      data: (page) => _buildPage(
+        context,
+        ref,
+        page,
+        activeVerseKey,
+        mushafSettings.fontSizeScale,
+      ),
       loading: () => const Center(
         child: CircularProgressIndicator(
           color: Color(0xFFC9A227),
@@ -59,7 +65,10 @@ class QuranPageWidget extends ConsumerWidget {
               ),
               child: Column(
                 children: page.lines
-                    .map((line) => _buildLine(ref, line, activeVerseKey, fontSizeScale))
+                    .map(
+                      (line) =>
+                          _buildLine(ref, line, activeVerseKey, fontSizeScale),
+                    )
                     .toList(),
               ),
             ),
@@ -123,7 +132,12 @@ class QuranPageWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildLine(WidgetRef ref, QuranLine line, String? activeVerseKey, double fontSizeScale) {
+  Widget _buildLine(
+    WidgetRef ref,
+    QuranLine line,
+    String? activeVerseKey,
+    double fontSizeScale,
+  ) {
     return Expanded(
       child: Directionality(
         textDirection: TextDirection.rtl,
@@ -142,7 +156,14 @@ class QuranPageWidget extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: line.words
-                        .map((word) => _buildWord(ref, word, activeVerseKey, fontSizeScale))
+                        .map(
+                          (word) => _buildWord(
+                            ref,
+                            word,
+                            activeVerseKey,
+                            fontSizeScale,
+                          ),
+                        )
                         .toList(),
                   ),
                 ),
@@ -154,7 +175,12 @@ class QuranPageWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildWord(WidgetRef ref, QuranWord word, String? activeVerseKey, double fontSizeScale) {
+  Widget _buildWord(
+    WidgetRef ref,
+    QuranWord word,
+    String? activeVerseKey,
+    double fontSizeScale,
+  ) {
     final bool isEnd = word.charTypeName == 'end';
     final bool isActive = activeVerseKey == word.verseKey;
 

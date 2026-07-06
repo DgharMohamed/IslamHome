@@ -16,7 +16,8 @@ final tasbeehListProvider =
 
 class TasbeehNotifier extends Notifier<List<TasbeehModel>> {
   TasbeehService get _service => ref.read(tasbeehServiceProvider);
-  FirestoreSyncService get _syncService => ref.read(firestoreSyncServiceProvider);
+  FirestoreSyncService get _syncService =>
+      ref.read(firestoreSyncServiceProvider);
   FirebaseAuth get _auth => FirebaseAuth.instance;
   StreamSubscription? _cloudSubscription;
   String? _listeningUid;
@@ -49,39 +50,48 @@ class TasbeehNotifier extends Notifier<List<TasbeehModel>> {
 
     _cloudSubscription = _syncService
         .getUserCollectionStream('tasbeeh', uid: uid)
-        .listen((snapshot) {
-      bool localUpdated = false;
-      final currentList = List<TasbeehModel>.from(state);
+        .listen(
+          (snapshot) {
+            bool localUpdated = false;
+            final currentList = List<TasbeehModel>.from(state);
 
-      for (var doc in snapshot.docs) {
-        final cloudDhikr = TasbeehModel.fromJson(doc.data());
-        final index = currentList.indexWhere((d) => d.id == cloudDhikr.id);
+            for (var doc in snapshot.docs) {
+              final cloudDhikr = TasbeehModel.fromJson(doc.data());
+              final index = currentList.indexWhere(
+                (d) => d.id == cloudDhikr.id,
+              );
 
-        if (index != -1) {
-          final localDhikr = currentList[index];
-          // Only update if cloud version is newer
-          final cloudTime = cloudDhikr.lastUpdated ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final localTime = localDhikr.lastUpdated ?? DateTime.fromMillisecondsSinceEpoch(0);
-          
-          if (cloudTime.isAfter(localTime)) {
-            currentList[index] = cloudDhikr;
-            _service.updateDhikr(cloudDhikr);
-            localUpdated = true;
-          }
-        } else {
-          // New dhikr from cloud
-          currentList.add(cloudDhikr);
-          _service.updateDhikr(cloudDhikr);
-          localUpdated = true;
-        }
-      }
+              if (index != -1) {
+                final localDhikr = currentList[index];
+                // Only update if cloud version is newer
+                final cloudTime =
+                    cloudDhikr.lastUpdated ??
+                    DateTime.fromMillisecondsSinceEpoch(0);
+                final localTime =
+                    localDhikr.lastUpdated ??
+                    DateTime.fromMillisecondsSinceEpoch(0);
 
-      if (localUpdated) {
-        state = currentList;
-      }
-    }, onError: (Object error) {
-      debugPrint('TasbeehNotifier: cloud listener error: $error');
-    });
+                if (cloudTime.isAfter(localTime)) {
+                  currentList[index] = cloudDhikr;
+                  _service.updateDhikr(cloudDhikr);
+                  localUpdated = true;
+                }
+              } else {
+                // New dhikr from cloud
+                currentList.add(cloudDhikr);
+                _service.updateDhikr(cloudDhikr);
+                localUpdated = true;
+              }
+            }
+
+            if (localUpdated) {
+              state = currentList;
+            }
+          },
+          onError: (Object error) {
+            debugPrint('TasbeehNotifier: cloud listener error: $error');
+          },
+        );
   }
 
   Future<void> increment(String id) async {
@@ -103,8 +113,10 @@ class TasbeehNotifier extends Notifier<List<TasbeehModel>> {
           d,
     ];
 
-    final updatedDhikr = state.firstWhere((d) => d.id == id).copyWith(lastUpdated: DateTime.now());
-    
+    final updatedDhikr = state
+        .firstWhere((d) => d.id == id)
+        .copyWith(lastUpdated: DateTime.now());
+
     // Update local state with the one having the new timestamp
     state = [
       for (final d in state)

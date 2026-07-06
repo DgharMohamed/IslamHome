@@ -260,7 +260,10 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
         final filteredSurahIds = _searchQuery.isEmpty
             ? groupedSurahs.keys.toList()
             : groupedSurahs.keys.where((id) {
-                final surahName = QuranUtils.getSurahName(id, isEnglish: isEnglish);
+                final surahName = QuranUtils.getSurahName(
+                  id,
+                  isEnglish: isEnglish,
+                );
                 return QuranUtils.matchesSearch(surahName, _searchQuery);
               }).toList();
 
@@ -270,7 +273,8 @@ class _TafsirScreenState extends ConsumerState<TafsirScreen> {
             delegate: SliverChildBuilderDelegate((context, index) {
               final surahId = filteredSurahIds[index];
               final parts = groupedSurahs[surahId]!;
-              final surahName = '${l10n.surah} ${QuranUtils.getSurahName(surahId, isEnglish: isEnglish)}';
+              final surahName =
+                  '${l10n.surah} ${QuranUtils.getSurahName(surahId, isEnglish: isEnglish)}';
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12.0),

@@ -174,7 +174,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
-                child: SizedBox(height: MediaQuery.of(context).padding.top + 60),
+                child: SizedBox(
+                  height: MediaQuery.of(context).padding.top + 60,
+                ),
               ),
               // Modern Hero Header
               SliverToBoxAdapter(
@@ -191,12 +193,43 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       if (data != null) ...[
-                        _buildTimelineItem(l10n.fajr, data.getFajr(), Icons.wb_twilight, 'Fajr'),
-                        _buildTimelineItem(l10n.sunrise, data.getSunrise(), Icons.wb_sunny_outlined, 'Sunrise'),
-                        _buildTimelineItem(l10n.dhuhr, data.getDhuhr(), Icons.wb_sunny, 'Dhuhr'),
-                        _buildTimelineItem(l10n.asr, data.getAsr(), Icons.cloud_queue_rounded, 'Asr'),
-                        _buildTimelineItem(l10n.maghrib, data.getMaghrib(), Icons.nights_stay_outlined, 'Maghrib'),
-                        _buildTimelineItem(l10n.isha, data.getIsha(), Icons.nights_stay_rounded, 'Isha', isLast: true),
+                        _buildTimelineItem(
+                          l10n.fajr,
+                          data.getFajr(),
+                          Icons.wb_twilight,
+                          'Fajr',
+                        ),
+                        _buildTimelineItem(
+                          l10n.sunrise,
+                          data.getSunrise(),
+                          Icons.wb_sunny_outlined,
+                          'Sunrise',
+                        ),
+                        _buildTimelineItem(
+                          l10n.dhuhr,
+                          data.getDhuhr(),
+                          Icons.wb_sunny,
+                          'Dhuhr',
+                        ),
+                        _buildTimelineItem(
+                          l10n.asr,
+                          data.getAsr(),
+                          Icons.cloud_queue_rounded,
+                          'Asr',
+                        ),
+                        _buildTimelineItem(
+                          l10n.maghrib,
+                          data.getMaghrib(),
+                          Icons.nights_stay_outlined,
+                          'Maghrib',
+                        ),
+                        _buildTimelineItem(
+                          l10n.isha,
+                          data.getIsha(),
+                          Icons.nights_stay_rounded,
+                          'Isha',
+                          isLast: true,
+                        ),
                       ] else
                         Center(
                           child: Text(
@@ -210,7 +243,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                 ),
                 loading: () => const SliverFillRemaining(
                   child: Center(
-                    child: CircularProgressIndicator(color: AppTheme.primaryColor),
+                    child: CircularProgressIndicator(
+                      color: AppTheme.primaryColor,
+                    ),
                   ),
                 ),
                 error: (e, _) => SliverToBoxAdapter(
@@ -229,12 +264,20 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
     );
   }
 
-  Widget _buildHeroSection(PrayerState state, AppLocalizations l10n, Color nextColor) {
+  Widget _buildHeroSection(
+    PrayerState state,
+    AppLocalizations l10n,
+    Color nextColor,
+  ) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final hasCountdown = _nextPrayerName.isNotEmpty && _remaining.inSeconds > 0;
     final h = hasCountdown ? twoDigits(_remaining.inHours) : '--';
-    final m = hasCountdown ? twoDigits(_remaining.inMinutes.remainder(60)) : '--';
-    final s = hasCountdown ? twoDigits(_remaining.inSeconds.remainder(60)) : '--';
+    final m = hasCountdown
+        ? twoDigits(_remaining.inMinutes.remainder(60))
+        : '--';
+    final s = hasCountdown
+        ? twoDigits(_remaining.inSeconds.remainder(60))
+        : '--';
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
@@ -270,7 +313,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
           ),
           const SizedBox(height: 30),
           Text(
-            _nextPrayerName.isEmpty ? '...' : _getLocalizedPrayerName(_nextPrayerName, l10n),
+            _nextPrayerName.isEmpty
+                ? '...'
+                : _getLocalizedPrayerName(_nextPrayerName, l10n),
             style: GoogleFonts.cairo(
               fontSize: 36,
               fontWeight: FontWeight.w900,
@@ -333,17 +378,30 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
 
   String _getLocalizedPrayerName(String key, AppLocalizations l10n) {
     switch (key) {
-      case 'Fajr': return l10n.fajr;
-      case 'Sunrise': return l10n.sunrise;
-      case 'Dhuhr': return l10n.dhuhr;
-      case 'Asr': return l10n.asr;
-      case 'Maghrib': return l10n.maghrib;
-      case 'Isha': return l10n.isha;
-      default: return '...';
+      case 'Fajr':
+        return l10n.fajr;
+      case 'Sunrise':
+        return l10n.sunrise;
+      case 'Dhuhr':
+        return l10n.dhuhr;
+      case 'Asr':
+        return l10n.asr;
+      case 'Maghrib':
+        return l10n.maghrib;
+      case 'Isha':
+        return l10n.isha;
+      default:
+        return '...';
     }
   }
 
-  Widget _buildTimelineItem(String name, String time, IconData icon, String key, {bool isLast = false}) {
+  Widget _buildTimelineItem(
+    String name,
+    String time,
+    IconData icon,
+    String key, {
+    bool isLast = false,
+  }) {
     final isNext = _nextPrayerName == key;
     final color = _prayerAccentColor(key);
 
@@ -368,7 +426,12 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                       width: 3,
                     ),
                     boxShadow: isNext
-                        ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10)]
+                        ? [
+                            BoxShadow(
+                              color: color.withValues(alpha: 0.5),
+                              blurRadius: 10,
+                            ),
+                          ]
                         : null,
                   ),
                 ),
@@ -390,15 +453,23 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isNext ? color.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.03),
+                  color: isNext
+                      ? color.withValues(alpha: 0.1)
+                      : Colors.white.withValues(alpha: 0.03),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isNext ? color.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.03),
+                    color: isNext
+                        ? color.withValues(alpha: 0.3)
+                        : Colors.white.withValues(alpha: 0.03),
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(icon, color: isNext ? color : Colors.white54, size: 28),
+                    Icon(
+                      icon,
+                      color: isNext ? color : Colors.white54,
+                      size: 28,
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -409,7 +480,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                             name,
                             style: GoogleFonts.cairo(
                               fontSize: 16,
-                              fontWeight: isNext ? FontWeight.bold : FontWeight.w600,
+                              fontWeight: isNext
+                                  ? FontWeight.bold
+                                  : FontWeight.w600,
                               color: isNext ? Colors.white : Colors.white70,
                             ),
                           ),
@@ -417,7 +490,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                             time,
                             style: GoogleFonts.montserrat(
                               fontSize: 18,
-                              fontWeight: isNext ? FontWeight.bold : FontWeight.w500,
+                              fontWeight: isNext
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                               color: isNext ? color : Colors.white54,
                             ),
                           ),
@@ -430,20 +505,33 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                           keys: ['athan_global_enabled', 'athan_enabled_$key'],
                         ),
                         builder: (context, box, widget) {
-                          final globalEnabled = box.get('athan_global_enabled', defaultValue: true) as bool;
-                          final isEnabled = box.get('athan_enabled_$key', defaultValue: true) as bool;
+                          final globalEnabled =
+                              box.get(
+                                    'athan_global_enabled',
+                                    defaultValue: true,
+                                  )
+                                  as bool;
+                          final isEnabled =
+                              box.get('athan_enabled_$key', defaultValue: true)
+                                  as bool;
                           final active = isEnabled && globalEnabled;
 
                           return GestureDetector(
-                            onTap: () => ref.read(prayerNotifierProvider.notifier).togglePrayerAthan(key, !isEnabled),
+                            onTap: () => ref
+                                .read(prayerNotifierProvider.notifier)
+                                .togglePrayerAthan(key, !isEnabled),
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: active ? color.withValues(alpha: 0.15) : Colors.transparent,
+                                color: active
+                                    ? color.withValues(alpha: 0.15)
+                                    : Colors.transparent,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                active ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                                active
+                                    ? Icons.notifications_active_rounded
+                                    : Icons.notifications_off_rounded,
                                 color: active ? color : Colors.white24,
                                 size: 20,
                               ),
@@ -503,15 +591,23 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
 
                 // Global Adhan Settings
                 ValueListenableBuilder(
-                  valueListenable: Hive.box('settings').listenable(keys: ['athan_global_enabled']),
+                  valueListenable: Hive.box(
+                    'settings',
+                  ).listenable(keys: ['athan_global_enabled']),
                   builder: (context, box, _) {
-                    final isEnabled = box.get('athan_global_enabled', defaultValue: true) as bool;
+                    final isEnabled =
+                        box.get('athan_global_enabled', defaultValue: true)
+                            as bool;
                     return _buildSettingsTile(
                       title: l10n.athanNotifications,
-                      icon: isEnabled ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                      icon: isEnabled
+                          ? Icons.notifications_active_rounded
+                          : Icons.notifications_off_rounded,
                       trailing: Switch(
                         value: isEnabled,
-                        onChanged: (val) => ref.read(prayerNotifierProvider.notifier).toggleAthan(val),
+                        onChanged: (val) => ref
+                            .read(prayerNotifierProvider.notifier)
+                            .toggleAthan(val),
                         activeThumbColor: AppTheme.primaryColor,
                       ),
                     );
@@ -521,7 +617,10 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                 // Calculation Method
                 _buildSettingsTile(
                   title: l10n.calculationMethodTitle,
-                  subtitle: PrayerMethod.getLocalizedName(state.calculationMethodId, l10n),
+                  subtitle: PrayerMethod.getLocalizedName(
+                    state.calculationMethodId,
+                    l10n,
+                  ),
                   icon: Icons.calculate_rounded,
                   onTap: () {
                     Navigator.pop(context);
@@ -531,9 +630,13 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
 
                 // Prayer Adjustment
                 ValueListenableBuilder(
-                  valueListenable: Hive.box('settings').listenable(keys: ['prayer_adjustment_minutes']),
+                  valueListenable: Hive.box(
+                    'settings',
+                  ).listenable(keys: ['prayer_adjustment_minutes']),
                   builder: (context, box, _) {
-                    final adjustment = box.get('prayer_adjustment_minutes', defaultValue: 0) as int;
+                    final adjustment =
+                        box.get('prayer_adjustment_minutes', defaultValue: 0)
+                            as int;
                     return _buildSettingsTile(
                       title: l10n.prayerAdjustment,
                       subtitle: adjustment != 0
@@ -551,11 +654,21 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                 // Pre-Prayer Reminders
                 ValueListenableBuilder(
                   valueListenable: Hive.box('settings').listenable(
-                    keys: ['athan_pre_reminders_enabled', 'athan_reminder_minutes'],
+                    keys: [
+                      'athan_pre_reminders_enabled',
+                      'athan_reminder_minutes',
+                    ],
                   ),
                   builder: (context, box, _) {
-                    final isEnabled = box.get('athan_pre_reminders_enabled', defaultValue: false) as bool;
-                    final reminderMin = box.get('athan_reminder_minutes', defaultValue: 15) as int;
+                    final isEnabled =
+                        box.get(
+                              'athan_pre_reminders_enabled',
+                              defaultValue: false,
+                            )
+                            as bool;
+                    final reminderMin =
+                        box.get('athan_reminder_minutes', defaultValue: 15)
+                            as int;
                     return Column(
                       children: [
                         _buildSettingsTile(
@@ -564,7 +677,9 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                           icon: Icons.auto_awesome_rounded,
                           trailing: Switch(
                             value: isEnabled,
-                            onChanged: (val) => ref.read(prayerNotifierProvider.notifier).togglePreAthanReminders(val),
+                            onChanged: (val) => ref
+                                .read(prayerNotifierProvider.notifier)
+                                .togglePreAthanReminders(val),
                             activeThumbColor: AppTheme.primaryColor,
                           ),
                         ),
@@ -573,17 +688,36 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                             padding: const EdgeInsets.only(top: 8, bottom: 16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [5, 10, 15, 30].map((min) => GestureDetector(
-                                onTap: () => ref.read(prayerNotifierProvider.notifier).setReminderMinutes(min),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: reminderMin == min ? AppTheme.primaryColor : Colors.white10,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text('$minد', style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold)),
-                                ),
-                              )).toList(),
+                              children: [5, 10, 15, 30]
+                                  .map(
+                                    (min) => GestureDetector(
+                                      onTap: () => ref
+                                          .read(prayerNotifierProvider.notifier)
+                                          .setReminderMinutes(min),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: reminderMin == min
+                                              ? AppTheme.primaryColor
+                                              : Colors.white10,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '$minد',
+                                          style: GoogleFonts.cairo(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                             ),
                           ),
                       ],
@@ -612,20 +746,44 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          onTap: onTap,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 8,
           ),
-          child: Icon(icon, color: AppTheme.primaryColor, size: 24),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppTheme.primaryColor, size: 24),
+          ),
+          title: Text(
+            title,
+            style: GoogleFonts.cairo(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          subtitle: subtitle != null
+              ? Text(
+                  subtitle,
+                  style: GoogleFonts.cairo(color: Colors.white54, fontSize: 13),
+                )
+              : null,
+          trailing:
+              trailing ??
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.white24,
+                size: 16,
+              ),
         ),
-        title: Text(title, style: GoogleFonts.cairo(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-        subtitle: subtitle != null ? Text(subtitle, style: GoogleFonts.cairo(color: Colors.white54, fontSize: 13)) : null,
-        trailing: trailing ?? const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16),
       ),
     );
   }
@@ -634,38 +792,60 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.backgroundColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
       builder: (context) => ListView.builder(
         padding: const EdgeInsets.all(24),
         itemCount: PrayerMethod.methods.length,
         itemBuilder: (context, index) {
           final method = PrayerMethod.methods[index];
           final isSelected = state.calculationMethodId == method.id;
-          return ListTile(
-            title: Text(PrayerMethod.getLocalizedName(method.id, l10n), style: GoogleFonts.cairo(color: Colors.white)),
-            trailing: isSelected ? const Icon(Icons.check_circle, color: AppTheme.primaryColor) : null,
-            onTap: () {
-              ref.read(prayerNotifierProvider.notifier).updateCalculationMethod(method.id);
-              Navigator.pop(context);
-            },
+          return Material(
+            type: MaterialType.transparency,
+            child: ListTile(
+              title: Text(
+                PrayerMethod.getLocalizedName(method.id, l10n),
+                style: GoogleFonts.cairo(color: Colors.white),
+              ),
+              trailing: isSelected
+                  ? const Icon(Icons.check_circle, color: AppTheme.primaryColor)
+                  : null,
+              onTap: () {
+                ref
+                    .read(prayerNotifierProvider.notifier)
+                    .updateCalculationMethod(method.id);
+                Navigator.pop(context);
+              },
+            ),
           );
         },
       ),
     );
   }
 
-  void _showPrayerAdjustmentDialog(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+  void _showPrayerAdjustmentDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
     final box = Hive.box('settings');
-    int currentAdjustment = box.get('prayer_adjustment_minutes', defaultValue: 0) as int;
-    
+    int currentAdjustment =
+        box.get('prayer_adjustment_minutes', defaultValue: 0) as int;
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
             backgroundColor: AppTheme.surfaceColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            title: Text(l10n.prayerAdjustment, style: GoogleFonts.cairo(color: Colors.white)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            title: Text(
+              l10n.prayerAdjustment,
+              style: GoogleFonts.cairo(color: Colors.white),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -673,23 +853,43 @@ class _PrayerTimesScreenState extends ConsumerState<PrayerTimesScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.remove_circle_outline, color: Colors.white),
-                      onPressed: () => setDialogState(() => currentAdjustment--),
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        color: Colors.white,
+                      ),
+                      onPressed: () =>
+                          setDialogState(() => currentAdjustment--),
                     ),
-                    Text('$currentAdjustment', style: GoogleFonts.montserrat(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                    Text(
+                      '$currentAdjustment',
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     IconButton(
-                      icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-                      onPressed: () => setDialogState(() => currentAdjustment++),
+                      icon: const Icon(
+                        Icons.add_circle_outline,
+                        color: Colors.white,
+                      ),
+                      onPressed: () =>
+                          setDialogState(() => currentAdjustment++),
                     ),
                   ],
                 ),
               ],
             ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(l10n.cancel),
+              ),
               ElevatedButton(
                 onPressed: () {
-                  ref.read(prayerNotifierProvider.notifier).updateAdjustment(currentAdjustment);
+                  ref
+                      .read(prayerNotifierProvider.notifier)
+                      .updateAdjustment(currentAdjustment);
                   Navigator.pop(context);
                 },
                 child: Text(l10n.done),

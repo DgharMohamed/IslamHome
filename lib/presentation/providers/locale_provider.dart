@@ -26,10 +26,10 @@ class LocaleNotifier extends Notifier<Locale> {
   Future<void> setLocale(Locale locale) async {
     final box = await Hive.openBox('settings');
     await box.put('language', locale.languageCode);
-    
+
     // Update NotificationService locale as well
     NotificationService().updateLocale(locale.languageCode);
-    
+
     state = locale;
   }
 }

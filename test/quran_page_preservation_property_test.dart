@@ -126,7 +126,7 @@ void main() {
             overrides: [
               quranPageProvider(
                 pageNumber,
-              ).overrideWithValue(AsyncValue.data(page)),
+              ).overrideWith((ref) => page),
               mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
@@ -206,7 +206,7 @@ void main() {
             overrides: [
               quranPageProvider(
                 pageNumber,
-              ).overrideWithValue(AsyncValue.data(page)),
+              ).overrideWith((ref) => page),
               mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
@@ -288,7 +288,7 @@ void main() {
             overrides: [
               quranPageProvider(
                 pageNumber,
-              ).overrideWithValue(AsyncValue.data(page)),
+              ).overrideWith((ref) => page),
               mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
@@ -347,7 +347,7 @@ void main() {
             overrides: [
               quranPageProvider(
                 pageNumber,
-              ).overrideWithValue(AsyncValue.data(page)),
+              ).overrideWith((ref) => page),
               mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
@@ -396,7 +396,7 @@ void main() {
             overrides: [
               quranPageProvider(
                 pageNumber,
-              ).overrideWithValue(AsyncValue.data(page)),
+              ).overrideWith((ref) => page),
               mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
             ],
             child: const MaterialApp(
@@ -476,8 +476,9 @@ void main() {
 
           await tester.pumpWidget(
             ProviderScope(
+              key: UniqueKey(),
               overrides: [
-                quranPageProvider(1).overrideWithValue(AsyncValue.data(page)),
+                quranPageProvider(1).overrideWith((ref) => page),
                 mushafSettingsProvider.overrideWith(() => FakeMushafSettingsNotifier()),
               ],
               child: const MaterialApp(
@@ -555,7 +556,7 @@ void main() {
 class FakeMushafSettingsNotifier extends MushafSettingsNotifier {
   @override
   MushafSettings build() {
-    return const MushafSettings(fontSizeScale: 1.0);
+    return const MushafSettings(fontSizeScale: 1.0, selectedFontId: 'uthmanic_hafs');
   }
 
   @override

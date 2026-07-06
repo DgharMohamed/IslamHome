@@ -105,7 +105,10 @@ class DailyVerseWidget extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const SizedBox(height: 150, child: Center(child: CircularProgressIndicator())),
+      loading: () => const SizedBox(
+        height: 150,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }

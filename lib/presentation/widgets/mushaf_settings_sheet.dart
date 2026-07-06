@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/providers/mushaf_settings_provider.dart';
 import 'package:islam_home/presentation/providers/mushaf_theme_provider.dart';
+import 'package:islam_home/presentation/widgets/font_selection_sheet.dart';
 
 class MushafSettingsSheet extends ConsumerWidget {
   const MushafSettingsSheet({super.key});
@@ -143,9 +144,8 @@ class MushafSettingsSheet extends ConsumerWidget {
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       activeTrackColor: currentTheme.secondaryColor,
-                      inactiveTrackColor: currentTheme.secondaryColor.withValues(
-                        alpha: 0.15,
-                      ),
+                      inactiveTrackColor: currentTheme.secondaryColor
+                          .withValues(alpha: 0.15),
                       thumbColor: currentTheme.secondaryColor,
                       overlayColor: currentTheme.secondaryColor.withValues(
                         alpha: 0.1,
@@ -160,7 +160,8 @@ class MushafSettingsSheet extends ConsumerWidget {
                       min: 1.0,
                       max: 2.0,
                       divisions: 10,
-                      label: '${mushafSettings.fontSizeScale.toStringAsFixed(1)}x',
+                      label:
+                          '${mushafSettings.fontSizeScale.toStringAsFixed(1)}x',
                       onChanged: (value) {
                         ref
                             .read(mushafSettingsProvider.notifier)
@@ -175,6 +176,73 @@ class MushafSettingsSheet extends ConsumerWidget {
                   color: currentTheme.secondaryColor,
                 ),
               ],
+            ),
+            const SizedBox(height: 32),
+            // Quran Font Section
+            _sectionTitle(
+              isEnglish ? 'Quran Font' : 'خط المصحف',
+              currentTheme,
+              isEnglish,
+            ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const FontSelectionSheet(),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: currentTheme.secondaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: currentTheme.secondaryColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.font_download_rounded,
+                      color: currentTheme.secondaryColor,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isEnglish ? 'Current Font' : 'الخط الحالي',
+                            style: GoogleFonts.cairo(
+                              fontSize: 12,
+                              color: currentTheme.textColor.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          Text(
+                            isEnglish
+                                ? mushafSettings.selectedFont.nameEn
+                                : mushafSettings.selectedFont.nameAr,
+                            style: GoogleFonts.cairo(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: currentTheme.textColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: currentTheme.textColor.withValues(alpha: 0.4),
+                    ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 32),
           ],

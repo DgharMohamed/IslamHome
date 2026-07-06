@@ -57,7 +57,10 @@ class _AdhkarSearchScreenState extends ConsumerState<AdhkarSearchScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                    ),
                     onPressed: () => context.pop(),
                   ),
                   const SizedBox(width: 8),
@@ -87,11 +90,19 @@ class _AdhkarSearchScreenState extends ConsumerState<AdhkarSearchScreen> {
             // Results
             Expanded(
               child: _query.trim().isEmpty
-                  ? _buildEmptyState(l10n, Icons.search_rounded, l10n.typeToSearchAdhkar)
+                  ? _buildEmptyState(
+                      l10n,
+                      Icons.search_rounded,
+                      l10n.typeToSearchAdhkar,
+                    )
                   : resultsAsync.when(
                       data: (items) {
                         if (items.isEmpty) {
-                          return _buildEmptyState(l10n, Icons.search_off_rounded, l10n.noAdhkarMatches);
+                          return _buildEmptyState(
+                            l10n,
+                            Icons.search_off_rounded,
+                            l10n.noAdhkarMatches,
+                          );
                         }
                         return ListView.builder(
                           padding: const EdgeInsets.all(16),
@@ -105,7 +116,9 @@ class _AdhkarSearchScreenState extends ConsumerState<AdhkarSearchScreen> {
                                 isEnglish: isEnglish,
                                 showCategory: true,
                                 onTap: () {
-                                  final category = Uri.encodeComponent(item.category);
+                                  final category = Uri.encodeComponent(
+                                    item.category,
+                                  );
                                   context.push(
                                     '/azkar/details/${item.id}?category=$category',
                                   );
@@ -116,7 +129,9 @@ class _AdhkarSearchScreenState extends ConsumerState<AdhkarSearchScreen> {
                         );
                       },
                       loading: () => const Center(
-                        child: CircularProgressIndicator(color: AppTheme.primaryColor),
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primaryColor,
+                        ),
                       ),
                       error: (error, _) => Center(
                         child: Text(
@@ -132,16 +147,16 @@ class _AdhkarSearchScreenState extends ConsumerState<AdhkarSearchScreen> {
     );
   }
 
-  Widget _buildEmptyState(AppLocalizations l10n, IconData icon, String message) {
+  Widget _buildEmptyState(
+    AppLocalizations l10n,
+    IconData icon,
+    String message,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 80,
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
+          Icon(icon, size: 80, color: Colors.white.withValues(alpha: 0.1)),
           const SizedBox(height: 16),
           Text(
             message,

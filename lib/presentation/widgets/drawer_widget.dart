@@ -296,37 +296,42 @@ class DrawerWidget extends ConsumerWidget {
             ? Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2))
             : null,
       ),
-      child: ListTile(
-        visualDensity: VisualDensity.compact,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        leading: Icon(
-          icon,
-          color: isSelected ? AppTheme.primaryColor : Colors.white54,
-          size: 22,
-        ),
-        title: Text(
-          title,
-          style: GoogleFonts.cairo(
-            color: isSelected ? Colors.white : Colors.white70,
-            fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-            fontSize: 15,
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          visualDensity: VisualDensity.compact,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        onTap: () {
-          context.pop(); // Close drawer
-          if (route == 'bookmark') {
-            final lastReadPos = ref.read(lastReadPositionProvider).value;
-            if (lastReadPos != null) {
-              context.push(
-                '/quran?surah=${lastReadPos.surahNumber}&ayah=${lastReadPos.ayahNumber}',
-              );
+          leading: Icon(
+            icon,
+            color: isSelected ? AppTheme.primaryColor : Colors.white54,
+            size: 22,
+          ),
+          title: Text(
+            title,
+            style: GoogleFonts.cairo(
+              color: isSelected ? Colors.white : Colors.white70,
+              fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+              fontSize: 15,
+            ),
+          ),
+          onTap: () {
+            context.pop(); // Close drawer
+            if (route == 'bookmark') {
+              final lastReadPos = ref.read(lastReadPositionProvider).value;
+              if (lastReadPos != null) {
+                context.push(
+                  '/quran?surah=${lastReadPos.surahNumber}&ayah=${lastReadPos.ayahNumber}',
+                );
+              } else {
+                context.push('/quran');
+              }
             } else {
-              context.push('/quran');
+              context.push(route);
             }
-          } else {
-            context.push(route);
-          }
-        },
+          },
+        ),
       ),
     );
   }

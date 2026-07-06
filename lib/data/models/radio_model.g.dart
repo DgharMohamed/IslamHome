@@ -7,10 +7,10 @@ part of 'radio_model.dart';
 // **************************************************************************
 
 RadioModel _$RadioModelFromJson(Map<String, dynamic> json) => RadioModel(
-      id: (json['id'] as num?)?.toInt(),
-      name: json['name'] as String?,
-      url: json['url'] as String?,
-    );
+  id: (json['id'] as num?)?.toInt(),
+  name: json['name'] as String?,
+  url: json['url'] as String?,
+);
 
 Map<String, dynamic> _$RadioModelToJson(RadioModel instance) =>
     <String, dynamic>{

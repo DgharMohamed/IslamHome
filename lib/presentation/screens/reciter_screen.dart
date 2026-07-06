@@ -21,7 +21,6 @@ import 'package:islam_home/core/utils/quran_utils.dart';
 import 'package:islam_home/data/services/download_service.dart';
 import 'package:islam_home/presentation/widgets/app_search_field.dart';
 
-
 class ReciterScreen extends ConsumerStatefulWidget {
   final Reciter reciter;
 
@@ -550,44 +549,47 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                   itemCount: playlists.length,
                   itemBuilder: (context, index) {
                     final playlist = playlists[index];
-                    return ListTile(
-                      leading: Text(
-                        playlist.icon ?? '⭐',
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      title: Text(
-                        playlist.name,
-                        style: GoogleFonts.cairo(color: Colors.white),
-                      ),
-                      onTap: () {
-                        String? url;
-                        if (moshaf.server != null) {
-                          final paddedId = surah.number.toString().padLeft(
-                            3,
-                            '0',
-                          );
-                          url = '${moshaf.server}$paddedId.mp3';
-                        }
-                        if (url != null) {
-                          ref
-                              .read(favoritesProvider.notifier)
-                              .addToPlaylist(
-                                playlist.id,
-                                surah,
-                                widget.reciter,
-                                url,
-                              );
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                l10n.addedToPlaylist(playlist.name),
-                                style: GoogleFonts.cairo(),
+                    return Material(
+                      type: MaterialType.transparency,
+                      child: ListTile(
+                        leading: Text(
+                          playlist.icon ?? '⭐',
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        title: Text(
+                          playlist.name,
+                          style: GoogleFonts.cairo(color: Colors.white),
+                        ),
+                        onTap: () {
+                          String? url;
+                          if (moshaf.server != null) {
+                            final paddedId = surah.number.toString().padLeft(
+                              3,
+                              '0',
+                            );
+                            url = '${moshaf.server}$paddedId.mp3';
+                          }
+                          if (url != null) {
+                            ref
+                                .read(favoritesProvider.notifier)
+                                .addToPlaylist(
+                                  playlist.id,
+                                  surah,
+                                  widget.reciter,
+                                  url,
+                                );
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  l10n.addedToPlaylist(playlist.name),
+                                  style: GoogleFonts.cairo(),
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                      },
+                            );
+                          }
+                        },
+                      ),
                     );
                   },
                 ),
@@ -619,10 +621,12 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
     final downloadState = ref.watch(downloadProvider);
 
     // Check if any surah for *this* reciter is downloading or queued
-    final hasActiveDownloads = downloadState.values.any((item) =>
-        item.id.contains('quran_${widget.reciter.id}_') &&
-        (item.status == DownloadStatus.downloading ||
-            item.status == DownloadStatus.idle));
+    final hasActiveDownloads = downloadState.values.any(
+      (item) =>
+          item.id.contains('quran_${widget.reciter.id}_') &&
+          (item.status == DownloadStatus.downloading ||
+              item.status == DownloadStatus.idle),
+    );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -639,7 +643,9 @@ class _ReciterScreenState extends ConsumerState<ReciterScreen> {
                     .cast<Surah>()
                     .toList();
 
-                ref.read(downloadProvider.notifier).downloadAll(
+                ref
+                    .read(downloadProvider.notifier)
+                    .downloadAll(
                       reciter: widget.reciter,
                       moshaf: moshaf,
                       surahs: surahsToDownload,

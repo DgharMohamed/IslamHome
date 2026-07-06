@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:islam_home/data/services/audio_player_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:islam_home/presentation/widgets/quran_mushaf_view.dart';
 import 'package:islam_home/presentation/widgets/quran_english_view.dart';
@@ -21,6 +22,7 @@ import 'package:islam_home/data/models/khatma_v2_models.dart';
 import 'package:islam_home/presentation/providers/mushaf_riwaya_provider.dart';
 import 'package:islam_home/presentation/providers/khatma_v2_provider.dart';
 import 'package:islam_home/data/services/tafsir_download_service.dart';
+import 'package:islam_home/data/services/share_service.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 
 class QuranMushafScreen extends ConsumerStatefulWidget {
@@ -43,11 +45,15 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
   static const String _settingsBoxName = 'settings_box';
   static const String _lastMushafPageKey = 'quran_last_mushaf_page';
 
+  AudioPlayerService? _audioService;
+
   @override
   void initState() {
     super.initState();
     _currentPageNotifier = ValueNotifier<int>(widget.initialPage);
     _restoreAndOpenInitialPage();
+    // Cache audio service reference for use in dispose()
+    _audioService = ref.read(audioPlayerServiceProvider);
   }
 
   late final ValueNotifier<int> _currentPageNotifier;
@@ -58,6 +64,13 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
   void dispose() {
     _persistLastReadPage(_currentPageNotifier.value);
     _currentPageNotifier.dispose();
+
+    // Stop the audio player if it's currently playing an ayah (started from this screen)
+    final currentItem = _audioService?.currentMediaItem;
+    if (currentItem != null && currentItem.id.startsWith('quran_')) {
+      _audioService?.stop();
+    }
+
     super.dispose();
   }
 
@@ -153,10 +166,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     final surah = data.first['surah'] as int;
     final ayah = data.first['start'] as int;
 
-    await ref.read(lastReadServiceProvider).saveLastRead(
-      surahNumber: surah,
-      ayahNumber: ayah,
-    );
+    await ref
+        .read(lastReadServiceProvider)
+        .saveLastRead(surahNumber: surah, ayahNumber: ayah);
     ref.read(lastReadUpdateProvider.notifier).increment();
 
     if (mounted) {
@@ -172,10 +184,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
   }
 
   Future<void> _saveAyahAsLastRead(int surah, int ayah) async {
-    await ref.read(lastReadServiceProvider).saveLastRead(
-      surahNumber: surah,
-      ayahNumber: ayah,
-    );
+    await ref
+        .read(lastReadServiceProvider)
+        .saveLastRead(surahNumber: surah, ayahNumber: ayah);
     ref.read(lastReadUpdateProvider.notifier).increment();
 
     if (mounted) {
@@ -272,6 +283,25 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
           l10n.playVerseAudio,
           mushafTheme,
         ),
+        const PopupMenuDivider(height: 1),
+        _bubbleItem(
+          'share_text',
+          Icons.text_fields_rounded,
+          l10n.shareAsText,
+          mushafTheme,
+        ),
+        _bubbleItem(
+          'share_image',
+          Icons.image_rounded,
+          l10n.shareAsImage,
+          mushafTheme,
+        ),
+        _bubbleItem(
+          'share_audio',
+          Icons.audiotrack_rounded,
+          l10n.shareAsAudio,
+          mushafTheme,
+        ),
       ],
     ).then((value) {
       _clearAyahSelection();
@@ -285,6 +315,34 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
           break;
         case 'play':
           _playAyahAudio(surah, ayah);
+          break;
+        case 'share_text':
+          ref.read(shareServiceProvider).shareAsText(
+            surah: surah,
+            ayah: ayah,
+            l10n: l10n,
+            isEnglish: _isEnglishUi,
+          );
+          break;
+        case 'share_image':
+          ref.read(shareServiceProvider).shareAsImage(
+            surah: surah,
+            ayah: ayah,
+            theme: mushafTheme,
+            l10n: l10n,
+            isEnglish: _isEnglishUi,
+          );
+          break;
+        case 'share_audio':
+          final reciter = ref.read(selectedReciterProvider);
+          final reciterId = reciter?.id ?? 7;
+          ref.read(shareServiceProvider).shareAsAudio(
+            context: context,
+            surah: surah,
+            ayah: ayah,
+            reciterId: reciterId,
+            l10n: l10n,
+          );
           break;
       }
     });
@@ -367,7 +425,11 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     }
   }
 
-  Future<void> _playAyahAudio(int surah, int ayah, {bool autoPlay = true}) async {
+  Future<void> _playAyahAudio(
+    int surah,
+    int ayah, {
+    bool autoPlay = true,
+  }) async {
     final audioService = ref.read(audioPlayerServiceProvider);
     if (audioService == null) return;
     final l10n = AppLocalizations.of(context)!;
@@ -606,7 +668,8 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                                           : TextAlign.left,
                                       style: TextStyle(
                                         color: mushafTheme.secondaryColor,
-                                        fontSize: 18 * mushafSettings.fontSizeScale,
+                                        fontSize:
+                                            18 * mushafSettings.fontSizeScale,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'Amiri',
                                       ),
@@ -934,37 +997,44 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                                         );
                                       }
 
-                                      return ListTile(
-                                        onTap: id.isEmpty
-                                            ? null
-                                            : () => Navigator.pop(
-                                                context,
-                                                source,
-                                              ),
-                                        isThreeLine: hasSubtitle && !isArabicUi,
-                                        title: Text(
-                                          name,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: mushafTheme.textColor,
-                                            fontSize: 18,
-                                            fontFamily: 'Amiri',
-                                          ),
-                                        ),
-                                        subtitle: hasSubtitle && !isArabicUi
-                                            ? Text(
-                                                subtitleText,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  color: mushafTheme.textColor
-                                                      .withValues(alpha: 0.62),
-                                                  fontSize: 13,
+                                      return Material(
+                                        type: MaterialType.transparency,
+                                        child: ListTile(
+                                          onTap: id.isEmpty
+                                              ? null
+                                              : () => Navigator.pop(
+                                                  context,
+                                                  source,
                                                 ),
-                                              )
-                                            : null,
-                                        trailing: trailingWidget,
+                                          isThreeLine:
+                                              hasSubtitle && !isArabicUi,
+                                          title: Text(
+                                            name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: mushafTheme.textColor,
+                                              fontSize: 18,
+                                              fontFamily: 'Amiri',
+                                            ),
+                                          ),
+                                          subtitle: hasSubtitle && !isArabicUi
+                                              ? Text(
+                                                  subtitleText,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: mushafTheme.textColor
+                                                        .withValues(
+                                                          alpha: 0.62,
+                                                        ),
+                                                    fontSize: 13,
+                                                  ),
+                                                )
+                                              : null,
+                                          trailing: trailingWidget,
+                                        ),
                                       );
                                     },
                                   );
@@ -1141,7 +1211,10 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
     KhatmaUnit? displayUnit,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final currentPage = _currentPageNotifier.value.clamp(1, quran.totalPagesCount);
+    final currentPage = _currentPageNotifier.value.clamp(
+      1,
+      quran.totalPagesCount,
+    );
     final selectedUnit = displayUnit ?? track.unit;
 
     int targetUnit;
@@ -1177,7 +1250,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
         break;
     }
 
-    await ref.read(khatmaV2Provider.notifier).updateProgress(track.id, targetUnit);
+    await ref
+        .read(khatmaV2Provider.notifier)
+        .updateProgress(track.id, targetUnit);
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1207,7 +1282,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
       ),
       style: OutlinedButton.styleFrom(
         foregroundColor: mushafTheme.secondaryColor,
-        side: BorderSide(color: mushafTheme.secondaryColor.withValues(alpha: 0.4)),
+        side: BorderSide(
+          color: mushafTheme.secondaryColor.withValues(alpha: 0.4),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       ),
     );
@@ -1227,8 +1304,7 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
         ? null
         : khatmaState.getTrack(widget.trackId!);
     final contentBottomInset =
-        16.0 +
-        (hasActiveAyahPlayer ? (isPlayerMinimized ? 76.0 : 246.0) : 0.0);
+        16.0 + (hasActiveAyahPlayer ? (isPlayerMinimized ? 76.0 : 246.0) : 0.0);
 
     // Listen for reciter changes to restart playback if active
     ref.listen(selectedReciterProvider, (previous, next) {
@@ -1253,10 +1329,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
           final surah = int.tryParse(parts[0]);
           final ayah = int.tryParse(parts[1]);
           if (surah != null && ayah != null) {
-            ref.read(lastReadServiceProvider).saveLastRead(
-              surahNumber: surah,
-              ayahNumber: ayah,
-            );
+            ref
+                .read(lastReadServiceProvider)
+                .saveLastRead(surahNumber: surah, ayahNumber: ayah);
           }
         }
       }
@@ -1313,9 +1388,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                         Icons.playlist_add_check_circle_rounded,
                         color: mushafTheme.secondaryColor,
                       ),
-                      tooltip: AppLocalizations.of(context)!.khatmaV2ProgressSaved(
-                        linkedTrack.title,
-                      ),
+                      tooltip: AppLocalizations.of(
+                        context,
+                      )!.khatmaV2ProgressSaved(linkedTrack.title),
                     ),
                   // Save Last Read Button
                   IconButton(
@@ -1358,9 +1433,9 @@ class _QuranMushafScreenState extends ConsumerState<QuranMushafScreen> {
                         linkedTrack,
                         KhatmaUnit.page,
                         Icons.menu_book_rounded,
-                        AppLocalizations.of(context)!.khatmaV2RecordPage(
-                          _currentPageNotifier.value,
-                        ),
+                        AppLocalizations.of(
+                          context,
+                        )!.khatmaV2RecordPage(_currentPageNotifier.value),
                         mushafTheme,
                       ),
                       const SizedBox(width: 8),

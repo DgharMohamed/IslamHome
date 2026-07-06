@@ -20,16 +20,20 @@ class KhatmaRemediationSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final backlog = plan.backlogUnits;
-    final remainingDays = plan.extraDaysNeeded > 0 ? plan.extraDaysNeeded : track.daysRemaining;
-    final unitLabel = track.unit == KhatmaUnit.page 
-        ? l10n.khatmaV2UnitPage 
-        : track.unit == KhatmaUnit.juz 
-            ? l10n.khatmaV2UnitJuz 
-            : l10n.khatmaV2UnitSurah;
+    final remainingDays = plan.extraDaysNeeded > 0
+        ? plan.extraDaysNeeded
+        : track.daysRemaining;
+    final unitLabel = track.unit == KhatmaUnit.page
+        ? l10n.khatmaV2UnitPage
+        : track.unit == KhatmaUnit.juz
+        ? l10n.khatmaV2UnitJuz
+        : l10n.khatmaV2UnitSurah;
 
     // Current metrics
     final currentEndDate = track.targetDate ?? DateTime.now();
-    final currentDailyGoal = ref.read(khatmaV2Provider.notifier).calculateDailyGoal(track.id);
+    final currentDailyGoal = ref
+        .read(khatmaV2Provider.notifier)
+        .calculateDailyGoal(track.id);
     final safeDailyGoal = currentDailyGoal > 0 ? currentDailyGoal : 1;
 
     return Container(
@@ -89,10 +93,9 @@ class KhatmaRemediationSheet extends ConsumerWidget {
               icon: Icons.bolt,
               color: Colors.amber,
               onTap: () {
-                ref.read(khatmaV2Provider.notifier).applyRemediation(
-                      track.id,
-                      RemediationStrategy.catchUp,
-                    );
+                ref
+                    .read(khatmaV2Provider.notifier)
+                    .applyRemediation(track.id, RemediationStrategy.catchUp);
                 Navigator.of(context).pop();
               },
             ),
@@ -107,12 +110,13 @@ class KhatmaRemediationSheet extends ConsumerWidget {
               color: Colors.blue,
               metric1: l10n.khatmaRemediationCurrentGoal('$currentDailyGoal'),
               // Very rough estimation just for UI visualization
-              metric2: l10n.khatmaRemediationNewGoal('${currentDailyGoal + (backlog / remainingDays).ceil()}'),
+              metric2: l10n.khatmaRemediationNewGoal(
+                '${currentDailyGoal + (backlog / remainingDays).ceil()}',
+              ),
               onTap: () {
-                ref.read(khatmaV2Provider.notifier).applyRemediation(
-                      track.id,
-                      RemediationStrategy.distribute,
-                    );
+                ref
+                    .read(khatmaV2Provider.notifier)
+                    .applyRemediation(track.id, RemediationStrategy.distribute);
                 Navigator.of(context).pop();
               },
             ),
@@ -125,13 +129,16 @@ class KhatmaRemediationSheet extends ConsumerWidget {
               description: l10n.khatmaRemediationExtendDesc,
               icon: Icons.calendar_month,
               color: Colors.orangeAccent,
-              metric1: l10n.khatmaRemediationCurrentDate('${currentEndDate.day}/${currentEndDate.month}/${currentEndDate.year}'),
-              metric2: l10n.khatmaRemediationNewDate('${currentEndDate.add(Duration(days: (backlog / safeDailyGoal).ceil())).day}/${currentEndDate.add(Duration(days: (backlog / safeDailyGoal).ceil())).month}/${currentEndDate.add(Duration(days: (backlog / safeDailyGoal).ceil())).year}'),
+              metric1: l10n.khatmaRemediationCurrentDate(
+                '${currentEndDate.day}/${currentEndDate.month}/${currentEndDate.year}',
+              ),
+              metric2: l10n.khatmaRemediationNewDate(
+                '${currentEndDate.add(Duration(days: (backlog / safeDailyGoal).ceil())).day}/${currentEndDate.add(Duration(days: (backlog / safeDailyGoal).ceil())).month}/${currentEndDate.add(Duration(days: (backlog / safeDailyGoal).ceil())).year}',
+              ),
               onTap: () {
-                ref.read(khatmaV2Provider.notifier).applyRemediation(
-                      track.id,
-                      RemediationStrategy.extend,
-                    );
+                ref
+                    .read(khatmaV2Provider.notifier)
+                    .applyRemediation(track.id, RemediationStrategy.extend);
                 Navigator.of(context).pop();
               },
             ),
@@ -159,9 +166,7 @@ class KhatmaRemediationSheet extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(
-              color: Colors.white.withValues(alpha: 0.05),
-            ),
+            bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
           ),
         ),
         child: Row(
@@ -210,7 +215,11 @@ class KhatmaRemediationSheet extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward, size: 12, color: AppTheme.primaryColor),
+                        const Icon(
+                          Icons.arrow_forward,
+                          size: 12,
+                          color: AppTheme.primaryColor,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           metric2,

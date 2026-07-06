@@ -10,7 +10,7 @@ class CompassFilter {
   /// [smoothingFactor] controls the responsiveness (0.0 = very smooth, 1.0 = no filter).
   /// Recommended: 0.15 - 0.25 for a good balance of stability and responsiveness.
   CompassFilter({double smoothingFactor = 0.2})
-      : _smoothingFactor = smoothingFactor.clamp(0.01, 1.0);
+    : _smoothingFactor = smoothingFactor.clamp(0.01, 1.0);
 
   /// Updates the filter with a new heading reading (in degrees, 0-360).
   /// Returns the smoothed heading in degrees (0-360).

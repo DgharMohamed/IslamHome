@@ -24,6 +24,7 @@ import 'package:islam_home/presentation/screens/radio_screen.dart';
 import 'package:islam_home/presentation/screens/live_tv_screen.dart';
 import 'package:islam_home/presentation/screens/video_screen.dart';
 import 'package:islam_home/presentation/screens/search_screen.dart';
+import 'package:islam_home/presentation/screens/adhkar_settings_screen.dart';
 import 'package:islam_home/presentation/screens/prayer_times_screen.dart';
 import 'package:islam_home/presentation/screens/qibla_screen.dart';
 import 'package:islam_home/presentation/screens/downloads_screen.dart';
@@ -67,6 +68,8 @@ import 'package:islam_home/presentation/screens/adhkar_search_screen.dart';
 import 'package:islam_home/presentation/providers/app_settings_sync_provider.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:islam_home/data/models/quran_font_model.dart';
+import 'package:islam_home/data/services/quran_font_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -163,6 +166,9 @@ void main() async {
 
     debugPrint('🎵 Main: Essential services initialized');
 
+    // Pre-load any previously downloaded Quran display fonts
+    _preloadDownloadedFonts();
+
     runApp(const ProviderScope(child: IslamicLibraryApp()));
 
     // Initialize notifications and then register the background Adhan job
@@ -170,7 +176,8 @@ void main() async {
       debugPrint('🔔 Main: Notifications ready');
       // workmanager is Android-only — skip on desktop/web/iOS/Windows
       if (Platform.isAndroid) {
-        Workmanager().initialize(callbackDispatcher)
+        Workmanager()
+            .initialize(callbackDispatcher)
             .then((_) => registerAdhanBackgroundTask());
       }
     });
@@ -224,6 +231,25 @@ void main() async {
   }
 }
 
+/// Pre-load any previously downloaded Quran display fonts into Flutter's engine.
+/// This runs fire-and-forget so it doesn't block the app startup.
+void _preloadDownloadedFonts() {
+  final fontService = QuranFontService();
+  for (final font in QuranFont.all) {
+    if (!font.isBundled) {
+      fontService.isFontDownloaded(font).then((downloaded) {
+        if (downloaded) {
+          fontService.loadFont(font).then((loaded) {
+            if (loaded) {
+              debugPrint('🔤 Font loaded: ${font.fontFamily}');
+            }
+          });
+        }
+      });
+    }
+  }
+}
+
 /// Helper for non-blocking asset check in debug mode
 void _debugCheckAssets() {
   AssetManifest.loadFromAssetBundle(rootBundle)
@@ -252,7 +278,10 @@ final _router = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
-    GoRoute(path: '/maintenance', builder: (context, state) => const MaintenanceScreen()),
+    GoRoute(
+      path: '/maintenance',
+      builder: (context, state) => const MaintenanceScreen(),
+    ),
     GoRoute(
       path: '/language-selection',
       builder: (context, state) => const LanguageSelectionScreen(),
@@ -272,6 +301,10 @@ final _router = GoRouter(
         GoRoute(
           path: '/all-sections',
           builder: (context, state) => const AllSectionsScreen(),
+        ),
+        GoRoute(
+          path: '/adhkar-settings',
+          builder: (context, state) => const AdhkarSettingsScreen(),
         ),
         GoRoute(
           path: '/search',
@@ -352,10 +385,7 @@ final _router = GoRouter(
           builder: (context, state) {
             final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
             final category = state.uri.queryParameters['category'];
-            return AdhkarDetailsScreen(
-              id: id,
-              category: category,
-            );
+            return AdhkarDetailsScreen(id: id, category: category);
           },
         ),
         GoRoute(
@@ -458,10 +488,7 @@ final _router = GoRouter(
         );
       },
     ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
       path: '/register',
       builder: (context, state) {
@@ -497,4 +524,3 @@ class IslamicLibraryApp extends ConsumerWidget {
     );
   }
 }
-

@@ -10,7 +10,6 @@ import 'package:go_router/go_router.dart';
 import 'package:islam_home/l10n/generated/app_localizations.dart';
 import 'package:islam_home/presentation/widgets/app_search_field.dart';
 
-
 enum SearchType { quran, hadith, adhkar }
 
 class SearchResult {
@@ -159,13 +158,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Expanded(
             child: _isLoading
                 ? const Center(
-                    child: CircularProgressIndicator(color: AppTheme.primaryColor),
+                    child: CircularProgressIndicator(
+                      color: AppTheme.primaryColor,
+                    ),
                   )
                 : _results.isEmpty && _searchController.text.isNotEmpty
-                    ? _buildNoResults(l10n)
-                    : _searchController.text.isEmpty
-                        ? _buildInitialState(l10n)
-                        : _buildResultsList(),
+                ? _buildNoResults(l10n)
+                : _searchController.text.isEmpty
+                ? _buildInitialState(l10n)
+                : _buildResultsList(),
           ),
         ],
       ),
@@ -233,32 +234,35 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: Text(
-              result.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.amiri(
-                fontSize: 18,
-                color: Colors.white,
-                height: 1.4,
+          child: Material(
+            type: MaterialType.transparency,
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(16),
+              title: Text(
+                result.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.amiri(
+                  fontSize: 18,
+                  color: Colors.white,
+                  height: 1.4,
+                ),
+                textAlign: QuranUtils.isArabic(result.title)
+                    ? TextAlign.right
+                    : TextAlign.left,
               ),
-              textAlign: QuranUtils.isArabic(result.title)
-                  ? TextAlign.right
-                  : TextAlign.left,
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Text(
-                result.subtitle,
-                style: GoogleFonts.cairo(
-                  color: AppTheme.primaryColor,
-                  fontSize: 12,
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  result.subtitle,
+                  style: GoogleFonts.cairo(
+                    color: AppTheme.primaryColor,
+                    fontSize: 12,
+                  ),
                 ),
               ),
+              onTap: () => _handleResultTap(result),
             ),
-            onTap: () => _handleResultTap(result),
           ),
         );
       },

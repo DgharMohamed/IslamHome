@@ -650,7 +650,10 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
       style: const TextStyle(color: Colors.white, fontSize: 13),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+        labelStyle: const TextStyle(
+          color: AppTheme.textSecondary,
+          fontSize: 11,
+        ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
           borderRadius: BorderRadius.circular(12),
@@ -664,7 +667,10 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
       items: List.generate(max - min + 1, (i) {
         final surahNum = min + i;
         final isEnglish = Localizations.localeOf(context).languageCode == 'en';
-        final surahName = QuranUtils.getSurahName(surahNum, isEnglish: isEnglish);
+        final surahName = QuranUtils.getSurahName(
+          surahNum,
+          isEnglish: isEnglish,
+        );
         return DropdownMenuItem(
           value: surahNum,
           child: Text(
@@ -760,7 +766,10 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+        labelStyle: const TextStyle(
+          color: AppTheme.textSecondary,
+          fontSize: 12,
+        ),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
           borderRadius: BorderRadius.circular(12),
@@ -821,11 +830,13 @@ class _KhatmaV2SetupSheetState extends ConsumerState<KhatmaV2SetupSheet> {
   String _mapValidationError(String code) {
     final l10n = AppLocalizations.of(context)!;
     if (code.startsWith('start_out_of_range:')) {
-      final max = int.tryParse(code.split(':').last) ?? _maxUnitFor(_selectedUnit);
+      final max =
+          int.tryParse(code.split(':').last) ?? _maxUnitFor(_selectedUnit);
       return l10n.khatmaV2ValidationStartOutOfRange(max);
     }
     if (code.startsWith('end_out_of_range:')) {
-      final max = int.tryParse(code.split(':').last) ?? _maxUnitFor(_selectedUnit);
+      final max =
+          int.tryParse(code.split(':').last) ?? _maxUnitFor(_selectedUnit);
       return l10n.khatmaV2ValidationEndOutOfRange(max);
     }
     if (code == 'range_order_invalid') {

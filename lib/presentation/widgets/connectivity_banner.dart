@@ -54,7 +54,7 @@ class _ConnectivityBannerState extends ConsumerState<ConnectivityBanner>
 
     return SizeTransition(
       sizeFactor: _opacityAnimation,
-      axisAlignment: -1.0,
+      alignment: Alignment.topCenter,
       child: SlideTransition(
         position: _slideAnimation,
         child: FadeTransition(

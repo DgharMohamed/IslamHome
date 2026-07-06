@@ -37,10 +37,7 @@ class AppSearchField extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
-        style: GoogleFonts.cairo(
-          color: Colors.white,
-          fontSize: 16,
-        ),
+        style: GoogleFonts.cairo(color: Colors.white, fontSize: 16),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: GoogleFonts.cairo(

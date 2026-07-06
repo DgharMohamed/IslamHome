@@ -621,76 +621,81 @@ class _HistoryTab extends ConsumerWidget {
       child: GlassContainer(
         borderRadius: 20,
         padding: EdgeInsets.zero,
-        child: ListTile(
-          contentPadding: const EdgeInsetsDirectional.symmetric(
-            horizontal: 20,
-            vertical: 8,
-          ),
-          leading: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+        child: Material(
+          type: MaterialType.transparency,
+          child: ListTile(
+            contentPadding: const EdgeInsetsDirectional.symmetric(
+              horizontal: 20,
+              vertical: 8,
             ),
-            child: Icon(
+            leading: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item.type == 'seerah'
+                    ? Icons.history_edu_rounded
+                    : Icons.audiotrack,
+                color: AppTheme.primaryColor,
+              ),
+            ),
+            title: Text(
+              item.title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            subtitle: Text(
               item.type == 'seerah'
-                  ? Icons.history_edu_rounded
-                  : Icons.audiotrack,
-              color: AppTheme.primaryColor,
+                  ? item.reciterId
+                  : 'سورة ${item.surahNumber}',
+              style: const TextStyle(color: AppTheme.textSecondary),
             ),
-          ),
-          title: Text(
-            item.title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.play_circle_fill,
+                    color: AppTheme.primaryColor,
+                    size: 36,
+                  ),
+                  onPressed: () async {
+                    final audioService = ref.read(audioPlayerServiceProvider);
+                    if (audioService != null) {
+                      final dir = await DownloadService().getFilePath(
+                        item.reciterId,
+                        item.moshafType,
+                        item.surahNumber,
+                        type: item.type,
+                      );
+                      audioService.playFile(
+                        dir,
+                        title: item.title,
+                        artist: item.type == 'seerah'
+                            ? item.reciterId
+                            : 'القرآن الكريم',
+                      );
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent.withValues(alpha: 0.8),
+                  ),
+                  onPressed: () async {
+                    await ref
+                        .read(downloadProvider.notifier)
+                        .deleteFileById(item.id);
+                    ref.invalidate(downloadHistoryProvider);
+                  },
+                ),
+              ],
             ),
-          ),
-          subtitle: Text(
-            item.type == 'seerah' ? item.reciterId : 'سورة ${item.surahNumber}',
-            style: const TextStyle(color: AppTheme.textSecondary),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.play_circle_fill,
-                  color: AppTheme.primaryColor,
-                  size: 36,
-                ),
-                onPressed: () async {
-                  final audioService = ref.read(audioPlayerServiceProvider);
-                  if (audioService != null) {
-                    final dir = await DownloadService().getFilePath(
-                      item.reciterId,
-                      item.moshafType,
-                      item.surahNumber,
-                      type: item.type,
-                    );
-                    audioService.playFile(
-                      dir,
-                      title: item.title,
-                      artist: item.type == 'seerah'
-                          ? item.reciterId
-                          : 'القرآن الكريم',
-                    );
-                  }
-                },
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: Colors.redAccent.withValues(alpha: 0.8),
-                ),
-                onPressed: () async {
-                  await ref
-                      .read(downloadProvider.notifier)
-                      .deleteFileById(item.id);
-                  ref.invalidate(downloadHistoryProvider);
-                },
-              ),
-            ],
           ),
         ),
       ),

@@ -19,10 +19,11 @@ class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
-  static const String _adhanChannelId = 'adhan_channel_v6';
+  static const String _adhanChannelId = 'adhan_channel_v7';
   static const List<String> _legacyAdhanChannelIds = [
     'adhan_channel_v4',
     'adhan_channel_v5',
+    'adhan_channel_v6',
   ];
   static const String _reminderChannelId = 'prayer_reminder_channel';
   static const String _dailyContentChannelId = 'daily_content_channel';
@@ -52,10 +53,16 @@ class NotificationService {
   static const int _dailyDhikrNotificationId = 711;
   static const int _khatmaReminderNotificationId = 712;
 
+  // Smart Adhkar & Tasbeeh IDs
+  static const int _adhkarMorningBaseId = 300;
+  static const int _adhkarEveningBaseId = 301;
+  static const int _adhkarSleepBaseId = 302;
+  static const int _tasbeehStreakBaseId = 400;
+
   static AppLocalizations? _localizations;
   static String _currentLocale = 'ar';
 
-  /// Returns the current localizations. 
+  /// Returns the current localizations.
   /// Loads them synchronously if not already loaded.
   AppLocalizations get l10n {
     _localizations ??= lookupAppLocalizations(Locale(_currentLocale));
@@ -105,7 +112,9 @@ class NotificationService {
 
     if (Platform.isWindows || kIsWeb) {
       _initialized = true;
-      debugPrint('🔔 NotificationService: initialization skipped for this platform');
+      debugPrint(
+        '🔔 NotificationService: initialization skipped for this platform',
+      );
       return;
     }
 
@@ -120,7 +129,10 @@ class NotificationService {
 
     try {
       await _plugin.initialize(
-        const InitializationSettings(android: androidSettings, iOS: iosSettings),
+        const InitializationSettings(
+          android: androidSettings,
+          iOS: iosSettings,
+        ),
       );
     } catch (e) {
       debugPrint('🔔 NotificationService initialize error: $e');
@@ -317,7 +329,6 @@ class NotificationService {
     }
   }
 
-
   // ──────────────────────────────────────────────────────────────────────────
   // Schedule daily prayers
   // ──────────────────────────────────────────────────────────────────────────
@@ -335,7 +346,7 @@ class NotificationService {
     final scheduleMode = await _scheduleModeForPrayerAlerts();
 
     // 1. Cancel existing future notifications (to avoid overlaps)
-    // We use a safe range to clear IDs (100-350) which covers ~10 days
+    // Cancel IDs for up to 12 days to cover the full scheduling window
     for (int dayOffset = 0; dayOffset <= 12; dayOffset++) {
       for (final baseId in _prayerIds.values) {
         await _plugin.cancel(_calculateId(baseId, dayOffset));
@@ -368,15 +379,15 @@ class NotificationService {
 
         final notifId = _calculateId(baseId, dayIndex);
 
-        final prayerDisplayName = prayerName == 'Fajr' 
-            ? l10n.fajr 
-            : prayerName == 'Dhuhr' 
-                ? l10n.dhuhr 
-                : prayerName == 'Asr' 
-                    ? l10n.asr 
-                    : prayerName == 'Maghrib' 
-                        ? l10n.maghrib 
-                        : l10n.isha;
+        final prayerDisplayName = prayerName == 'Fajr'
+            ? l10n.fajr
+            : prayerName == 'Dhuhr'
+            ? l10n.dhuhr
+            : prayerName == 'Asr'
+            ? l10n.asr
+            : prayerName == 'Maghrib'
+            ? l10n.maghrib
+            : l10n.isha;
         final title = l10n.notificationAthanTimeFor(prayerDisplayName);
 
         final androidDetails = AndroidNotificationDetails(
@@ -412,8 +423,12 @@ class NotificationService {
             if (reminderTime.isAfter(tz.TZDateTime.now(tz.local))) {
               final reminderId = _calculateId(reminderBaseId, dayIndex);
               final reminderTitle = l10n.notificationReminderBefore(
-                  prayerDisplayName, reminderMinutes.toString());
-              final reminderBody = l10n.notificationPrepareFor(prayerDisplayName);
+                prayerDisplayName,
+                reminderMinutes.toString(),
+              );
+              final reminderBody = l10n.notificationPrepareFor(
+                prayerDisplayName,
+              );
 
               final reminderAndroid = AndroidNotificationDetails(
                 _reminderChannelId,
@@ -442,9 +457,162 @@ class NotificationService {
 
   /// Calculates a unique ID based on a base ID and a day offset.
   int _calculateId(int baseId, int dayOffset) {
-    // baseId is 100-104 or 200-204
-    // We add dayOffset * 20 to keep them separate (plenty of room)
-    return baseId + (dayOffset * 20);
+    // baseId is 100-104 (prayer) or 200-204 (reminder).
+    // We use dayOffset * 1000 to guarantee no collision between
+    // prayer IDs and reminder IDs across different days.
+    // E.g. day 0 prayer Fajr = 100, day 0 reminder Fajr = 200,
+    //      day 1 prayer Fajr = 1100, day 1 reminder Fajr = 1200.
+    return baseId + (dayOffset * 1000);
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Smart Adhkar & Tasbeeh Scheduling
+  // ──────────────────────────────────────────────────────────────────────────
+
+  Future<void> scheduleAdhkarReminders({
+    required Map<DateTime, Map<String, String>> multiDayTimings,
+    required bool morningEnabled,
+    required int morningMinutesAfterFajr,
+    required bool eveningEnabled,
+    required int eveningMinutesAfterAsr,
+    required bool sleepEnabled,
+    required int sleepMinutesAfterIsha,
+  }) async {
+    if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
+
+    final scheduleMode = await _scheduleModeForPrayerAlerts();
+
+    // Cancel existing Adhkar notifications
+    for (int dayOffset = 0; dayOffset <= 12; dayOffset++) {
+      await _plugin.cancel(_calculateId(_adhkarMorningBaseId, dayOffset));
+      await _plugin.cancel(_calculateId(_adhkarEveningBaseId, dayOffset));
+      await _plugin.cancel(_calculateId(_adhkarSleepBaseId, dayOffset));
+    }
+
+    int dayIndex = 0;
+    for (final dateEntry in multiDayTimings.entries) {
+      final date = dateEntry.key;
+      final timings = dateEntry.value;
+      final now = tz.TZDateTime.now(tz.local);
+
+      final androidDetails = AndroidNotificationDetails(
+        _reminderChannelId,
+        l10n.notificationReminders,
+        importance: Importance.high,
+        priority: Priority.high,
+      );
+      final details = NotificationDetails(android: androidDetails);
+
+      // Morning
+      if (morningEnabled) {
+        final fajrTimeStr = timings['Fajr'];
+        if (fajrTimeStr != null) {
+          final fajrTime = _getSpecificTime(date, fajrTimeStr);
+          if (fajrTime != null) {
+            final morningTime = fajrTime.add(Duration(minutes: morningMinutesAfterFajr));
+            if (morningTime.isAfter(now)) {
+              await _zonedScheduleWithFallback(
+                _calculateId(_adhkarMorningBaseId, dayIndex),
+                l10n.adhkarMorningNotificationTitle,
+                l10n.adhkarMorningNotificationBody,
+                morningTime,
+                details,
+                scheduleMode,
+              );
+            }
+          }
+        }
+      }
+
+      // Evening
+      if (eveningEnabled) {
+        final asrTimeStr = timings['Asr'];
+        if (asrTimeStr != null) {
+          final asrTime = _getSpecificTime(date, asrTimeStr);
+          if (asrTime != null) {
+            final eveningTime = asrTime.add(Duration(minutes: eveningMinutesAfterAsr));
+            if (eveningTime.isAfter(now)) {
+              await _zonedScheduleWithFallback(
+                _calculateId(_adhkarEveningBaseId, dayIndex),
+                l10n.adhkarEveningNotificationTitle,
+                l10n.adhkarEveningNotificationBody,
+                eveningTime,
+                details,
+                scheduleMode,
+              );
+            }
+          }
+        }
+      }
+
+      // Sleep
+      if (sleepEnabled) {
+        final ishaTimeStr = timings['Isha'];
+        if (ishaTimeStr != null) {
+          final ishaTime = _getSpecificTime(date, ishaTimeStr);
+          if (ishaTime != null) {
+            final sleepTime = ishaTime.add(Duration(minutes: sleepMinutesAfterIsha));
+            if (sleepTime.isAfter(now)) {
+              await _zonedScheduleWithFallback(
+                _calculateId(_adhkarSleepBaseId, dayIndex),
+                l10n.adhkarSleepNotificationTitle,
+                l10n.adhkarSleepNotificationBody,
+                sleepTime,
+                details,
+                scheduleMode,
+              );
+            }
+          }
+        }
+      }
+
+      dayIndex++;
+    }
+  }
+
+  Future<void> scheduleTasbeehStreakReminder({
+    required bool enabled,
+    required int hour,
+    required int minute,
+  }) async {
+    if (!_initialized) await init();
+    if (Platform.isWindows || kIsWeb) return;
+
+    final scheduleMode = await _scheduleModeForPrayerAlerts();
+    await _plugin.cancel(_tasbeehStreakBaseId);
+
+    if (!enabled) return;
+
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledTime = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    if (scheduledTime.isBefore(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+    }
+
+    final androidDetails = AndroidNotificationDetails(
+      _reminderChannelId,
+      l10n.notificationReminders,
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    // We can use matchDateTimeComponents to make it daily
+    try {
+      await _plugin.zonedSchedule(
+        _tasbeehStreakBaseId,
+        l10n.tasbeehStreakNotificationTitle,
+        l10n.tasbeehStreakNotificationBody,
+        scheduledTime,
+        NotificationDetails(android: androidDetails),
+        androidScheduleMode: scheduleMode,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (e) {
+      debugPrint('🔔 Tasbeeh schedule error: $e');
+    }
   }
 
   /// Deprecated in favor of [scheduleMultipleDays]
@@ -621,10 +789,7 @@ class NotificationService {
         channelDescription: l10n.notificationDailyDesc,
         importance: Importance.high,
         priority: Priority.high,
-        styleInformation: BigTextStyleInformation(
-          body,
-          contentTitle: title,
-        ),
+        styleInformation: BigTextStyleInformation(body, contentTitle: title),
       );
 
       await _plugin.show(

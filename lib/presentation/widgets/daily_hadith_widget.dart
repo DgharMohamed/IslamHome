@@ -23,7 +23,9 @@ class DailyHadithWidget extends ConsumerWidget {
         final rawContent = isArabic
             ? (hadith.arab ?? hadith.english ?? '')
             : (hadith.english ?? hadith.arab ?? '');
-        final content = rawContent.replaceAll(RegExp(r'<br\s*?/?>'), '\n').trim();
+        final content = rawContent
+            .replaceAll(RegExp(r'<br\s*?/?>'), '\n')
+            .trim();
 
         return GlassContainer(
           borderRadius: 24,

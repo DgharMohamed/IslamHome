@@ -37,7 +37,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   dio: ^5.9.0
-  flutter_riverpod: ^3.1.0
+  flutter_riverpod: 2.6.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   just_audio: ^0.9.42
@@ -204,8 +204,11 @@ flutter:
         - asset: assets/fonts/KFGQPC Uthmanic  HAFS.otf
     - family: WarshUthmanic
       fonts:
-        - asset: assets/fonts/Warsh-Uthmanic.woff2
+        - asset: assets/fonts/AlmaghribiWarshQuran.otf
     - family: QalonUthmanic
       fonts:
         - asset: assets/fonts/Qalon-Uthmanic.otf
 
+    - family: SamirKhouaja
+      fonts:
+        - asset: assets/fonts/samir-khouaja-maghribi-bold.ttf

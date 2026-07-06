@@ -21,9 +21,7 @@ class HadithShareCard extends StatelessWidget {
     final hasArabic = hadith.arab != null && hadith.arab!.isNotEmpty;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.backgroundColor,
-      ),
+      decoration: const BoxDecoration(color: AppTheme.backgroundColor),
       child: Stack(
         children: [
           // Background Pattern
@@ -31,11 +29,13 @@ class HadithShareCard extends StatelessWidget {
             child: Opacity(
               opacity: 0.05,
               child: CustomPaint(
-                painter: _ShareIslamicPatternPainter(color: AppTheme.primaryColor),
+                painter: _ShareIslamicPatternPainter(
+                  color: AppTheme.primaryColor,
+                ),
               ),
             ),
           ),
-          
+
           // Content
           Padding(
             padding: const EdgeInsets.all(24.0),
@@ -43,7 +43,10 @@ class HadithShareCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.surfaceColor.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.3), width: 1.5),
+                border: Border.all(
+                  color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                  width: 1.5,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.5),
@@ -59,20 +62,34 @@ class HadithShareCard extends StatelessWidget {
                   children: [
                     // Header
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                        border: Border(bottom: BorderSide(color: AppTheme.primaryColor.withValues(alpha: 0.2), width: 1.5)),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                            width: 1.5,
+                          ),
+                        ),
                       ),
                       child: Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.2,
+                              ),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.menu_book_rounded, color: AppTheme.primaryColor, size: 20),
+                            child: const Icon(
+                              Icons.menu_book_rounded,
+                              color: AppTheme.primaryColor,
+                              size: 20,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -87,7 +104,10 @@ class HadithShareCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: AppTheme.primaryColor,
                               borderRadius: BorderRadius.circular(20),
@@ -104,7 +124,7 @@ class HadithShareCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // Body
                     Padding(
                       padding: const EdgeInsets.all(32.0),
@@ -117,11 +137,20 @@ class HadithShareCard extends StatelessWidget {
                               alignment: Alignment.center,
                               child: Container(
                                 margin: const EdgeInsets.only(bottom: 24),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                  color: AppTheme.primaryColor.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.3)),
+                                  border: Border.all(
+                                    color: AppTheme.primaryColor.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
                                 ),
                                 child: Text(
                                   gradeLabel,
@@ -134,7 +163,7 @@ class HadithShareCard extends StatelessWidget {
                               ),
                             ),
                           ],
-                          
+
                           if (hasArabic)
                             Text(
                               hadith.arab!,
@@ -147,13 +176,16 @@ class HadithShareCard extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            
+
                           if (hasArabic && hasEnglish)
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 24),
-                              child: Divider(color: Colors.white24, thickness: 1.5),
+                              child: Divider(
+                                color: Colors.white24,
+                                thickness: 1.5,
+                              ),
                             ),
-                            
+
                           if (hasEnglish)
                             Text(
                               hadith.english!,
@@ -162,23 +194,32 @@ class HadithShareCard extends StatelessWidget {
                               style: GoogleFonts.tajawal(
                                 fontSize: 20,
                                 height: 1.6,
-                                color: AppTheme.primaryColor.withValues(alpha: 0.9),
+                                color: AppTheme.primaryColor.withValues(
+                                  alpha: 0.9,
+                                ),
                               ),
                             ),
                         ],
                       ),
                     ),
-                    
+
                     // Footer
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.2),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.mosque_rounded, color: AppTheme.primaryColor, size: 20),
+                          const Icon(
+                            Icons.mosque_rounded,
+                            color: AppTheme.primaryColor,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Flexible(
                             child: Text(
@@ -220,7 +261,11 @@ class _ShareIslamicPatternPainter extends CustomPainter {
     for (double x = 0; x < size.width + spacing; x += spacing) {
       for (double y = 0; y < size.height + spacing; y += spacing) {
         canvas.drawCircle(Offset(x, y), 20, paint);
-        final rect = Rect.fromCenter(center: Offset(x, y), width: 30, height: 30);
+        final rect = Rect.fromCenter(
+          center: Offset(x, y),
+          width: 30,
+          height: 30,
+        );
         canvas.drawRect(rect, paint);
         canvas.drawLine(Offset(x - 20, y), Offset(x + 20, y), paint);
         canvas.drawLine(Offset(x, y - 20), Offset(x, y + 20), paint);

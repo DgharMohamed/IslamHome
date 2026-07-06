@@ -301,7 +301,9 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
             tablet: 2,
             desktop: 4,
           ),
-          childAspectRatio: ResponsiveUtils.isDesktop(context) ? 3.2 : (ResponsiveUtils.isMobile(context) ? 3.5 : 2.8),
+          childAspectRatio: ResponsiveUtils.isDesktop(context)
+              ? 3.2
+              : (ResponsiveUtils.isMobile(context) ? 3.5 : 2.8),
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
@@ -323,7 +325,9 @@ class _AllRecitersScreenState extends ConsumerState<AllRecitersScreen> {
             tablet: 2,
             desktop: 4,
           ),
-          childAspectRatio: ResponsiveUtils.isDesktop(context) ? 3.2 : (ResponsiveUtils.isMobile(context) ? 3.5 : 2.8),
+          childAspectRatio: ResponsiveUtils.isDesktop(context)
+              ? 3.2
+              : (ResponsiveUtils.isMobile(context) ? 3.5 : 2.8),
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),

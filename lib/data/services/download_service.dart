@@ -173,23 +173,25 @@ class DownloadService {
       // Verify file exists and has size after Dio succeeds
       if (await file.exists() && await file.length() > 0) {
         debugPrint('✅ Download successful for ${request.id}: $filePath');
-        
+
         // Notify complete (UI first)
         _notifyProgress(request.id, 1.0, DownloadStatus.completed);
 
         // Nested try-catch for non-critical post-download steps
         try {
           await _addToHistory(request);
-          
+
           await Future.delayed(const Duration(milliseconds: 200));
-          
+
           await _notificationService.showDownloadCompleteNotification(
             id: request.notificationId,
             title: 'تم التحميل',
             body: 'تم تحميل ${request.title} بنجاح',
           );
         } catch (postError) {
-          debugPrint('⚠️ Post-download non-critical error for ${request.id}: $postError');
+          debugPrint(
+            '⚠️ Post-download non-critical error for ${request.id}: $postError',
+          );
           // We don't mark as failed because the file is actually there
         }
       } else {
@@ -201,7 +203,7 @@ class DownloadService {
         _notifyProgress(request.id, 0.0, DownloadStatus.canceled);
       } else {
         debugPrint('❌ Download error for ${request.id}: $e');
-        
+
         // Final sanity check: if file exists despite error, consider it a success
         try {
           final filePath = await getFilePath(
@@ -211,10 +213,11 @@ class DownloadService {
             type: request.type,
           );
           final file = File(filePath);
-          if (await file.exists() && await file.length() > 1024 * 5) { // Min 5KB for safety
-             debugPrint('💡 File found despite error, treating as success');
-             _notifyProgress(request.id, 1.0, DownloadStatus.completed);
-             return;
+          if (await file.exists() && await file.length() > 1024 * 5) {
+            // Min 5KB for safety
+            debugPrint('💡 File found despite error, treating as success');
+            _notifyProgress(request.id, 1.0, DownloadStatus.completed);
+            return;
           }
         } catch (_) {}
 
@@ -259,7 +262,7 @@ class DownloadService {
 
     // Clear queue
     _queue.clear();
-    
+
     // Reset current downloads count to be safe, though finally blocks should handle it
     _currentDownloads = 0;
   }

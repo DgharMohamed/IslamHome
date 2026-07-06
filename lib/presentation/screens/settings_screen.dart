@@ -95,21 +95,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     bool isSelected,
     Locale locale,
   ) {
-    return ListTile(
-      title: Text(
-        label,
-        style: GoogleFonts.cairo(
-          color: isSelected ? AppTheme.primaryColor : Colors.white70,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        title: Text(
+          label,
+          style: GoogleFonts.cairo(
+            color: isSelected ? AppTheme.primaryColor : Colors.white70,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
+        trailing: isSelected
+            ? const Icon(Icons.check, color: AppTheme.primaryColor)
+            : null,
+        onTap: () {
+          ref.read(localeProvider.notifier).setLocale(locale);
+          Navigator.pop(context);
+        },
       ),
-      trailing: isSelected
-          ? const Icon(Icons.check, color: AppTheme.primaryColor)
-          : null,
-      onTap: () {
-        ref.read(localeProvider.notifier).setLocale(locale);
-        Navigator.pop(context);
-      },
     );
   }
 
@@ -152,6 +155,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           _buildSectionHeader(l10n.notificationsAthan, l10n),
           _buildAthanSettings(l10n),
+          _buildSettingTile(
+            icon: Icons.notifications_active_rounded,
+            title: l10n.adhkarTasbeehSettingsTitle,
+            subtitle: l10n.adhkarTasbeehSettingsSubtitle,
+            onTap: () => context.push('/adhkar-settings'),
+          ),
           _buildSettingTile(
             icon: Icons.settings_applications_rounded,
             title: l10n.manageNotificationSettings,
@@ -310,36 +319,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        onTap: onTap,
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppTheme.primaryColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(icon, color: AppTheme.primaryColor, size: 20),
-        ),
-        title: Text(
-          title,
-          style: GoogleFonts.cairo(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          onTap: onTap,
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: AppTheme.primaryColor, size: 20),
           ),
+          title: Text(
+            title,
+            style: GoogleFonts.cairo(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          subtitle: subtitle != null
+              ? Text(
+                  subtitle,
+                  style: GoogleFonts.cairo(fontSize: 12, color: Colors.white38),
+                )
+              : null,
+          trailing:
+              trailing ??
+              (onTap != null
+                  ? const Icon(Icons.chevron_right, color: Colors.white24)
+                  : null),
         ),
-        subtitle: subtitle != null
-            ? Text(
-                subtitle,
-                style: GoogleFonts.cairo(fontSize: 12, color: Colors.white38),
-              )
-            : null,
-        trailing:
-            trailing ??
-            (onTap != null
-                ? const Icon(Icons.chevron_right, color: Colors.white24)
-                : null),
       ),
     );
   }

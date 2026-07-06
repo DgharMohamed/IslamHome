@@ -697,106 +697,113 @@ class _ReciterListTileState extends ConsumerState<_ReciterListTile> {
       widget.reciter.id,
     );
 
-    return ListTile(
-      title: Text(
-        widget.reciter.displayName,
-        style: GoogleFonts.amiri(
-          color: isSelected
-              ? widget.theme.secondaryColor
-              : widget.theme.textColor,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        title: Text(
+          widget.reciter.displayName,
+          style: GoogleFonts.amiri(
+            color: isSelected
+                ? widget.theme.secondaryColor
+                : widget.theme.textColor,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
-      ),
-      trailing: _isChecking
-          ? const SizedBox(width: 24, height: 24)
-          : ValueListenableBuilder<double>(
-              valueListenable: progressNotifier,
-              builder: (context, progress, child) {
-                if (progress > 0 && progress < 1.0) {
-                  return SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      value: progress,
-                      strokeWidth: 2,
-                      color: widget.theme.secondaryColor,
-                    ),
-                  );
-                }
+        trailing: _isChecking
+            ? const SizedBox(width: 24, height: 24)
+            : ValueListenableBuilder<double>(
+                valueListenable: progressNotifier,
+                builder: (context, progress, child) {
+                  if (progress > 0 && progress < 1.0) {
+                    return SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        strokeWidth: 2,
+                        color: widget.theme.secondaryColor,
+                      ),
+                    );
+                  }
 
-                if (_isDownloaded || progress == 1.0) {
+                  if (_isDownloaded || progress == 1.0) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.check_circle_rounded,
+                        color: widget.theme.secondaryColor,
+                        size: 24,
+                      ),
+                      onPressed: () async {
+                        // Optional: confirm deletion
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: widget.theme.backgroundColor,
+                            title: Text(
+                              'حذف الملفات الصوتية',
+                              style: TextStyle(color: widget.theme.textColor),
+                            ),
+                            content: Text(
+                              'هل تريد مسح التلاوة المحملة لهذا القارئ من الجهاز؟',
+                              style: TextStyle(color: widget.theme.textColor),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: Text(
+                                  'إلغاء',
+                                  style: TextStyle(
+                                    color: widget.theme.textColor,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text(
+                                  'حذف',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          await downloadService.deleteReciterAudio(
+                            widget.reciter.id,
+                          );
+                          setState(() {
+                            _isDownloaded = false;
+                          });
+                        }
+                      },
+                    );
+                  }
+
+                  // Not downloaded, show download button
                   return IconButton(
                     icon: Icon(
-                      Icons.check_circle_rounded,
-                      color: widget.theme.secondaryColor,
+                      Icons.download_rounded,
+                      color: widget.theme.textColor.withValues(alpha: 0.5),
                       size: 24,
                     ),
                     onPressed: () async {
-                      // Optional: confirm deletion
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: widget.theme.backgroundColor,
-                          title: Text(
-                            'حذف الملفات الصوتية',
-                            style: TextStyle(color: widget.theme.textColor),
-                          ),
-                          content: Text(
-                            'هل تريد مسح التلاوة المحملة لهذا القارئ من الجهاز؟',
-                            style: TextStyle(color: widget.theme.textColor),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: Text(
-                                'إلغاء',
-                                style: TextStyle(color: widget.theme.textColor),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text(
-                                'حذف',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-
-                      if (confirm == true) {
-                        await downloadService.deleteReciterAudio(
-                          widget.reciter.id,
-                        );
-                        setState(() {
-                          _isDownloaded = false;
-                        });
-                      }
+                      // Start download (fire and forget)
+                      downloadService.downloadReciterAudio(widget.reciter.id);
                     },
                   );
-                }
-
-                // Not downloaded, show download button
-                return IconButton(
-                  icon: Icon(
-                    Icons.download_rounded,
-                    color: widget.theme.textColor.withValues(alpha: 0.5),
-                    size: 24,
-                  ),
-                  onPressed: () async {
-                    // Start download (fire and forget)
-                    downloadService.downloadReciterAudio(widget.reciter.id);
-                  },
-                );
-              },
-            ),
-      onTap: () {
-        final oldReciter = ref.read(selectedReciterProvider);
-        if (oldReciter?.id != widget.reciter.id) {
-          ref.read(selectedReciterProvider.notifier).setReciter(widget.reciter);
-        }
-        Navigator.pop(context);
-      },
+                },
+              ),
+        onTap: () {
+          final oldReciter = ref.read(selectedReciterProvider);
+          if (oldReciter?.id != widget.reciter.id) {
+            ref
+                .read(selectedReciterProvider.notifier)
+                .setReciter(widget.reciter);
+          }
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 }

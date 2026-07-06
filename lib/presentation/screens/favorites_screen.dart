@@ -223,55 +223,58 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           child: GlassContainer(
             borderRadius: 20,
             padding: EdgeInsets.zero,
-            child: ListTile(
-              onTap: () => context.push('/reciter', extra: reciter),
-              contentPadding: const EdgeInsetsDirectional.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              leading: Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppTheme.primaryColor.withValues(alpha: 0.2),
-                      AppTheme.primaryColor.withValues(alpha: 0.05),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                  ),
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                onTap: () => context.push('/reciter', extra: reciter),
+                contentPadding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
                 ),
-                child: Center(
-                  child: Text(
-                    reciter.name?[0] ?? '',
-                    style: GoogleFonts.cairo(
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22,
+                leading: Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.primaryColor.withValues(alpha: 0.2),
+                        AppTheme.primaryColor.withValues(alpha: 0.05),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      reciter.name?[0] ?? '',
+                      style: GoogleFonts.cairo(
+                        color: AppTheme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              title: Text(
-                reciter.name ?? '',
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Colors.white,
+                title: Text(
+                  reciter.name ?? '',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.favorite_rounded,
-                  color: AppTheme.primaryColor,
-                  size: 26,
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.favorite_rounded,
+                    color: AppTheme.primaryColor,
+                    size: 26,
+                  ),
+                  onPressed: () => ref
+                      .read(favoritesProvider.notifier)
+                      .toggleFavoriteReciter(reciter),
                 ),
-                onPressed: () => ref
-                    .read(favoritesProvider.notifier)
-                    .toggleFavoriteReciter(reciter),
               ),
             ),
           ),
@@ -303,119 +306,122 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           child: GlassContainer(
             borderRadius: 20,
             padding: EdgeInsets.zero,
-            child: ListTile(
-              contentPadding: const EdgeInsetsDirectional.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              leading: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                contentPadding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: AppTheme.primaryColor,
+                    size: 30,
                   ),
                 ),
-                child: const Icon(
-                  Icons.play_arrow_rounded,
-                  color: AppTheme.primaryColor,
-                  size: 30,
+                title: Text(
+                  item['surah_name'] ?? '',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              title: Text(
-                item['surah_name'] ?? '',
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Colors.white,
+                subtitle: Text(
+                  item['reciter_name'] ?? '',
+                  style: GoogleFonts.cairo(fontSize: 13, color: Colors.white70),
                 ),
-              ),
-              subtitle: Text(
-                item['reciter_name'] ?? '',
-                style: GoogleFonts.cairo(fontSize: 13, color: Colors.white70),
-              ),
-              onTap: () async {
-                final sources = items.map((s) {
-                  return AudioSource.uri(
-                    Uri.parse(s['url']),
-                    tag: MediaItem(
-                      id: s['url'],
-                      title: s['surah_name'] ?? l10n.surahName(''),
-                      artist: s['reciter_name'] ?? l10n.reciterName(''),
-                      artUri: Uri.parse(
-                        'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=500',
+                onTap: () async {
+                  final sources = items.map((s) {
+                    return AudioSource.uri(
+                      Uri.parse(s['url']),
+                      tag: MediaItem(
+                        id: s['url'],
+                        title: s['surah_name'] ?? l10n.surahName(''),
+                        artist: s['reciter_name'] ?? l10n.reciterName(''),
+                        artUri: Uri.parse(
+                          'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=500',
+                        ),
+                        extras: {'surahNumber': s['surah_number']},
                       ),
-                      extras: {'surahNumber': s['surah_number']},
-                    ),
-                  );
-                }).toList();
+                    );
+                  }).toList();
 
-                try {
-                  final audioService = ref.read(audioPlayerServiceProvider);
-                  if (audioService == null) {
+                  try {
+                    final audioService = ref.read(audioPlayerServiceProvider);
+                    if (audioService == null) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              l10n.audioServiceNotReady,
+                              style: GoogleFonts.cairo(),
+                            ),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    await audioService.setPlaylist(
+                      sources: sources,
+                      initialIndex: index,
+                    );
+                  } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            l10n.audioServiceNotReady,
+                            l10n.playlistPlayError(e.toString()),
                             style: GoogleFonts.cairo(),
                           ),
-                          backgroundColor: Colors.orange,
+                          backgroundColor: Colors.red,
                         ),
                       );
                     }
-                    return;
                   }
-                  await audioService.setPlaylist(
-                    sources: sources,
-                    initialIndex: index,
-                  );
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          l10n.playlistPlayError(e.toString()),
-                          style: GoogleFonts.cairo(),
-                        ),
-                        backgroundColor: Colors.red,
+                },
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.playlist_add_rounded,
+                        color: Colors.white54,
                       ),
-                    );
-                  }
-                }
-              },
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.playlist_add_rounded,
-                      color: Colors.white54,
+                      onPressed: () => _showPlaylistSelector(context, item),
                     ),
-                    onPressed: () => _showPlaylistSelector(context, item),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.favorite_rounded,
-                      color: AppTheme.primaryColor,
+                    IconButton(
+                      icon: const Icon(
+                        Icons.favorite_rounded,
+                        color: AppTheme.primaryColor,
+                      ),
+                      onPressed: () {
+                        final reciter = Reciter(
+                          id: int.tryParse(item['reciter_id'].toString()),
+                          name: item['reciter_name'],
+                        );
+                        final dummySurah = _DummySurah(
+                          number: item['surah_number'] ?? 0,
+                          name: item['surah_name'] ?? '',
+                        );
+                        ref
+                            .read(favoritesProvider.notifier)
+                            .toggleFavoriteSurah(dummySurah, reciter);
+                      },
                     ),
-                    onPressed: () {
-                      final reciter = Reciter(
-                        id: int.tryParse(item['reciter_id'].toString()),
-                        name: item['reciter_name'],
-                      );
-                      final dummySurah = _DummySurah(
-                        number: item['surah_number'] ?? 0,
-                        name: item['surah_name'] ?? '',
-                      );
-                      ref
-                          .read(favoritesProvider.notifier)
-                          .toggleFavoriteSurah(dummySurah, reciter);
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -447,76 +453,79 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           child: GlassContainer(
             borderRadius: 20,
             padding: EdgeInsets.zero,
-            child: ListTile(
-              contentPadding: const EdgeInsetsDirectional.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              leading: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                contentPadding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: AppTheme.primaryColor,
+                    size: 30,
                   ),
                 ),
-                child: const Icon(
-                  Icons.play_arrow_rounded,
-                  color: AppTheme.primaryColor,
-                  size: 30,
+                title: Text(
+                  item['part_name'] ?? '',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              title: Text(
-                item['part_name'] ?? '',
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Colors.white,
+                subtitle: Text(
+                  item['tafsir_name'] ?? '',
+                  style: GoogleFonts.cairo(fontSize: 13, color: Colors.white70),
                 ),
-              ),
-              subtitle: Text(
-                item['tafsir_name'] ?? '',
-                style: GoogleFonts.cairo(fontSize: 13, color: Colors.white70),
-              ),
-              onTap: () async {
-                final audioService = ref.read(audioPlayerServiceProvider);
-                if (audioService == null) return;
+                onTap: () async {
+                  final audioService = ref.read(audioPlayerServiceProvider);
+                  if (audioService == null) return;
 
-                final queue = items.map((i) {
-                  return MediaItem(
-                    id: i['url'],
-                    title: i['part_name'],
-                    album: i['tafsir_name'],
-                    artist: l10n.audioTafsir,
-                    artUri: Uri.parse(
-                      'https://www.mp3quran.net/images/logo_mp3.png',
-                    ),
-                  );
-                }).toList();
+                  final queue = items.map((i) {
+                    return MediaItem(
+                      id: i['url'],
+                      title: i['part_name'],
+                      album: i['tafsir_name'],
+                      artist: l10n.audioTafsir,
+                      artUri: Uri.parse(
+                        'https://www.mp3quran.net/images/logo_mp3.png',
+                      ),
+                    );
+                  }).toList();
 
-                await audioService.playQueue(queue, initialIndex: index);
-                if (context.mounted) context.push('/player');
-              },
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.favorite_rounded,
-                  color: AppTheme.primaryColor,
-                ),
-                onPressed: () {
-                  ref
-                      .read(favoritesProvider.notifier)
-                      .toggleFavoriteTafsir(
-                        tafsirName: item['tafsir_name'],
-                        surahPart: _DummyPart(
-                          id: item['part_id'],
-                          name: item['part_name'],
-                          url: item['url'],
-                          surahId: item['surah_id'],
-                        ),
-                      );
+                  await audioService.playQueue(queue, initialIndex: index);
+                  if (context.mounted) context.push('/player');
                 },
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.favorite_rounded,
+                    color: AppTheme.primaryColor,
+                  ),
+                  onPressed: () {
+                    ref
+                        .read(favoritesProvider.notifier)
+                        .toggleFavoriteTafsir(
+                          tafsirName: item['tafsir_name'],
+                          surahPart: _DummyPart(
+                            id: item['part_id'],
+                            name: item['part_name'],
+                            url: item['url'],
+                            surahId: item['surah_id'],
+                          ),
+                        );
+                  },
+                ),
               ),
             ),
           ),
@@ -548,75 +557,78 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           child: GlassContainer(
             borderRadius: 20,
             padding: EdgeInsets.zero,
-            child: ListTile(
-              contentPadding: const EdgeInsetsDirectional.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              leading: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                contentPadding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                leading: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: AppTheme.primaryColor,
+                    size: 30,
                   ),
                 ),
-                child: const Icon(
-                  Icons.play_arrow_rounded,
-                  color: AppTheme.primaryColor,
-                  size: 30,
+                title: Text(
+                  item['episode_title'] ?? '',
+                  style: GoogleFonts.cairo(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              title: Text(
-                item['episode_title'] ?? '',
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                  color: Colors.white,
+                subtitle: Text(
+                  item['scholar_name'] ?? '',
+                  style: GoogleFonts.cairo(fontSize: 13, color: Colors.white70),
                 ),
-              ),
-              subtitle: Text(
-                item['scholar_name'] ?? '',
-                style: GoogleFonts.cairo(fontSize: 13, color: Colors.white70),
-              ),
-              onTap: () async {
-                final audioService = ref.read(audioPlayerServiceProvider);
-                if (audioService == null) return;
+                onTap: () async {
+                  final audioService = ref.read(audioPlayerServiceProvider);
+                  if (audioService == null) return;
 
-                final queue = items.map((i) {
-                  return MediaItem(
-                    id: i['url'],
-                    title: i['episode_title'],
-                    artist: i['scholar_name'],
-                    album: l10n.videoLibraryTitle,
-                    artUri: Uri.parse(
-                      'https://www.mp3quran.net/images/logo_mp3.png',
-                    ),
-                  );
-                }).toList();
+                  final queue = items.map((i) {
+                    return MediaItem(
+                      id: i['url'],
+                      title: i['episode_title'],
+                      artist: i['scholar_name'],
+                      album: l10n.videoLibraryTitle,
+                      artUri: Uri.parse(
+                        'https://www.mp3quran.net/images/logo_mp3.png',
+                      ),
+                    );
+                  }).toList();
 
-                await audioService.playQueue(queue, initialIndex: index);
-                if (context.mounted) context.push('/player');
-              },
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.favorite_rounded,
-                  color: AppTheme.primaryColor,
-                ),
-                onPressed: () {
-                  ref
-                      .read(favoritesProvider.notifier)
-                      .toggleFavoriteSeerah(
-                        _DummyEpisode(
-                          id: item['episode_id'],
-                          title: item['episode_title'],
-                          url: item['url'],
-                        ),
-                        item['scholar_name'],
-                      );
+                  await audioService.playQueue(queue, initialIndex: index);
+                  if (context.mounted) context.push('/player');
                 },
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.favorite_rounded,
+                    color: AppTheme.primaryColor,
+                  ),
+                  onPressed: () {
+                    ref
+                        .read(favoritesProvider.notifier)
+                        .toggleFavoriteSeerah(
+                          _DummyEpisode(
+                            id: item['episode_id'],
+                            title: item['episode_title'],
+                            url: item['url'],
+                          ),
+                          item['scholar_name'],
+                        );
+                  },
+                ),
               ),
             ),
           ),
@@ -704,42 +716,45 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   itemCount: playlists.length,
                   itemBuilder: (context, index) {
                     final playlist = playlists[index];
-                    return ListTile(
-                      leading: Text(
-                        playlist.icon ?? '\u2B50',
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      title: Text(
-                        playlist.name,
-                        style: GoogleFonts.cairo(color: Colors.white),
-                      ),
-                      onTap: () {
-                        final reciter = Reciter(
-                          id: int.tryParse(item['reciter_id'].toString()),
-                          name: item['reciter_name'],
-                        );
-                        final surah = _DummySurah(
-                          number: item['surah_number'] ?? 0,
-                          name: item['surah_name'] ?? '',
-                        );
-                        ref
-                            .read(favoritesProvider.notifier)
-                            .addToPlaylist(
-                              playlist.id,
-                              surah,
-                              reciter,
-                              item['url'],
-                            );
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              l10n.addedToPlaylist(playlist.name),
-                              style: GoogleFonts.cairo(),
+                    return Material(
+                      type: MaterialType.transparency,
+                      child: ListTile(
+                        leading: Text(
+                          playlist.icon ?? '\u2B50',
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        title: Text(
+                          playlist.name,
+                          style: GoogleFonts.cairo(color: Colors.white),
+                        ),
+                        onTap: () {
+                          final reciter = Reciter(
+                            id: int.tryParse(item['reciter_id'].toString()),
+                            name: item['reciter_name'],
+                          );
+                          final surah = _DummySurah(
+                            number: item['surah_number'] ?? 0,
+                            name: item['surah_name'] ?? '',
+                          );
+                          ref
+                              .read(favoritesProvider.notifier)
+                              .addToPlaylist(
+                                playlist.id,
+                                surah,
+                                reciter,
+                                item['url'],
+                              );
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                l10n.addedToPlaylist(playlist.name),
+                                style: GoogleFonts.cairo(),
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     );
                   },
                 ),

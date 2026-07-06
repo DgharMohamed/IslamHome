@@ -7,14 +7,15 @@ part of 'qf_recitation_model.dart';
 // **************************************************************************
 
 QFRecitation _$QFRecitationFromJson(Map<String, dynamic> json) => QFRecitation(
-      id: (json['id'] as num).toInt(),
-      reciterName: json['reciter_name'] as String,
-      style: json['style'] as String?,
-      translatedName: json['translated_name'] == null
-          ? null
-          : QFTranslatedName.fromJson(
-              json['translated_name'] as Map<String, dynamic>),
-    );
+  id: (json['id'] as num).toInt(),
+  reciterName: json['reciter_name'] as String,
+  style: json['style'] as String?,
+  translatedName: json['translated_name'] == null
+      ? null
+      : QFTranslatedName.fromJson(
+          json['translated_name'] as Map<String, dynamic>,
+        ),
+);
 
 Map<String, dynamic> _$QFRecitationToJson(QFRecitation instance) =>
     <String, dynamic>{

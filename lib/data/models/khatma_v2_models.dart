@@ -149,8 +149,7 @@ class KhatmaTrack extends HiveObject {
   /// Last completed unit (page/juz/surah based on [unit]).
   int get currentUnit => currentPage;
 
-  int get completedUnits =>
-      (currentUnit - startPage + 1).clamp(0, totalUnits);
+  int get completedUnits => (currentUnit - startPage + 1).clamp(0, totalUnits);
 
   int get remainingUnits => (totalUnits - completedUnits).clamp(0, totalUnits);
 

@@ -6,6 +6,7 @@ class SurahHeaderWidget extends StatelessWidget {
   final Map<String, dynamic> element;
   final MushafTheme theme;
   final double fontSizeScale;
+  final String? fontFamily;
   final VoidCallback? onTapSurahName;
 
   const SurahHeaderWidget({
@@ -13,6 +14,7 @@ class SurahHeaderWidget extends StatelessWidget {
     required this.element,
     required this.theme,
     required this.fontSizeScale,
+    this.fontFamily,
     this.onTapSurahName,
   });
 
@@ -57,9 +59,9 @@ class SurahHeaderWidget extends StatelessWidget {
                     child: Text(
                       quran.getSurahNameArabic(element['surah']),
                       style: TextStyle(
-                        fontFamily: 'Amiri',
+                        fontFamily: fontFamily ?? 'Amiri',
                         fontWeight: FontWeight.bold,
-                        fontSize: 18 * fontSizeScale,
+                        fontSize: 20 * fontSizeScale,
                         color: theme.textColor,
                       ),
                     ),
@@ -86,7 +88,14 @@ class SurahHeaderWidget extends StatelessWidget {
 class BismillahWidget extends StatelessWidget {
   final MushafTheme theme;
   final double fontSizeScale;
-  const BismillahWidget({super.key, required this.theme, required this.fontSizeScale});
+  final String? fontFamily;
+
+  const BismillahWidget({
+    super.key,
+    required this.theme,
+    required this.fontSizeScale,
+    this.fontFamily,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +105,8 @@ class BismillahWidget extends StatelessWidget {
         child: Text(
           quran.basmala,
           style: TextStyle(
-            fontFamily: 'Amiri',
-            fontSize: 22 * fontSizeScale,
+            fontFamily: fontFamily ?? 'Amiri',
+            fontSize: 24 * fontSizeScale,
             color: theme.textColor,
           ),
         ),

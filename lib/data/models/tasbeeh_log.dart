@@ -32,18 +32,20 @@ class TasbeehLog extends HiveObject {
       '${dhikrId}_${timestamp?.millisecondsSinceEpoch ?? (date.millisecondsSinceEpoch + hour)}';
 
   Map<String, dynamic> toJson() => {
-        'dhikrId': dhikrId,
-        'date': date.toIso8601String(),
-        'hour': hour,
-        'count': count,
-        'timestamp': timestamp?.toIso8601String(),
-      };
+    'dhikrId': dhikrId,
+    'date': date.toIso8601String(),
+    'hour': hour,
+    'count': count,
+    'timestamp': timestamp?.toIso8601String(),
+  };
 
   factory TasbeehLog.fromJson(Map<String, dynamic> json) => TasbeehLog(
-        dhikrId: json['dhikrId'],
-        date: DateTime.parse(json['date']),
-        hour: json['hour'],
-        count: json['count'] ?? 0,
-        timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : null,
-      );
+    dhikrId: json['dhikrId'],
+    date: DateTime.parse(json['date']),
+    hour: json['hour'],
+    count: json['count'] ?? 0,
+    timestamp: json['timestamp'] != null
+        ? DateTime.parse(json['timestamp'])
+        : null,
+  );
 }

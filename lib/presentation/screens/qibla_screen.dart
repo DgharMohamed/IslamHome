@@ -83,14 +83,16 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
       );
       _magneticDeclination = geoField.declination;
       debugPrint(
-          'QiblaScreen: Magnetic declination at ($lat, $lng) = ${_magneticDeclination.toStringAsFixed(2)}°');
+        'QiblaScreen: Magnetic declination at ($lat, $lng) = ${_magneticDeclination.toStringAsFixed(2)}°',
+      );
     } catch (e) {
       debugPrint('QiblaScreen: Declination calculation failed: $e');
       _magneticDeclination = 0.0;
     }
 
-    final direction =
-        await ref.read(alAdhanServiceProvider).getQiblaDirection(lat, lng);
+    final direction = await ref
+        .read(alAdhanServiceProvider)
+        .getQiblaDirection(lat, lng);
 
     if (mounted) {
       setState(() {
@@ -198,8 +200,11 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.compass_calibration,
-                                size: 80, color: Colors.white54),
+                            const Icon(
+                              Icons.compass_calibration,
+                              size: 80,
+                              color: Colors.white54,
+                            ),
                             const SizedBox(height: 16),
                             Text(
                               l10n.qiblaNotSupportedOnWindows,
@@ -227,8 +232,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
-                              child:
-                                  Text(l10n.error(snapshot.error.toString())),
+                              child: Text(
+                                l10n.error(snapshot.error.toString()),
+                              ),
                             );
                           }
                           if (snapshot.connectionState ==
@@ -249,12 +255,12 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                           _compassAccuracy = snapshot.data?.accuracy;
 
                           // ── FIX 1: Smooth the compass reading ──
-                          final smoothedMagnetic =
-                              _compassFilter.update(rawHeading);
+                          final smoothedMagnetic = _compassFilter.update(
+                            rawHeading,
+                          );
 
                           // ── FIX 2: Convert magnetic heading → true heading ──
-                          final trueHeading =
-                              _toTrueHeading(smoothedMagnetic);
+                          final trueHeading = _toTrueHeading(smoothedMagnetic);
 
                           // Calculate Qibla bearing (from True North)
                           double qiblaDirection;
@@ -271,29 +277,34 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
                           // Distance to Kaaba
                           final double distanceInMeters =
                               Geolocator.distanceBetween(
-                            lat,
-                            lng,
-                            21.4225,
-                            39.8262,
-                          );
+                                lat,
+                                lng,
+                                21.4225,
+                                39.8262,
+                              );
 
                           // Check if needle is pointing near Qibla (within 3°)
-                          final angleDiff =
-                              angularDifference(trueHeading, qiblaDirection)
-                                  .abs();
+                          final angleDiff = angularDifference(
+                            trueHeading,
+                            qiblaDirection,
+                          ).abs();
                           final isAligned = angleDiff < 3.0;
 
                           return Column(
                             children: [
                               const Spacer(),
                               // 3. Accuracy indicator
-                              if (_showCalibrationHint) _buildCalibrationHint(l10n),
+                              if (_showCalibrationHint)
+                                _buildCalibrationHint(l10n),
                               if (_compassAccuracy != null &&
                                   _compassAccuracy! < 0)
                                 _buildLowAccuracyWarning(l10n),
                               // 4. Compass Section (now using true heading)
                               _buildCompass(
-                                  trueHeading, qiblaDirection, isAligned),
+                                trueHeading,
+                                qiblaDirection,
+                                isAligned,
+                              ),
                               const Spacer(),
                               // 5. Info Badges
                               _buildInfoBadges(
@@ -428,7 +439,10 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
   }
 
   Widget _buildCompass(
-      double trueHeading, double qiblaDirection, bool isAligned) {
+    double trueHeading,
+    double qiblaDirection,
+    bool isAligned,
+  ) {
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -538,7 +552,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen> {
             child: Text(
               isUsingApi
                   ? l10n.qiblaSourceApi(_magneticDeclination.toStringAsFixed(1))
-                  : l10n.qiblaSourceOffline(_magneticDeclination.toStringAsFixed(1)),
+                  : l10n.qiblaSourceOffline(
+                      _magneticDeclination.toStringAsFixed(1),
+                    ),
               style: GoogleFonts.cairo(fontSize: 10, color: Colors.white38),
             ),
           ),

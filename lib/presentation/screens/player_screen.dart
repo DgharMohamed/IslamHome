@@ -525,98 +525,102 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                                     : BorderSide.none,
                               ),
                             ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
-                              ),
-                              onTap: () {
-                                audioService.player.seek(
-                                  Duration.zero,
-                                  index: index,
-                                );
-                                Navigator.pop(
-                                  context,
-                                ); // Close sheet after selection
-                              },
-                              leading: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: isCurrent
-                                      ? AppTheme.primaryColor.withValues(
-                                          alpha: 0.2,
-                                        )
-                                      : Colors.white.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(10),
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 8,
                                 ),
-                                child: Center(
-                                  child: isCurrent
-                                      ? const Icon(
-                                          Icons.bar_chart_rounded,
-                                          color: AppTheme.primaryColor,
-                                          size: 20,
-                                        )
-                                      : Text(
-                                          '${index + 1}',
-                                          style: GoogleFonts.tajawal(
-                                            color: Colors.white54,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
+                                onTap: () {
+                                  audioService.player.seek(
+                                    Duration.zero,
+                                    index: index,
+                                  );
+                                  Navigator.pop(
+                                    context,
+                                  ); // Close sheet after selection
+                                },
+                                leading: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: isCurrent
+                                        ? AppTheme.primaryColor.withValues(
+                                            alpha: 0.2,
+                                          )
+                                        : Colors.white.withValues(alpha: 0.05),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: isCurrent
+                                        ? const Icon(
+                                            Icons.bar_chart_rounded,
+                                            color: AppTheme.primaryColor,
+                                            size: 20,
+                                          )
+                                        : Text(
+                                            '${index + 1}',
+                                            style: GoogleFonts.tajawal(
+                                              color: Colors.white54,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                                title: Text(
+                                  metadata.title,
+                                  style: GoogleFonts.tajawal(
+                                    color: isCurrent
+                                        ? AppTheme.primaryColor
+                                        : Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: isCurrent
+                                        ? FontWeight.w900
+                                        : FontWeight.w500,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(
+                                  metadata.artist ?? '',
+                                  style: GoogleFonts.tajawal(
+                                    color: Colors.white54,
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: isCurrent
+                                    ? Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.primaryColor
+                                              .withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          border: Border.all(
+                                            color: AppTheme.primaryColor
+                                                .withValues(alpha: 0.3),
                                           ),
                                         ),
-                                ),
-                              ),
-                              title: Text(
-                                metadata.title,
-                                style: GoogleFonts.tajawal(
-                                  color: isCurrent
-                                      ? AppTheme.primaryColor
-                                      : Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: isCurrent
-                                      ? FontWeight.w900
-                                      : FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(
-                                metadata.artist ?? '',
-                                style: GoogleFonts.tajawal(
-                                  color: Colors.white54,
-                                  fontSize: 13,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              trailing: isCurrent
-                                  ? Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.primaryColor.withValues(
-                                          alpha: 0.2,
+                                        child: Text(
+                                          l10n.nowPlayingLabel,
+                                          style: GoogleFonts.cairo(
+                                            color: AppTheme.primaryColor,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.2,
+                                          ),
                                         ),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: AppTheme.primaryColor
-                                              .withValues(alpha: 0.3),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        l10n.nowPlayingLabel,
-                                        style: GoogleFonts.cairo(
-                                          color: AppTheme.primaryColor,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                    )
-                                  : null,
+                                      )
+                                    : null,
+                              ),
                             ),
                           );
                         },
@@ -766,19 +770,25 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     String title,
     Duration duration,
   ) {
-    return ListTile(
-      leading: const Icon(Icons.timer_outlined, color: Colors.white70),
-      title: Text(title, style: GoogleFonts.cairo(color: Colors.white)),
-      onTap: () {
-        audioService.setSleepTimer(duration);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.timerSetFor(title), style: GoogleFonts.cairo()),
-            backgroundColor: AppTheme.primaryColor,
-          ),
-        );
-      },
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        leading: const Icon(Icons.timer_outlined, color: Colors.white70),
+        title: Text(title, style: GoogleFonts.cairo(color: Colors.white)),
+        onTap: () {
+          audioService.setSleepTimer(duration);
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                l10n.timerSetFor(title),
+                style: GoogleFonts.cairo(),
+              ),
+              backgroundColor: AppTheme.primaryColor,
+            ),
+          );
+        },
+      ),
     );
   }
 

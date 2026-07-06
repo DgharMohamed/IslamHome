@@ -78,8 +78,10 @@ class AuthService {
       final user = _auth.currentUser;
       if (user == null) return null;
 
-      final credential =
-          EmailAuthProvider.credential(email: email, password: password);
+      final credential = EmailAuthProvider.credential(
+        email: email,
+        password: password,
+      );
       final result = await user.linkWithCredential(credential);
 
       if (result.user != null) {

@@ -69,8 +69,9 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
   StreamSubscription? _cloudSubscription;
   String? _listeningUid;
   static const String _activeListeningTrackKey = 'active_listening_track_id';
-  
-  FirestoreSyncService get _syncService => ref.read(firestoreSyncServiceProvider);
+
+  FirestoreSyncService get _syncService =>
+      ref.read(firestoreSyncServiceProvider);
   FirebaseAuth get _auth => FirebaseAuth.instance;
 
   @override
@@ -97,32 +98,36 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
 
     _cloudSubscription = _syncService
         .getUserCollectionStream('khatma', uid: uid)
-        .listen((snapshot) {
-      bool localUpdated = false;
-      
-      for (var doc in snapshot.docs) {
-        final cloudTrack = KhatmaTrack.fromJson(doc.data());
-        final localTrack = _box.get(cloudTrack.id);
+        .listen(
+          (snapshot) {
+            bool localUpdated = false;
 
-        if (localTrack == null || cloudTrack.lastUpdated.isAfter(localTrack.lastUpdated)) {
-          _box.put(cloudTrack.id, cloudTrack);
-          localUpdated = true;
-        }
-      }
+            for (var doc in snapshot.docs) {
+              final cloudTrack = KhatmaTrack.fromJson(doc.data());
+              final localTrack = _box.get(cloudTrack.id);
 
-      if (localUpdated) {
-        _refreshState();
-      }
-    }, onError: (Object error) {
-      debugPrint('KhatmaV2Notifier: cloud listener error: $error');
-    });
+              if (localTrack == null ||
+                  cloudTrack.lastUpdated.isAfter(localTrack.lastUpdated)) {
+                _box.put(cloudTrack.id, cloudTrack);
+                localUpdated = true;
+              }
+            }
+
+            if (localUpdated) {
+              _refreshState();
+            }
+          },
+          onError: (Object error) {
+            debugPrint('KhatmaV2Notifier: cloud listener error: $error');
+          },
+        );
   }
 
   Future<void> addTrack(KhatmaTrack track) async {
     validateTrack(track);
     final trackWithTime = track.copyWith(lastUpdated: DateTime.now());
     await _box.put(trackWithTime.id, trackWithTime);
-    
+
     if (trackWithTime.type == KhatmaType.listening &&
         trackWithTime.unit == KhatmaUnit.surah &&
         _settingsBox.get(_activeListeningTrackKey) == null) {
@@ -186,7 +191,7 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
 
     // Note: In a full sync, we might want to mark as deleted in Firestore
     // For now, we'll focus on positive sync (adds/updates)
-    
+
     _refreshState();
   }
 
@@ -356,10 +361,7 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
     }
   }
 
-  static int calculateDailyGoalForTrack(
-    KhatmaTrack track, {
-    DateTime? now,
-  }) {
+  static int calculateDailyGoalForTrack(KhatmaTrack track, {DateTime? now}) {
     if (track.targetDate == null) return 0;
     final nowDate = now ?? DateTime.now();
     final remainingUnits = track.remainingUnits;
@@ -380,20 +382,17 @@ class KhatmaV2Notifier extends Notifier<KhatmaV2State> {
 
     final totalDays = track.targetDate == null
         ? 1
-        : (track.targetDate!
-                  .difference(track.startDate)
-                  .inDays +
-              1)
-            .clamp(1, 100000);
+        : (track.targetDate!.difference(track.startDate).inDays + 1).clamp(
+            1,
+            100000,
+          );
     final elapsedDays = (nowDate.difference(track.startDate).inDays + 1).clamp(
       1,
       totalDays,
     );
-    final expectedCompleted =
-        ((elapsedDays / totalDays) * track.totalUnits).floor().clamp(
-          0,
-          track.totalUnits,
-        );
+    final expectedCompleted = ((elapsedDays / totalDays) * track.totalUnits)
+        .floor()
+        .clamp(0, track.totalUnits);
     final backlog = (expectedCompleted - track.completedUnits).clamp(
       0,
       track.totalUnits,

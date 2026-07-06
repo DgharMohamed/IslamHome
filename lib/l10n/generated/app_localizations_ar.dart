@@ -2491,4 +2491,96 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get themeBlack => 'أسود';
+
+  @override
+  String get adhkarTasbeehSettingsTitle => 'إعدادات تنبيهات الأذكار والتسبيح';
+
+  @override
+  String get adhkarTasbeehSettingsSubtitle =>
+      'تخصيص أوقات الأذكار والتذكير بالتسبيح اليومي';
+
+  @override
+  String get morningAdhkar => 'أذكار الصباح';
+
+  @override
+  String get morningAdhkarEnable => 'تفعيل إشعارات أذكار الصباح';
+
+  @override
+  String get morningAdhkarOffset => 'تنبيه بعد الفجر بـ';
+
+  @override
+  String get eveningAdhkar => 'أذكار المساء';
+
+  @override
+  String get eveningAdhkarEnable => 'تفعيل إشعارات أذكار المساء';
+
+  @override
+  String get eveningAdhkarOffset => 'تنبيه بعد العصر بـ';
+
+  @override
+  String get sleepAdhkar => 'أذكار النوم';
+
+  @override
+  String get sleepAdhkarEnable => 'تفعيل إشعارات أذكار النوم';
+
+  @override
+  String get sleepAdhkarOffset => 'تنبيه بعد العشاء بـ';
+
+  @override
+  String get dailyTasbeeh => 'التسبيح اليومي';
+
+  @override
+  String get dailyTasbeehEnable => 'تذكير التسبيح اليومي (Streak)';
+
+  @override
+  String get dailyTasbeehEnableSubtitle =>
+      'يُذكرك بالتسبيح إذا لم تقم به حتى وقت التذكير';
+
+  @override
+  String get reminderTime => 'وقت التذكير';
+
+  @override
+  String get adhkarMorningNotificationTitle => 'أذكار الصباح';
+
+  @override
+  String get adhkarMorningNotificationBody => 'حان وقت أذكار الصباح، حصن نفسك.';
+
+  @override
+  String get adhkarEveningNotificationTitle => 'أذكار المساء';
+
+  @override
+  String get adhkarEveningNotificationBody =>
+      'حان وقت أذكار المساء، لا تنسى ذكر الله.';
+
+  @override
+  String get adhkarSleepNotificationTitle => 'أذكار النوم';
+
+  @override
+  String get adhkarSleepNotificationBody => 'اختم يومك بأذكار النوم.';
+
+  @override
+  String get tasbeehStreakNotificationTitle => 'لا تنسى وردك اليومي';
+
+  @override
+  String get tasbeehStreakNotificationBody =>
+      'حافظ على سلسلة التسبيح الخاصة بك (Streak)! 📿';
+
+  @override
+  String get shareAsText => 'مشاركة كنص';
+
+  @override
+  String get shareAsImage => 'مشاركة كصورة';
+
+  @override
+  String get shareAsAudio => 'مشاركة كصوت';
+
+  @override
+  String get sharedFromApp => 'تمت المشاركة من تطبيق بيت الإسلام - Islam Home';
+
+  @override
+  String get downloadingAudioForShare => 'جاري تحميل الصوت للمشاركة...';
+
+  @override
+  String get audioNeedsInternetToShare =>
+      'هذا الصوت يحتاج لاتصال بالإنترنت ليتم مشاركته.';
 }

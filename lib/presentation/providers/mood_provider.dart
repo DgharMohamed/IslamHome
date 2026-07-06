@@ -81,9 +81,10 @@ class MoodEngineNotifier extends Notifier<MoodEngineState> {
   }
 }
 
-final moodEngineProvider = NotifierProvider<MoodEngineNotifier, MoodEngineState>(
-  MoodEngineNotifier.new,
-);
+final moodEngineProvider =
+    NotifierProvider<MoodEngineNotifier, MoodEngineState>(
+      MoodEngineNotifier.new,
+    );
 
 const Map<String, List<MoodRecommendation>> _recommendationsByMood = {
   'anxious': [
@@ -164,7 +165,8 @@ final moodRecommendationSuggestionsProvider =
       final isArabic = locale.languageCode == 'ar';
       final moodState = ref.watch(moodEngineProvider);
       final now = DateTime.now();
-      final items = _recommendationsByMood[moodId] ?? _recommendationsByMood['lost']!;
+      final items =
+          _recommendationsByMood[moodId] ?? _recommendationsByMood['lost']!;
       final isNight = now.hour >= 20 || now.hour < 5;
       final isMorning = now.hour >= 5 && now.hour < 12;
 

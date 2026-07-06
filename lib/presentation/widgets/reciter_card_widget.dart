@@ -47,8 +47,8 @@ class _ReciterCardWidgetState extends ConsumerState<ReciterCardWidget> {
             borderRadius: BorderRadius.circular(16),
             gradient: LinearGradient(
               colors: [
-                _isHovered 
-                    ? AppTheme.primaryColor.withValues(alpha: 0.15) 
+                _isHovered
+                    ? AppTheme.primaryColor.withValues(alpha: 0.15)
                     : AppTheme.surfaceColor,
                 AppTheme.darkBlue.withValues(alpha: 0.8),
               ],
@@ -74,8 +74,8 @@ class _ReciterCardWidgetState extends ConsumerState<ReciterCardWidget> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _isHovered 
-                          ? AppTheme.primaryColor 
+                      color: _isHovered
+                          ? AppTheme.primaryColor
                           : AppTheme.primaryColor.withValues(alpha: 0.3),
                       width: _isHovered ? 2 : 1.5,
                     ),
@@ -103,8 +103,8 @@ class _ReciterCardWidgetState extends ConsumerState<ReciterCardWidget> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: _isHovered 
-                              ? AppTheme.primaryColor 
+                          color: _isHovered
+                              ? AppTheme.primaryColor
                               : AppTheme.primaryColor.withValues(alpha: 0.6),
                           width: 2,
                         ),
@@ -124,7 +124,9 @@ class _ReciterCardWidgetState extends ConsumerState<ReciterCardWidget> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.1,
+                              ),
                               child: Icon(
                                 Icons.person,
                                 size: 35,

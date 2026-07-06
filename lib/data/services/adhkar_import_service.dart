@@ -102,19 +102,22 @@ class AdhkarImportService {
       final String searchTags = row.length > 5 ? row[5]?.toString() ?? '' : '';
 
       // Combine description and search tags into textEn for searchable content
-      final String combinedTextEn = [description, searchTags]
-          .where((s) => s.isNotEmpty)
-          .join(' | ');
+      final String combinedTextEn = [
+        description,
+        searchTags,
+      ].where((s) => s.isNotEmpty).join(' | ');
 
-      result.add(AdhkarModel(
-        id: generatedId++,
-        category: category,
-        title: category, 
-        textAr: textAr,
-        textEn: combinedTextEn,
-        reference: reference,
-        repeat: repeat < 1 ? 1 : repeat,
-      ));
+      result.add(
+        AdhkarModel(
+          id: generatedId++,
+          category: category,
+          title: category,
+          textAr: textAr,
+          textEn: combinedTextEn,
+          reference: reference,
+          repeat: repeat < 1 ? 1 : repeat,
+        ),
+      );
     }
 
     return result;

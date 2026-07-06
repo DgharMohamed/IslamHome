@@ -58,6 +58,8 @@ class PrayerNotifier extends Notifier<PrayerState> {
     final useGPS = box.get('prayer_use_gps', defaultValue: false);
     final methodId = box.get('prayer_calculation_method', defaultValue: 3);
 
+    final cachedTimings = _getCachedTimings();
+
     // Load initial data
     Future.microtask(() => refresh());
 
@@ -93,7 +95,9 @@ class PrayerNotifier extends Notifier<PrayerState> {
     });
 
     return PrayerState(
-      timings: const AsyncValue.loading(),
+      timings: cachedTimings != null
+          ? AsyncValue.data(cachedTimings)
+          : const AsyncValue.loading(),
       city: city,
       country: country,
       habousId: habousId,
@@ -104,7 +108,7 @@ class PrayerNotifier extends Notifier<PrayerState> {
 
   Future<void> refresh({bool forceRefresh = false}) async {
     final previousTimes = state.timings.asData?.value;
-    if (forceRefresh || previousTimes == null) {
+    if (previousTimes == null) {
       state = state.copyWith(timings: const AsyncValue.loading());
     }
 
@@ -332,7 +336,9 @@ class PrayerNotifier extends Notifier<PrayerState> {
     final hasPermission = await NotificationService()
         .holdsExactAlarmPermission();
     if (!hasPermission) {
-      debugPrint('Exact alarm permission missing; using inexact Adhan fallback');
+      debugPrint(
+        'Exact alarm permission missing; using inexact Adhan fallback',
+      );
       // NotificationService will use an inexact fallback so alerts are still scheduled.
     }
 
@@ -358,7 +364,7 @@ class PrayerNotifier extends Notifier<PrayerState> {
     final Map<DateTime, Map<String, String>> multiDayTimings = {};
     final lat = box.get('prayer_lat', defaultValue: 34.0209);
     final lng = box.get('prayer_lng', defaultValue: -6.8416);
-    
+
     // We schedule for the next 10 days to ensure the user is covered even if they don't open the app daily
     for (int i = 0; i < 10; i++) {
       final date = DateTime.now().add(Duration(days: i));
@@ -387,7 +393,37 @@ class PrayerNotifier extends Notifier<PrayerState> {
       reminderMinutes: reminderMinutes,
     );
 
-    debugPrint('🔔 PrayerNotifier: Multi-day Adhan schedules updated (10 days)');
+    // Also schedule Adhkar and Tasbeeh
+    final adhkarMorningEnabled = box.get('adhkar_morning_enabled', defaultValue: true);
+    final adhkarMorningOffset = box.get('adhkar_morning_offset', defaultValue: 30);
+    final adhkarEveningEnabled = box.get('adhkar_evening_enabled', defaultValue: true);
+    final adhkarEveningOffset = box.get('adhkar_evening_offset', defaultValue: 30);
+    final adhkarSleepEnabled = box.get('adhkar_sleep_enabled', defaultValue: true);
+    final adhkarSleepOffset = box.get('adhkar_sleep_offset', defaultValue: 120);
+
+    await NotificationService().scheduleAdhkarReminders(
+      multiDayTimings: multiDayTimings,
+      morningEnabled: adhkarMorningEnabled,
+      morningMinutesAfterFajr: adhkarMorningOffset,
+      eveningEnabled: adhkarEveningEnabled,
+      eveningMinutesAfterAsr: adhkarEveningOffset,
+      sleepEnabled: adhkarSleepEnabled,
+      sleepMinutesAfterIsha: adhkarSleepOffset,
+    );
+
+    final tasbeehEnabled = box.get('tasbeeh_reminder_enabled', defaultValue: true);
+    final tasbeehHour = box.get('tasbeeh_reminder_hour', defaultValue: 20);
+    final tasbeehMinute = box.get('tasbeeh_reminder_minute', defaultValue: 0);
+
+    await NotificationService().scheduleTasbeehStreakReminder(
+      enabled: tasbeehEnabled,
+      hour: tasbeehHour,
+      minute: tasbeehMinute,
+    );
+
+    debugPrint(
+      '🔔 PrayerNotifier: Multi-day Adhan, Adhkar, and Tasbeeh schedules updated',
+    );
   }
 
   Future<void> updateCalculationMethod(int methodId) async {

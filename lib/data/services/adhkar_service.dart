@@ -19,7 +19,12 @@ class AdhkarService {
     final all = box.values.toList(growable: false);
     final categories = all.map((e) => e.category).toSet().toList();
     // Maintain a basic sensible order for main categories if they exist
-    final topOrder = ['أذكار الصباح', 'أذكار المساء', 'أذكار النوم', 'أذكار الصلاة'];
+    final topOrder = [
+      'أذكار الصباح',
+      'أذكار المساء',
+      'أذكار النوم',
+      'أذكار الصلاة',
+    ];
     categories.sort((a, b) {
       final indexA = topOrder.indexOf(a);
       final indexB = topOrder.indexOf(b);
@@ -56,9 +61,7 @@ class AdhkarService {
     final favoriteBox = AdhkarDatabase.favoriteBox;
     final item = box.get(id);
     if (item == null) return null;
-    return item.copyWith(
-      favorite: favoriteBox.get(id.toString()) ?? false,
-    );
+    return item.copyWith(favorite: favoriteBox.get(id.toString()) ?? false);
   }
 
   Future<List<AdhkarModel>> search(String query) async {
@@ -80,9 +83,7 @@ class AdhkarService {
         })
         .map((item) {
           final isFavorite = favoriteBox.get(item.id.toString()) ?? false;
-          return item.copyWith(
-            favorite: isFavorite,
-          );
+          return item.copyWith(favorite: isFavorite);
         })
         .toList(growable: false);
 
@@ -109,11 +110,7 @@ class AdhkarService {
 
     final favorites = adhkarBox.values
         .where((item) => favoriteBox.get(item.id.toString()) ?? false)
-        .map(
-          (item) => item.copyWith(
-            favorite: true,
-          ),
-        )
+        .map((item) => item.copyWith(favorite: true))
         .toList(growable: false);
 
     return favorites;

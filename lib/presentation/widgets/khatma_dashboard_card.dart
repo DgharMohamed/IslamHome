@@ -34,10 +34,15 @@ class KhatmaDashboardCard extends ConsumerWidget {
     final progressPercent = (activeTrack.overallProgress * 100).toInt();
     final unitLabel = _unitSingularLabel(context, activeTrack.unit);
 
-    final remediationPlan = activeTrack.targetDate != null 
-        ? KhatmaV2Notifier.buildRemediationPlan(activeTrack, RemediationStrategy.catchUp, now: DateTime.now())
+    final remediationPlan = activeTrack.targetDate != null
+        ? KhatmaV2Notifier.buildRemediationPlan(
+            activeTrack,
+            RemediationStrategy.catchUp,
+            now: DateTime.now(),
+          )
         : null;
-    final isBehind = remediationPlan != null && remediationPlan.backlogUnits > 0;
+    final isBehind =
+        remediationPlan != null && remediationPlan.backlogUnits > 0;
 
     return GlassContainer(
       child: Padding(
@@ -109,7 +114,14 @@ class KhatmaDashboardCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            if (isBehind) _buildRemediationAlert(context, l10n, ref, activeTrack, remediationPlan),
+            if (isBehind)
+              _buildRemediationAlert(
+                context,
+                l10n,
+                ref,
+                activeTrack,
+                remediationPlan,
+              ),
             Row(
               children: [
                 _buildMetricChip(
@@ -287,9 +299,18 @@ class KhatmaDashboardCard extends ConsumerWidget {
               spacing: 6,
               runSpacing: 6,
               children: [
-                _buildFeatureChip(Icons.chrome_reader_mode_outlined, l10n.khatmaV2Reading),
-                _buildFeatureChip(Icons.headphones_outlined, l10n.khatmaV2Listening),
-                _buildFeatureChip(Icons.psychology_outlined, l10n.khatmaV2Memorization),
+                _buildFeatureChip(
+                  Icons.chrome_reader_mode_outlined,
+                  l10n.khatmaV2Reading,
+                ),
+                _buildFeatureChip(
+                  Icons.headphones_outlined,
+                  l10n.khatmaV2Listening,
+                ),
+                _buildFeatureChip(
+                  Icons.psychology_outlined,
+                  l10n.khatmaV2Memorization,
+                ),
               ],
             ),
 
@@ -336,11 +357,11 @@ class KhatmaDashboardCard extends ConsumerWidget {
   }
 
   Widget _buildRemediationAlert(
-    BuildContext context, 
-    AppLocalizations l10n, 
-    WidgetRef ref, 
-    KhatmaTrack track, 
-    RemediationPlan plan
+    BuildContext context,
+    AppLocalizations l10n,
+    WidgetRef ref,
+    KhatmaTrack track,
+    RemediationPlan plan,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -352,14 +373,21 @@ class KhatmaDashboardCard extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 24),
+          const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.redAccent,
+            size: 24,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.khatmaRemediationNeeded(plan.backlogUnits, _unitSingularLabel(context, track.unit)),
+                  l10n.khatmaRemediationNeeded(
+                    plan.backlogUnits,
+                    _unitSingularLabel(context, track.unit),
+                  ),
                   style: GoogleFonts.tajawal(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -374,10 +402,8 @@ class KhatmaDashboardCard extends ConsumerWidget {
                       useRootNavigator: true,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,
-                      builder: (context) => KhatmaRemediationSheet(
-                        track: track,
-                        plan: plan,
-                      ),
+                      builder: (context) =>
+                          KhatmaRemediationSheet(track: track, plan: plan),
                     );
                   },
                   child: Text(
@@ -423,7 +449,6 @@ class KhatmaDashboardCard extends ConsumerWidget {
       ),
     );
   }
-
 
   Widget _buildMetricChip({required String label, required String value}) {
     return Expanded(
@@ -722,50 +747,55 @@ class KhatmaDashboardCard extends ConsumerWidget {
                 const SizedBox(height: 12),
                 ...listeningTracks.map((item) {
                   final isActive = item.id == activeId;
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      isActive
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_off,
-                      color: isActive
-                          ? AppTheme.primaryColor
-                          : AppTheme.textSecondary,
-                    ),
-                    title: Text(
-                      item.title,
-                      style: GoogleFonts.cairo(
-                        color: isActive ? AppTheme.primaryColor : Colors.white,
-                        fontWeight: isActive
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+                  return Material(
+                    type: MaterialType.transparency,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        isActive
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        color: isActive
+                            ? AppTheme.primaryColor
+                            : AppTheme.textSecondary,
                       ),
-                    ),
-                    subtitle: Text(
-                      _trackTypeLabel(context, item.type),
-                      style: GoogleFonts.tajawal(
-                        color: AppTheme.textSecondary,
-                        fontSize: 12,
-                      ),
-                    ),
-                    onTap: () async {
-                      await ref
-                          .read(khatmaV2Provider.notifier)
-                          .setActiveListeningTrack(item.id);
-                      if (!context.mounted) return;
-                      Navigator.pop(sheetContext);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            _activeListeningTrackSetMessage(
-                              context,
-                              item.title,
-                            ),
-                            style: GoogleFonts.cairo(),
-                          ),
+                      title: Text(
+                        item.title,
+                        style: GoogleFonts.cairo(
+                          color: isActive
+                              ? AppTheme.primaryColor
+                              : Colors.white,
+                          fontWeight: isActive
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
-                      );
-                    },
+                      ),
+                      subtitle: Text(
+                        _trackTypeLabel(context, item.type),
+                        style: GoogleFonts.tajawal(
+                          color: AppTheme.textSecondary,
+                          fontSize: 12,
+                        ),
+                      ),
+                      onTap: () async {
+                        await ref
+                            .read(khatmaV2Provider.notifier)
+                            .setActiveListeningTrack(item.id);
+                        if (!context.mounted) return;
+                        Navigator.pop(sheetContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              _activeListeningTrackSetMessage(
+                                context,
+                                item.title,
+                              ),
+                              style: GoogleFonts.cairo(),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 }),
                 if (activeId != null) ...[

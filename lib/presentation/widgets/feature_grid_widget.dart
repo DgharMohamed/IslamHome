@@ -195,7 +195,9 @@ class _FeatureCardState extends State<_FeatureCard> {
           borderRadius: BorderRadius.circular(20),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            width: isWide ? null : 120, // Only fix width on mobile horizontal scroll
+            width: isWide
+                ? null
+                : 120, // Only fix width on mobile horizontal scroll
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             decoration: BoxDecoration(
               color: _isHovered
@@ -224,11 +226,15 @@ class _FeatureCardState extends State<_FeatureCard> {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: item.color.withValues(alpha: _isHovered ? 0.25 : 0.15),
+                    color: item.color.withValues(
+                      alpha: _isHovered ? 0.25 : 0.15,
+                    ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: item.color.withValues(alpha: _isHovered ? 0.5 : 0.3),
+                        color: item.color.withValues(
+                          alpha: _isHovered ? 0.5 : 0.3,
+                        ),
                         blurRadius: _isHovered ? 15 : 10,
                         spreadRadius: _isHovered ? 0 : -2,
                       ),

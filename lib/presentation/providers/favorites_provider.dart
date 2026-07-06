@@ -28,17 +28,25 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
   }
 
   Map<String, List<dynamic>> _getInitialFavorites() {
-    final categories = ['reciters', 'surahs', 'ayahs', 'playlists', 'hadiths', 'tafsir', 'seerah'];
+    final categories = [
+      'reciters',
+      'surahs',
+      'ayahs',
+      'playlists',
+      'hadiths',
+      'tafsir',
+      'seerah',
+    ];
     final Map<String, List<dynamic>> loadedState = {};
-    
+
     for (final category in categories) {
       final json = _box.get(category, defaultValue: '[]');
       loadedState[category] = jsonDecode(json);
     }
-    
+
     // Set up listener after state is initialized
     Future.microtask(() => _listenToCloudChanges(_auth.currentUser?.uid));
-    
+
     return loadedState;
   }
 
@@ -52,62 +60,65 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
 
     _cloudSubscription = _syncService
         .getUserCollectionStream('favorites', uid: uid)
-        .listen((snapshot) {
-      bool localUpdated = false;
-      final newState = Map<String, List<dynamic>>.from(state);
+        .listen(
+          (snapshot) {
+            bool localUpdated = false;
+            final newState = Map<String, List<dynamic>>.from(state);
 
-      for (var doc in snapshot.docs) {
-        final category = doc.id;
-        final cloudData = doc.data();
-        final List<dynamic> cloudList = cloudData['items'] ?? [];
-        
-        // Handle both ISO string and Firestore Timestamp
-        final cloudTimestampVal = cloudData['lastUpdated'];
-        final DateTime cloudTimestamp;
-        if (cloudTimestampVal is Timestamp) {
-          cloudTimestamp = cloudTimestampVal.toDate();
-        } else if (cloudTimestampVal is String) {
-          cloudTimestamp = DateTime.parse(cloudTimestampVal);
-        } else {
-          cloudTimestamp = DateTime.fromMillisecondsSinceEpoch(0);
-        }
-        
-        final localTimestampStr = _box.get('${category}_timestamp');
-        final localTimestamp = localTimestampStr != null 
-            ? DateTime.parse(localTimestampStr) 
-            : DateTime.fromMillisecondsSinceEpoch(0);
+            for (var doc in snapshot.docs) {
+              final category = doc.id;
+              final cloudData = doc.data();
+              final List<dynamic> cloudList = cloudData['items'] ?? [];
 
-        if (cloudTimestamp.isAfter(localTimestamp)) {
-          newState[category] = cloudList;
-          _box.put(category, jsonEncode(cloudList));
-          _box.put('${category}_timestamp', cloudTimestamp.toIso8601String());
-          localUpdated = true;
-        }
-      }
+              // Handle both ISO string and Firestore Timestamp
+              final cloudTimestampVal = cloudData['lastUpdated'];
+              final DateTime cloudTimestamp;
+              if (cloudTimestampVal is Timestamp) {
+                cloudTimestamp = cloudTimestampVal.toDate();
+              } else if (cloudTimestampVal is String) {
+                cloudTimestamp = DateTime.parse(cloudTimestampVal);
+              } else {
+                cloudTimestamp = DateTime.fromMillisecondsSinceEpoch(0);
+              }
 
-      if (localUpdated) {
-        state = newState;
-      }
-    }, onError: (Object error) {
-      debugPrint('FavoritesNotifier: cloud listener error: $error');
-    });
+              final localTimestampStr = _box.get('${category}_timestamp');
+              final localTimestamp = localTimestampStr != null
+                  ? DateTime.parse(localTimestampStr)
+                  : DateTime.fromMillisecondsSinceEpoch(0);
+
+              if (cloudTimestamp.isAfter(localTimestamp)) {
+                newState[category] = cloudList;
+                _box.put(category, jsonEncode(cloudList));
+                _box.put(
+                  '${category}_timestamp',
+                  cloudTimestamp.toIso8601String(),
+                );
+                localUpdated = true;
+              }
+            }
+
+            if (localUpdated) {
+              state = newState;
+            }
+          },
+          onError: (Object error) {
+            debugPrint('FavoritesNotifier: cloud listener error: $error');
+          },
+        );
   }
 
   Future<void> _syncToCloud(String category, List<dynamic> list) async {
     final now = DateTime.now();
     _box.put(category, jsonEncode(list));
     _box.put('${category}_timestamp', now.toIso8601String());
-    
+
     state = {...state, category: list};
 
     if (_auth.currentUser != null) {
       await _syncService.saveUserData(
         collection: 'favorites',
         docId: category,
-        data: {
-          'items': list,
-          'lastUpdated': now.toIso8601String(),
-        },
+        data: {'items': list, 'lastUpdated': now.toIso8601String()},
       );
     }
   }
@@ -361,9 +372,6 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
       final playlist = Playlist.fromJson(playlists[pIndex]);
       final items = List<PlaylistItem>.from(playlist.items);
 
-      if (oldIndex < newIndex) {
-        newIndex -= 1;
-      }
       final item = items.removeAt(oldIndex);
       items.insert(newIndex, item);
 
@@ -402,5 +410,5 @@ class FavoritesNotifier extends Notifier<Map<String, List<dynamic>>> {
 
 final favoritesProvider =
     NotifierProvider<FavoritesNotifier, Map<String, List<dynamic>>>(() {
-  return FavoritesNotifier();
-});
+      return FavoritesNotifier();
+    });

@@ -1396,6 +1396,43 @@
   "themeBlue": "Blue",
   "themeSepia": "Sepia",
   "themeNight": "Night",
-  "themeBlack": "Black"
+  "themeBlack": "Black",
+  "adhkarTasbeehSettingsTitle": "Adhkar & Tasbeeh Settings",
+  "adhkarTasbeehSettingsSubtitle": "Customize Adhkar times and daily Tasbeeh reminder",
+  "morningAdhkar": "Morning Adhkar",
+  "morningAdhkarEnable": "Enable Morning Adhkar Notifications",
+  "morningAdhkarOffset": "Alert after Fajr by",
+  "eveningAdhkar": "Evening Adhkar",
+  "eveningAdhkarEnable": "Enable Evening Adhkar Notifications",
+  "eveningAdhkarOffset": "Alert after Asr by",
+  "sleepAdhkar": "Sleep Adhkar",
+  "sleepAdhkarEnable": "Enable Sleep Adhkar Notifications",
+  "sleepAdhkarOffset": "Alert after Isha by",
+  "dailyTasbeeh": "Daily Tasbeeh",
+  "dailyTasbeehEnable": "Daily Tasbeeh Reminder (Streak)",
+  "dailyTasbeehEnableSubtitle": "Reminds you to do Tasbeeh if you haven't by the reminder time",
+  "reminderTime": "Reminder Time",
+  "minutes": "{count} minutes",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adhkarMorningNotificationTitle": "Morning Adhkar",
+  "adhkarMorningNotificationBody": "It's time for Morning Adhkar, protect yourself.",
+  "adhkarEveningNotificationTitle": "Evening Adhkar",
+  "adhkarEveningNotificationBody": "It's time for Evening Adhkar, don't forget the remembrance of Allah.",
+  "adhkarSleepNotificationTitle": "Sleep Adhkar",
+  "adhkarSleepNotificationBody": "End your day with Sleep Adhkar.",
+  "tasbeehStreakNotificationTitle": "Don't forget your daily Wird",
+  "tasbeehStreakNotificationBody": "Keep your Tasbeeh streak alive! 📿",
+  "shareAsText": "Share as Text",
+  "shareAsImage": "Share as Image",
+  "shareAsAudio": "Share as Audio",
+  "sharedFromApp": "Shared from Islam Home app",
+  "downloadingAudioForShare": "Downloading audio for sharing...",
+  "audioNeedsInternetToShare": "This audio needs an internet connection to be shared."
 }
 

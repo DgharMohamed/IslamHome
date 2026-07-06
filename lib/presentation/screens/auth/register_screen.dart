@@ -93,10 +93,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   String _getFriendlyErrorMessage(dynamic e) {
     final err = e.toString().toLowerCase();
-    if (err.contains('email-already-in-use')) return 'هذا البريد الإلكتروني مستخدم بالفعل';
+    if (err.contains('email-already-in-use')) {
+      return 'هذا البريد الإلكتروني مستخدم بالفعل';
+    }
     if (err.contains('weak-password')) return 'كلمة المرور ضعيفة جداً';
     if (err.contains('invalid-email')) return 'البريد الإلكتروني غير صالح';
-    if (err.contains('network-request-failed')) return 'لا يوجد اتصال بالإنترنت';
+    if (err.contains('network-request-failed')) {
+      return 'لا يوجد اتصال بالإنترنت';
+    }
     return 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة لاحقاً';
   }
 
@@ -115,7 +119,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height -
+              minHeight:
+                  MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top,
             ),
             child: IntrinsicHeight(
@@ -142,7 +147,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      widget.isUpgrading ? 'ربط الحساب بالسحابة' : 'إنشاء حساب جديد',
+                      widget.isUpgrading
+                          ? 'ربط الحساب بالسحابة'
+                          : 'إنشاء حساب جديد',
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
@@ -161,21 +168,31 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                                  color: AppTheme.primaryColor.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                      color: AppTheme.primaryColor.withValues(alpha: 0.2)),
+                                    color: AppTheme.primaryColor.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                  ),
                                 ),
                                 child: const Row(
                                   children: [
-                                    Icon(Icons.cloud_sync_rounded,
-                                        color: AppTheme.primaryColor, size: 20),
+                                    Icon(
+                                      Icons.cloud_sync_rounded,
+                                      color: AppTheme.primaryColor,
+                                      size: 20,
+                                    ),
                                     SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
                                         'سيتم نقل ختماتك وتسبيحاتك الحالية إلى حسابك الجديد تلقائياً.',
                                         style: TextStyle(
-                                            color: Colors.white70, fontSize: 13),
+                                          color: Colors.white70,
+                                          fontSize: 13,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -186,8 +203,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             controller: _nameController,
                             label: 'الاسم الكامل',
                             icon: Icons.person_outline_rounded,
-                            validator: (v) =>
-                                (v == null || v.isEmpty) ? 'يرجى إدخال الاسم' : null,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? 'يرجى إدخال الاسم'
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           AuthTextField(
@@ -216,7 +234,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               child: Text(
                                 _errorMessage!,
                                 style: const TextStyle(
-                                    color: Colors.redAccent, fontSize: 13),
+                                  color: Colors.redAccent,
+                                  fontSize: 13,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -224,7 +244,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             onPressed: (_isLoading || _isGoogleLoading)
                                 ? null
                                 : _handleRegister,
-                            text: widget.isUpgrading ? 'ربط الحساب' : 'إنشاء الحساب',
+                            text: widget.isUpgrading
+                                ? 'ربط الحساب'
+                                : 'إنشاء الحساب',
                             isLoading: _isLoading,
                           ),
                           const SizedBox(height: 20),

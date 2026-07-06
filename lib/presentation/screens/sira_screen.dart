@@ -109,7 +109,7 @@ class _SiraScreenState extends ConsumerState<SiraScreen> {
               ),
             ),
           ),
-          
+
           // Search Field
           SliverToBoxAdapter(
             child: Padding(
@@ -131,7 +131,9 @@ class _SiraScreenState extends ConsumerState<SiraScreen> {
               final filteredStages = stages.where((stage) {
                 final languageCode = isArabic ? 'ar' : 'en';
                 final title = stage.getTitle(languageCode).toLowerCase();
-                final description = stage.getDescription(languageCode).toLowerCase();
+                final description = stage
+                    .getDescription(languageCode)
+                    .toLowerCase();
                 final query = searchQuery.toLowerCase();
                 return title.contains(query) || description.contains(query);
               }).toList();
@@ -361,4 +363,3 @@ class _SiraScreenState extends ConsumerState<SiraScreen> {
     }
   }
 }
-

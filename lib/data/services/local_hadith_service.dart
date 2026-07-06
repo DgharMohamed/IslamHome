@@ -293,30 +293,28 @@ class LocalHadithService {
 
     allHadiths.forEach((book, hadiths) {
       results.addAll(
-        hadiths.where(
-          (hadith) {
-            // Match by number
-            final number = (hadith.number ?? '').toString();
-            if (number.contains(trimmed)) return true;
+        hadiths.where((hadith) {
+          // Match by number
+          final number = (hadith.number ?? '').toString();
+          if (number.contains(trimmed)) return true;
 
-            // Match by Arabic text (diacritics-tolerant)
-            if (hadith.arab != null &&
-                _normalizeForSearch(hadith.arab!).contains(normalizedQuery)) {
-              return true;
-            }
-            // Match by English text
-            if (hadith.english != null &&
-                _normalizeForSearch(hadith.english!).contains(normalizedQuery)) {
-              return true;
-            }
-            // Match by chapter
-            if (hadith.chapter != null &&
-                _normalizeForSearch(hadith.chapter!).contains(normalizedQuery)) {
-              return true;
-            }
-            return false;
-          },
-        ),
+          // Match by Arabic text (diacritics-tolerant)
+          if (hadith.arab != null &&
+              _normalizeForSearch(hadith.arab!).contains(normalizedQuery)) {
+            return true;
+          }
+          // Match by English text
+          if (hadith.english != null &&
+              _normalizeForSearch(hadith.english!).contains(normalizedQuery)) {
+            return true;
+          }
+          // Match by chapter
+          if (hadith.chapter != null &&
+              _normalizeForSearch(hadith.chapter!).contains(normalizedQuery)) {
+            return true;
+          }
+          return false;
+        }),
       );
     });
 

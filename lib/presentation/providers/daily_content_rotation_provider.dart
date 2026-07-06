@@ -152,10 +152,10 @@ const List<DailyVerse> _dailyVersesPool = <DailyVerse>[
 final rotatingDailyVerseProvider = FutureProvider<DailyVerse>((ref) async {
   final rotation = ref.watch(dailyContentRotationProvider);
   final syncService = ref.watch(firestoreSyncServiceProvider);
-  
+
   try {
     final cloudPool = await syncService.getDailyVerses();
-    
+
     if (cloudPool.isNotEmpty) {
       final index = rotation % cloudPool.length;
       final data = cloudPool[index];

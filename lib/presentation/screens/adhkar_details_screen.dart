@@ -176,7 +176,9 @@ class _DetailsBody extends ConsumerWidget {
                   // Arabic Primary
                   Text(
                     arText.isNotEmpty ? arText : enText,
-                    textAlign: arText.isNotEmpty ? TextAlign.right : TextAlign.left,
+                    textAlign: arText.isNotEmpty
+                        ? TextAlign.right
+                        : TextAlign.left,
                     style: TextStyle(
                       fontFamily: arText.isNotEmpty ? 'Cairo' : 'Montserrat',
                       fontSize: 28,
@@ -412,8 +414,7 @@ class _DetailsBody extends ConsumerWidget {
     return hasArabic || !hasLatin ? reference : null;
   }
 
-  bool _hasArabic(String text) =>
-      RegExp(r'[\u0600-\u06FF]').hasMatch(text);
+  bool _hasArabic(String text) => RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 
   bool _hasLatin(String text) => RegExp(r'[A-Za-z]').hasMatch(text);
 }

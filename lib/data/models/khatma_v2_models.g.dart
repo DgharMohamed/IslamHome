@@ -256,32 +256,33 @@ class RemediationStrategyAdapter extends TypeAdapter<RemediationStrategy> {
 // **************************************************************************
 
 KhatmaTrack _$KhatmaTrackFromJson(Map<String, dynamic> json) => KhatmaTrack(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      type: $enumDecode(_$KhatmaTypeEnumMap, json['type']),
-      schedulingMode:
-          $enumDecode(_$SchedulingModeEnumMap, json['schedulingMode']),
-      startDate: DateTime.parse(json['startDate'] as String),
-      targetDate: json['targetDate'] == null
-          ? null
-          : DateTime.parse(json['targetDate'] as String),
-      startPage: (json['startPage'] as num?)?.toInt() ?? 1,
-      endPage: (json['endPage'] as num?)?.toInt() ?? 604,
-      currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
-      unit: $enumDecodeNullable(_$KhatmaUnitEnumMap, json['unit']) ??
-          KhatmaUnit.page,
-      progress: (json['progress'] as Map<String, dynamic>?)?.map(
-            (k, e) => MapEntry(k, (e as num).toInt()),
-          ) ??
-          const {},
-      remediationLog: (json['remediationLog'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      lastUpdated: json['lastUpdated'] == null
-          ? null
-          : DateTime.parse(json['lastUpdated'] as String),
-    );
+  id: json['id'] as String,
+  title: json['title'] as String,
+  type: $enumDecode(_$KhatmaTypeEnumMap, json['type']),
+  schedulingMode: $enumDecode(_$SchedulingModeEnumMap, json['schedulingMode']),
+  startDate: DateTime.parse(json['startDate'] as String),
+  targetDate: json['targetDate'] == null
+      ? null
+      : DateTime.parse(json['targetDate'] as String),
+  startPage: (json['startPage'] as num?)?.toInt() ?? 1,
+  endPage: (json['endPage'] as num?)?.toInt() ?? 604,
+  currentPage: (json['currentPage'] as num?)?.toInt() ?? 1,
+  unit:
+      $enumDecodeNullable(_$KhatmaUnitEnumMap, json['unit']) ?? KhatmaUnit.page,
+  progress:
+      (json['progress'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, (e as num).toInt()),
+      ) ??
+      const {},
+  remediationLog:
+      (json['remediationLog'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  lastUpdated: json['lastUpdated'] == null
+      ? null
+      : DateTime.parse(json['lastUpdated'] as String),
+);
 
 Map<String, dynamic> _$KhatmaTrackToJson(KhatmaTrack instance) =>
     <String, dynamic>{

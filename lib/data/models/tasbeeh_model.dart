@@ -56,23 +56,24 @@ class TasbeehModel extends HiveObject {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'text': text,
-        'arabicText': arabicText,
-        'count': count,
-        'target': target,
-        'totalCount': totalCount,
-        'lastUpdated': lastUpdated?.toIso8601String(),
-      };
+    'id': id,
+    'text': text,
+    'arabicText': arabicText,
+    'count': count,
+    'target': target,
+    'totalCount': totalCount,
+    'lastUpdated': lastUpdated?.toIso8601String(),
+  };
 
   factory TasbeehModel.fromJson(Map<String, dynamic> json) => TasbeehModel(
-        id: json['id'],
-        text: json['text'],
-        arabicText: json['arabicText'],
-        count: json['count'] ?? 0,
-        target: json['target'] ?? 33,
-        totalCount: json['totalCount'] ?? 0,
-        lastUpdated: json['lastUpdated'] != null ? DateTime.parse(json['lastUpdated']) : null,
-      );
+    id: json['id'],
+    text: json['text'],
+    arabicText: json['arabicText'],
+    count: json['count'] ?? 0,
+    target: json['target'] ?? 33,
+    totalCount: json['totalCount'] ?? 0,
+    lastUpdated: json['lastUpdated'] != null
+        ? DateTime.parse(json['lastUpdated'])
+        : null,
+  );
 }
-

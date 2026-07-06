@@ -111,10 +111,10 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     if (visible.isEmpty) return;
 
     visible.sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
-    
+
     final isDesktop = ResponsiveUtils.isDesktop(context);
     final idx = visible.first.index;
-    
+
     int mushafPage;
     if (isDesktop && idx < _spreads.length) {
       mushafPage = _spreads[idx].first;
@@ -149,11 +149,11 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
 
     final mushafPage = quran.getPageNumber(surah, ayah);
     final isDesktop = ResponsiveUtils.isDesktop(context);
-    
-    final targetIndex = isDesktop 
+
+    final targetIndex = isDesktop
         ? (_mushafToSpreadIndex[mushafPage] ?? 0)
         : (_findVirtualIndexForAyah(surah, ayah));
-        
+
     final needsJump = !_isIndexVisible(targetIndex);
 
     if (needsJump) {
@@ -322,17 +322,19 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     // Group virtual pages by their physical Mushaf page number
     _mushafPageToVirtualPages.clear();
     for (final vp in _virtualPages) {
-      _mushafPageToVirtualPages.putIfAbsent(vp.mushafPageNumber, () => []).add(vp);
+      _mushafPageToVirtualPages
+          .putIfAbsent(vp.mushafPageNumber, () => [])
+          .add(vp);
     }
 
     // Build spreads (Page 1 centered, then 2-3, 4-5, etc.)
     _spreads.clear();
     _mushafToSpreadIndex.clear();
-    
+
     // Spread 0: Page 1
     _spreads.add([1]);
     _mushafToSpreadIndex[1] = 0;
-    
+
     for (var page = 2; page <= quran.totalPagesCount; page += 2) {
       final spread = [page];
       if (page + 1 <= quran.totalPagesCount) {
@@ -372,7 +374,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
 
     final fallbackPage = quran.getPageNumber(surahId, 1);
     final isDesktop = ResponsiveUtils.isDesktop(context);
-    
+
     if (isDesktop) {
       final spreadIdx = _mushafToSpreadIndex[fallbackPage];
       if (spreadIdx == null) return;
@@ -381,7 +383,10 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
       final targetVirtualIndex =
           _surahToVirtualIndex[surahId] ?? _mushafToVirtualIndex[fallbackPage];
       if (targetVirtualIndex == null) return;
-      _jumpToIndex(targetIndex: targetVirtualIndex, mushafPageNumber: fallbackPage);
+      _jumpToIndex(
+        targetIndex: targetVirtualIndex,
+        mushafPageNumber: fallbackPage,
+      );
     }
   }
 
@@ -390,7 +395,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
 
     final targetPage = pageNumber.clamp(1, quran.totalPagesCount);
     final isDesktop = ResponsiveUtils.isDesktop(context);
-    
+
     if (isDesktop) {
       final spreadIdx = _mushafToSpreadIndex[targetPage];
       if (spreadIdx == null) return;
@@ -398,7 +403,10 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     } else {
       final targetVirtualIndex = _mushafToVirtualIndex[targetPage];
       if (targetVirtualIndex == null) return;
-      _jumpToIndex(targetIndex: targetVirtualIndex, mushafPageNumber: targetPage);
+      _jumpToIndex(
+        targetIndex: targetVirtualIndex,
+        mushafPageNumber: targetPage,
+      );
     }
   }
 
@@ -408,10 +416,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     double alignment = 0.0,
   }) {
     if (_itemScrollController.isAttached) {
-      _itemScrollController.jumpTo(
-        index: targetIndex,
-        alignment: alignment,
-      );
+      _itemScrollController.jumpTo(index: targetIndex, alignment: alignment);
       _lastReportedPage = mushafPageNumber;
       widget.onPageChanged(mushafPageNumber);
       return;
@@ -450,7 +455,6 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     final mushafSettings = ref.watch(mushafSettingsProvider);
     final lastReadPos = ref.watch(lastReadPositionProvider).value;
 
-
     return NotificationListener<UserScrollNotification>(
       onNotification: (notification) {
         if (notification.direction != ScrollDirection.idle) {
@@ -465,13 +469,15 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
         builder: (context, constraints) {
           final isDesktop = ResponsiveUtils.isDesktop(context);
           final bool useSpread = isDesktop && constraints.maxWidth > 900;
-          
+
           return ScrollablePositionedList.builder(
             itemScrollController: _itemScrollController,
             itemPositionsListener: _itemPositionsListener,
             initialScrollIndex: _getInitialScrollIndex(),
             physics: const BouncingScrollPhysics(),
-            itemCount: useSpread ? (_spreads.length + 1) : (_virtualPages.length + 1),
+            itemCount: useSpread
+                ? (_spreads.length + 1)
+                : (_virtualPages.length + 1),
             itemBuilder: (context, index) {
               if (useSpread) {
                 if (index >= _spreads.length) {
@@ -489,7 +495,10 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                       children: pageNumbers.map((p) {
                         final vps = _mushafPageToVirtualPages[p] ?? [];
                         return Container(
-                          width: math.min(500, (constraints.maxWidth - 100) / 2), // Dynamic width for each page
+                          width: math.min(
+                            500,
+                            (constraints.maxWidth - 100) / 2,
+                          ), // Dynamic width for each page
                           margin: const EdgeInsets.symmetric(horizontal: 20),
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
@@ -505,14 +514,18 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: vps.map((vp) => _buildVirtualPage(
-                              vp,
-                              mushafTheme,
-                              playingAyah,
-                              selectedRiwaya,
-                              mushafSettings,
-                              lastReadPos,
-                            )).toList(),
+                            children: vps
+                                .map(
+                                  (vp) => _buildVirtualPage(
+                                    vp,
+                                    mushafTheme,
+                                    playingAyah,
+                                    selectedRiwaya,
+                                    mushafSettings,
+                                    lastReadPos,
+                                  ),
+                                )
+                                .toList(),
                           ),
                         );
                       }).toList(),
@@ -551,15 +564,11 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     bool showPageDecoration = false,
   }) {
     final quranPageNumber = virtualPage.mushafPageNumber;
-    
+
     final Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildPageHeader(
-          quranPageNumber,
-          virtualPage.segments,
-          mushafTheme,
-        ),
+        _buildPageHeader(quranPageNumber, virtualPage.segments, mushafTheme),
         const SizedBox(height: 12),
         Directionality(
           textDirection: TextDirection.rtl,
@@ -570,7 +579,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                 selectedRiwaya,
                 mushafTheme,
                 quranPageNumber,
-                mushafSettings.fontSizeScale,
+                mushafSettings,
               );
 
               return RichText(
@@ -583,8 +592,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                 softWrap: true,
                 strutStyle: StrutStyle(
                   fontFamily: mushafTextStyle.fontFamily,
-                  fontFamilyFallback:
-                      mushafTextStyle.fontFamilyFallback,
+                  fontFamilyFallback: mushafTextStyle.fontFamilyFallback,
                   fontSize: mushafTextStyle.fontSize,
                   height: mushafTextStyle.height,
                   forceStrutHeight: true,
@@ -600,6 +608,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                     mushafTheme,
                     mushafSettings.fontSizeScale,
                     lastReadPos,
+                    mushafTextStyle.fontFamily ?? 'Amiri',
                   ),
                 ),
               );
@@ -611,7 +620,9 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
 
     if (showPageDecoration) {
       return Container(
-        key: ValueKey('virtual_page_${virtualPage.mushafPageNumber}_${virtualPage.segments.first['start']}'),
+        key: ValueKey(
+          'virtual_page_${virtualPage.mushafPageNumber}_${virtualPage.segments.first['start']}',
+        ),
         decoration: BoxDecoration(
           color: mushafTheme.backgroundColor,
           border: Border(
@@ -631,7 +642,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
         ),
       );
     }
-    
+
     return content;
   }
 
@@ -703,6 +714,7 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     MushafTheme theme,
     double fontSizeScale,
     LastReadPosition? lastReadPos,
+    String fontFamily,
   ) {
     final spans = <InlineSpan>[];
 
@@ -720,13 +732,22 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
                 element: element,
                 theme: theme,
                 fontSizeScale: fontSizeScale,
+                fontFamily: fontFamily,
                 onTapSurahName: () => widget.onShowSurahInfo(surah, 1),
               ),
             ),
           );
 
           if (surah != 1 && surah != 9) {
-            spans.add(WidgetSpan(child: BismillahWidget(theme: theme, fontSizeScale: fontSizeScale)));
+            spans.add(
+              WidgetSpan(
+                child: BismillahWidget(
+                  theme: theme,
+                  fontSizeScale: fontSizeScale,
+                  fontFamily: fontFamily,
+                ),
+              ),
+            );
           }
           if (surah == 9) {
             spans.add(const WidgetSpan(child: SizedBox(height: 20)));
@@ -771,7 +792,9 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
           ),
         );
 
-        final isBookmarked = lastReadPos?.surahNumber == surah && lastReadPos?.ayahNumber == ayah;
+        final isBookmarked =
+            lastReadPos?.surahNumber == surah &&
+            lastReadPos?.ayahNumber == ayah;
 
         spans.add(
           WidgetSpan(
@@ -833,19 +856,28 @@ class QuranMushafViewState extends ConsumerState<QuranMushafView> {
     MushafRiwaya riwaya,
     MushafTheme theme,
     int pageNumber,
-    double fontSizeScale,
+    MushafSettings settings,
   ) {
     final isWarsh = riwaya.key == MushafRiwaya.warsh.key;
+    
+    // Use the user-selected display font if it's not the default (uthmanic_hafs).
+    // If the user hasn't changed the font (default), use the riwaya's own font.
+    final selectedFont = settings.selectedFont;
+    final bool isUsingCustomFont = selectedFont.id != 'uthmanic_hafs';
+    
+    final fontFamily = isUsingCustomFont ? selectedFont.fontFamily : riwaya.fontFamily;
+
     final fallback = isWarsh
         ? const ['UthmanicHafs', 'QalonUthmanic', 'Amiri']
         : const ['UthmanicHafs', 'Amiri'];
 
     return TextStyle(
       color: theme.textColor,
-      fontSize: _getFontSizeForPage(pageNumber) * fontSizeScale,
-      fontFamily: riwaya.fontFamily,
+      fontSize: _getFontSizeForPage(pageNumber) * settings.fontSizeScale,
+      fontFamily: fontFamily,
       fontFamilyFallback: fallback,
       height: isWarsh ? 1.9 : 1.95,
+      letterSpacing: 0.0,
     );
   }
 

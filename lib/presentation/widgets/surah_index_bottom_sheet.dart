@@ -106,56 +106,61 @@ class _SurahIndexBottomSheetState extends ConsumerState<SurahIndexBottomSheet> {
               ),
               itemBuilder: (context, index) {
                 final id = filteredSurahs[index];
-                return ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 4,
-                  ),
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: theme.secondaryColor.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
+                return Material(
+                  type: MaterialType.transparency,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
                     ),
-                    child: Text(
-                      '$id',
-                      style: TextStyle(
-                        color: theme.secondaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: theme.secondaryColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '$id',
+                        style: TextStyle(
+                          color: theme.secondaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                  title: Text(
-                    isEnglish
-                        ? QuranUtils.getSurahName(id, isEnglish: true)
-                        : quran.getSurahNameArabic(id),
-                    style: GoogleFonts.amiri(
-                      color: theme.textColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    title: Text(
+                      isEnglish
+                          ? QuranUtils.getSurahName(id, isEnglish: true)
+                          : quran.getSurahNameArabic(id),
+                      style: GoogleFonts.amiri(
+                        color: theme.textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  subtitle: Text(
-                    isEnglish
-                        ? '${quran.getSurahNameArabic(id)} • ${AppLocalizations.of(context)!.ayahsCount(quran.getVerseCount(id))}'
-                        : AppLocalizations.of(context)!.ayahsCount(quran.getVerseCount(id)),
-                    style: TextStyle(
-                      color: theme.textColor.withValues(alpha: 0.5),
-                      fontSize: 12,
+                    subtitle: Text(
+                      isEnglish
+                          ? '${quran.getSurahNameArabic(id)} • ${AppLocalizations.of(context)!.ayahsCount(quran.getVerseCount(id))}'
+                          : AppLocalizations.of(
+                              context,
+                            )!.ayahsCount(quran.getVerseCount(id)),
+                      style: TextStyle(
+                        color: theme.textColor.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
                     ),
+                    trailing: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: theme.textColor.withValues(alpha: 0.3),
+                    ),
+                    onTap: () {
+                      widget.onSurahSelected?.call(id);
+                      Navigator.pop(context, id);
+                    },
                   ),
-                  trailing: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 14,
-                    color: theme.textColor.withValues(alpha: 0.3),
-                  ),
-                  onTap: () {
-                    widget.onSurahSelected?.call(id);
-                    Navigator.pop(context, id);
-                  },
                 );
               },
             ),

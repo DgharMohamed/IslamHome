@@ -342,13 +342,19 @@ class _HadithScreenState extends ConsumerState<HadithScreen> {
                   final filteredHadiths = hadiths.where((h) {
                     final query = searchQuery.trim();
                     if (query.isEmpty) return true;
-                    
+
                     final numberStr = (h.number ?? '').toString();
                     if (numberStr.contains(query)) return true;
 
-                    final matchAr = QuranUtils.matchesSearch(h.arab ?? '', query);
-                    final matchEn = QuranUtils.matchesSearch(h.english ?? '', query);
-                    
+                    final matchAr = QuranUtils.matchesSearch(
+                      h.arab ?? '',
+                      query,
+                    );
+                    final matchEn = QuranUtils.matchesSearch(
+                      h.english ?? '',
+                      query,
+                    );
+
                     return matchAr || matchEn;
                   }).toList();
 

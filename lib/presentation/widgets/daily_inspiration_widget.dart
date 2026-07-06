@@ -109,7 +109,9 @@ class _HadithCard extends ConsumerWidget {
         final rawContent = isArabic
             ? (hadith.arab ?? hadith.english ?? '')
             : (hadith.english ?? hadith.arab ?? '');
-        final content = rawContent.replaceAll(RegExp(r'<br\s*?/?>'), '\n').trim();
+        final content = rawContent
+            .replaceAll(RegExp(r'<br\s*?/?>'), '\n')
+            .trim();
         final subtitle = '${hadith.book ?? ''} - ${hadith.number ?? ''}';
 
         return _BaseCard(

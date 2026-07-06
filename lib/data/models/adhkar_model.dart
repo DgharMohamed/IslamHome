@@ -95,7 +95,8 @@ class AdhkarModel extends HiveObject {
       reference: reference,
       repeat: repeat < 1 ? 1 : repeat,
       favorite: json['favorite'] == true,
-      textArWithoutDiacritics: json['text_without_diacritical']?.toString() ?? '',
+      textArWithoutDiacritics:
+          json['text_without_diacritical']?.toString() ?? '',
     );
   }
 
@@ -133,7 +134,8 @@ class AdhkarModel extends HiveObject {
       reference: reference ?? this.reference,
       repeat: repeat ?? this.repeat,
       favorite: favorite ?? this.favorite,
-      textArWithoutDiacritics: textArWithoutDiacritics ?? this.textArWithoutDiacritics,
+      textArWithoutDiacritics:
+          textArWithoutDiacritics ?? this.textArWithoutDiacritics,
     );
   }
 

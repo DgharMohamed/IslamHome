@@ -143,48 +143,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final isWideLayout = constraints.maxWidth >= 900;
         if (isWideLayout) {
           return Scaffold(
-        extendBodyBehindAppBar: true,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const HomeHeaderWidget(),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Main Area: Feature Grid
-                    const Expanded(
-                      flex: 3,
-                      child: FeatureGridWidget(),
+            extendBodyBehindAppBar: true,
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const HomeHeaderWidget(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 32,
                     ),
-                    const SizedBox(width: 32),
-                    // Sidebar Area: Daily Tools
-                    Expanded(
-                      flex: 1,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 450, minWidth: 300),
-                        child: const Column(
-                          children: [
-                            KhatmaDashboardCard(),
-                            SizedBox(height: 24),
-                            DailyInspirationWidget(),
-                            SizedBox(height: 24),
-                            SpiritualMoodsWidget(),
-                          ],
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Main Area: Feature Grid
+                        const Expanded(flex: 3, child: FeatureGridWidget()),
+                        const SizedBox(width: 32),
+                        // Sidebar Area: Daily Tools
+                        Expanded(
+                          flex: 1,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 450,
+                              minWidth: 300,
+                            ),
+                            child: const Column(
+                              children: [
+                                KhatmaDashboardCard(),
+                                SizedBox(height: 24),
+                                DailyInspirationWidget(),
+                                SizedBox(height: 24),
+                                SpiritualMoodsWidget(),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 100),
+                ],
               ),
-              const SizedBox(height: 100),
-            ],
-          ),
-        ),
-      );
+            ),
+          );
         }
-        
+
         // Mobile/Tablet layout
         return const Scaffold(
           extendBodyBehindAppBar: true,

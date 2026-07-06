@@ -93,29 +93,35 @@ class _PrayerMethodSelectionScreenState
                               });
                             },
                             borderRadius: BorderRadius.circular(16),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 4,
-                              ),
-                              title: Text(
-                                PrayerMethod.getLocalizedName(method.id, l10n),
-                                style: GoogleFonts.cairo(
-                                  fontSize: 15,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: isSelected
-                                      ? AppTheme.primaryColor
-                                      : Colors.white,
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 4,
                                 ),
+                                title: Text(
+                                  PrayerMethod.getLocalizedName(
+                                    method.id,
+                                    l10n,
+                                  ),
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 15,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? AppTheme.primaryColor
+                                        : Colors.white,
+                                  ),
+                                ),
+                                trailing: isSelected
+                                    ? const Icon(
+                                        Icons.check_circle,
+                                        color: AppTheme.primaryColor,
+                                      )
+                                    : null,
                               ),
-                              trailing: isSelected
-                                  ? const Icon(
-                                      Icons.check_circle,
-                                      color: AppTheme.primaryColor,
-                                    )
-                                  : null,
                             ),
                           ),
                         ),

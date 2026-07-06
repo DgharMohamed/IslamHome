@@ -31,7 +31,7 @@ class AdhkarItemCard extends StatelessWidget {
     final double progress = remainingCount != null && item.repeat > 0
         ? 1.0 - (remainingCount! / item.repeat)
         : 0.0;
-        
+
     // Fix flex issue if progress is exactly 0 or 1
     final int progressFlex = (progress * 1000).toInt();
     final int remainingFlex = ((1 - progress) * 1000).toInt();
@@ -55,15 +55,12 @@ class AdhkarItemCard extends StatelessWidget {
                         ),
                       ),
                     if (remainingFlex > 0)
-                      Expanded(
-                        flex: remainingFlex,
-                        child: const SizedBox(),
-                      ),
+                      Expanded(flex: remainingFlex, child: const SizedBox()),
                   ],
                 ),
               ),
             ),
-            
+
           GlassContainer(
             borderRadius: 20,
             opacity: 0.04,
@@ -106,10 +103,14 @@ class AdhkarItemCard extends StatelessWidget {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
-                                      fontFamily: isEnglish ? 'Montserrat' : 'Cairo',
+                                      fontFamily: isEnglish
+                                          ? 'Montserrat'
+                                          : 'Cairo',
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
-                                      color: AppTheme.primaryColor.withValues(alpha: 0.9),
+                                      color: AppTheme.primaryColor.withValues(
+                                        alpha: 0.9,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -124,10 +125,14 @@ class AdhkarItemCard extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withValues(alpha: 0.15),
+                              color: AppTheme.primaryColor.withValues(
+                                alpha: 0.15,
+                              ),
                               borderRadius: BorderRadius.circular(99),
                               border: Border.all(
-                                color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                                color: AppTheme.primaryColor.withValues(
+                                  alpha: 0.3,
+                                ),
                               ),
                             ),
                             child: Row(
@@ -156,9 +161,9 @@ class AdhkarItemCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Text Content
                       if (isEnglish && enText.isNotEmpty) ...[
                         // English Primary
@@ -200,7 +205,7 @@ class AdhkarItemCard extends StatelessWidget {
                           ),
                         ),
                       ],
-                      
+
                       // Category Tag (if enabled)
                       if (showCategory) ...[
                         const SizedBox(height: 16),
@@ -283,8 +288,7 @@ class AdhkarItemCard extends StatelessWidget {
     }
   }
 
-  bool _hasArabic(String text) =>
-      RegExp(r'[\u0600-\u06FF]').hasMatch(text);
+  bool _hasArabic(String text) => RegExp(r'[\u0600-\u06FF]').hasMatch(text);
 
   bool _hasLatin(String text) => RegExp(r'[A-Za-z]').hasMatch(text);
 }

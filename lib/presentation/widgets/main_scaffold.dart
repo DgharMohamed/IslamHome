@@ -80,7 +80,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                   NavigationRail(
                     extended: ResponsiveUtils.isDesktop(context),
                     backgroundColor: const Color(0xFF0F172A),
-                    indicatorColor: AppTheme.primaryColor.withValues(alpha: 0.15),
+                    indicatorColor: AppTheme.primaryColor.withValues(
+                      alpha: 0.15,
+                    ),
                     leading: ResponsiveUtils.isDesktop(context)
                         ? Padding(
                             padding: const EdgeInsets.all(24.0),
@@ -89,8 +91,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primaryColor
-                                        .withValues(alpha: 0.1),
+                                    color: AppTheme.primaryColor.withValues(
+                                      alpha: 0.1,
+                                    ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Icon(
@@ -397,9 +400,7 @@ class _DetailPane extends StatelessWidget {
           ),
         ],
       ),
-      child: ClipRect(
-        child: child,
-      ),
+      child: ClipRect(child: child),
     );
   }
 }

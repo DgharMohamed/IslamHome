@@ -9,8 +9,36 @@ import 'package:islam_home/data/models/khatma_v2_models.dart';
 /// The unique task name for the periodic Adhan reschedule job.
 const String kAdhanRescheduleTaskName = 'adhan_reschedule_task';
 
-/// The unique task name for the one-shot Adhan reschedule job (used on boot).
 const String kAdhanRescheduleOneshotName = 'adhan_reschedule_oneshot';
+
+/// Applies a minute offset to all prayer time strings in a timings map.
+Map<String, String> _applyOffset(
+  Map<String, String> timings,
+  int offsetMinutes,
+) {
+  final Map<String, String> adjusted = Map.from(timings);
+  adjusted.forEach((key, value) {
+    try {
+      final parts = value.split(':');
+      if (parts.length == 2) {
+        final int h = int.parse(parts[0]);
+        final int m = int.parse(parts[1]);
+        final dateTime = DateTime(
+          2000,
+          1,
+          1,
+          h,
+          m,
+        ).add(Duration(minutes: offsetMinutes));
+        adjusted[key] =
+            '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+      }
+    } catch (e) {
+      debugPrint('Error adjusting timing $key: $e');
+    }
+  });
+  return adjusted;
+}
 
 /// Top-level callback required by workmanager.
 /// This runs in an ISOLATED background isolate — no BuildContext, no providers.
@@ -32,15 +60,20 @@ void callbackDispatcher() {
       final box = Hive.box('settings');
 
       // Check if Adhan is globally enabled — if not, nothing to schedule
-      final isAthanEnabled = box.get('athan_global_enabled', defaultValue: true);
+      final isAthanEnabled = box.get(
+        'athan_global_enabled',
+        defaultValue: true,
+      );
       if (!isAthanEnabled) {
         debugPrint('🔄 BackgroundWorker: Adhan disabled, skipping reschedule');
         return true;
       }
 
       // Read location from saved settings
-      final lat = (box.get('prayer_lat', defaultValue: 34.0209) as num).toDouble();
-      final lng = (box.get('prayer_lng', defaultValue: -6.8416) as num).toDouble();
+      final lat = (box.get('prayer_lat', defaultValue: 34.0209) as num)
+          .toDouble();
+      final lng = (box.get('prayer_lng', defaultValue: -6.8416) as num)
+          .toDouble();
 
       // Read per-prayer enabled states
       final enabledPrayers = <String, bool>{
@@ -51,10 +84,13 @@ void callbackDispatcher() {
         'Isha': box.get('athan_enabled_Isha', defaultValue: true) as bool,
       };
 
-      final isPreReminderEnabled = box.get(
-        'athan_pre_reminders_enabled',
-        defaultValue: false,
-      ) as bool;
+      final methodId =
+          box.get('prayer_calculation_method', defaultValue: 3) as int;
+      final offsetMinutes =
+          box.get('prayer_adjustment_minutes', defaultValue: 0) as int;
+
+      final isPreReminderEnabled =
+          box.get('athan_pre_reminders_enabled', defaultValue: false) as bool;
       final reminderMinutes =
           box.get('athan_reminder_minutes', defaultValue: 15) as int;
 
@@ -68,9 +104,17 @@ void callbackDispatcher() {
           latitude: lat,
           longitude: lng,
           date: date,
+          methodId: methodId,
         );
         if (result.timings != null) {
-          multiDayTimings[date] = result.timings!;
+          if (offsetMinutes != 0) {
+            multiDayTimings[date] = _applyOffset(
+              result.timings!,
+              offsetMinutes,
+            );
+          } else {
+            multiDayTimings[date] = result.timings!;
+          }
         }
       }
 
@@ -110,7 +154,9 @@ void callbackDispatcher() {
           await Hive.openBox<KhatmaTrack>('khatma_tracks_box');
         }
         final khatmaBox = Hive.box<KhatmaTrack>('khatma_tracks_box');
-        final activeTracks = khatmaBox.values.where((t) => t.overallProgress < 1.0).toList();
+        final activeTracks = khatmaBox.values
+            .where((t) => t.overallProgress < 1.0)
+            .toList();
 
         if (activeTracks.isNotEmpty) {
           // If the user has active tracks, send a daily reminder

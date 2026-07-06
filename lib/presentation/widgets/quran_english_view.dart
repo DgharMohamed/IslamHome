@@ -433,7 +433,8 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
                     ),
                   ),
                 ),
-                if (lastReadPos?.surahNumber == surah && lastReadPos?.ayahNumber == ayah)
+                if (lastReadPos?.surahNumber == surah &&
+                    lastReadPos?.ayahNumber == ayah)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: Icon(
@@ -471,7 +472,7 @@ class QuranEnglishViewState extends ConsumerState<QuranEnglishView> {
               child: Text(
                 quran.getVerse(surah, ayah, verseEndSymbol: false),
                 style: TextStyle(
-                  color: theme.textColor.withValues(alpha:0.97),
+                  color: theme.textColor.withValues(alpha: 0.97),
                   fontSize: 26 * fontSizeScale,
                   height: 1.8,
                   fontFamily: selectedRiwaya.fontFamily,
